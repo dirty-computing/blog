@@ -18,6 +18,9 @@ twitter_username: jekyllrb
 github_username:  jekyll
 gitlab_username:  pages
 
+plugins:
+  - jekyll-katex
+
 # Outputting
 permalink: /:categories/:year/:month/:day/:title
 
