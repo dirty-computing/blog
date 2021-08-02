@@ -5,6 +5,7 @@ variables:
   LC_ALL: C.UTF-8
 
 before_script:
+  - apk install gcc g++ make
   - gem install bundler
   - bundle install
 
