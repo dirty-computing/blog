@@ -198,6 +198,9 @@ Isso gera:
 
 Bacana, né? Infelizmente não encontrei um jeito mais direto, mas também não é uma volta muito grande.
 
+> A versão atual de como faço a linkagem foi ligeiramente alterada; para maiores curiosidades e motivos
+> sobre isso, se referir ao [post sobre isso]({% post_url 2021-09-12-base-assets %})
+
 # Imprimindo Liquid literal
 
 Para explicar como eu consegui imprimir as informações 
