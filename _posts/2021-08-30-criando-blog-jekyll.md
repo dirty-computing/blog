@@ -2,6 +2,7 @@
 layout: post
 title: "Criando o blog com Jekyll no GitLab"
 author: "Jefferson Quesado"
+tags: meta jekyll liquid ruby gitlab-ci
 ---
 
 O primeiro passo para isso foi de fato pegar o exemplo do GitLab. Porém, o template
