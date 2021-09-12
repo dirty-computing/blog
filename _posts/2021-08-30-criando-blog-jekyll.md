@@ -218,7 +218,7 @@ Bem, eu caminhei por algumas alternativas antes...
 2. tentei capturar com [`{{ "%7B%25 capture var %25%7D" | url_decode }}`](https://shopify.github.io/liquid/tags/variable/#capture),
    mas ainda assim precisei depois fazer tratativas de substituição
 3. pegar uma string com escapes URL e mandar pro filtro `url_decode`, como em
-   `{{ "%7B%7B %22%257B%2525 raw %25257D%22 %7C url_decode %7D%7D" | url_decode }}`, que gera `{{ "%7B%25 raw %25%7D" | url_decode }}`
+   `{{ "%7B%7B %22%257B%2525 raw %2525%257D%22 %7C url_decode %7D%7D" | url_decode }}`, que gera `{{ "%7B%25 raw %25%7D" | url_decode }}`
 
 A última alternativa se mostrou a mais fácil de tratar e expandir. Quando preciso imprimir informações sobre a tag, só aumentar
 a quantidade de escapes URL.
