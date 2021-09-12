@@ -2,6 +2,7 @@
 layout: post
 title: "Criando o blog com Jekyll no GitLab"
 author: "Jefferson Quesado"
+base-assets: "/assets/criando-blog/"
 tags: meta jekyll liquid ruby gitlab-ci
 ---
 
@@ -113,7 +114,7 @@ Isso permite que se consiga fazer o deploy do blog, e agora?
 
 A primeira coisa que pude perceber é que o CSS estava completamente desformatado:
 
-![Print CSS quebrado]({{ "/assets/criando-blog/screen-css-quebrado.png" | relative_url }})
+![Print CSS quebrado]({{ page.base-assets | append: "screen-css-quebrado.png" | relative_url }})
 
 Mas, onde poderia ter quebrado o link do CSS?
 
@@ -155,7 +156,7 @@ url: "https://computaria.gitlab.io" # the base hostname & protocol for your site
 
 Ao subir essas mudanças:
 
-![Print CSS quebrado]({{ "/assets/criando-blog/screen-css-ok.png" | relative_url }})
+![Print CSS OK]({{ page.base-assets | append: "screen-css-ok.png" | relative_url }})
 
 # Adicionando assets visuais
 
@@ -187,13 +188,13 @@ Então, será que podemos usar isso dentro do próprio markdown? Bem, por que n�
 
 {% raw %}
 ```md
-> ![Print CSS quebrado]({{ "/assets/criando-blog/screen-css-ok.png" | relative_url }})
+> ![Print CSS OK]({{ "/assets/criando-blog/screen-css-ok.png" | relative_url }})
 ```
 {% endraw %}
 
 Isso gera:
 
-> ![Print CSS quebrado]({{ "/assets/criando-blog/screen-css-ok.png" | relative_url }})
+> ![Print CSS OK]({{ page.base-assets | append: "screen-css-ok.png" | relative_url }})
 
 Bacana, né? Infelizmente não encontrei um jeito mais direto, mas também não é uma volta muito grande.
 
