@@ -3,7 +3,7 @@ layout: post
 title: "Desenhando com Python e tartarugas"
 author: "Jefferson Quesado"
 base-assets: "/assets/desenhos-python-turtle/"
-tag: python tartaruga
+tags: python tartaruga
 ---
 
 Senti a necessidade de fazer alguns desenhos para fazer a explicação sobre
