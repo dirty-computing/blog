@@ -161,14 +161,13 @@ AAABBBCCC
 ```
 
 Onde a seta para baixo mostra a cabeça de leitura da Máquina de Turing. O estado está indicado acima da cabeça de
-leitura, no caso, $q_i$. Símbolos em branco à esquerda ou à direita serão omitidos exceto quando proveitoso (indicado
-por `X` em uma linha abaixo). Por exemplo, a máquina está na estado $q_j$ dois espaços em branco antes da entrada:
+leitura, no caso, $q_i$. Símbolos em branco à esquerda ou à direita serão omitidos ou motrados conforme proveito. Por exemplo,
+a máquina está na estado $q_j$ dois espaços em branco antes da entrada:
 
 ```
 qj
 V
   AAABBBCCC
-XX
 ```
 
 Bem, na simulação da autômato de fila, apenas mantemos a fila e o estado da máquina, sem maiores indicações. Isso permite,
@@ -369,8 +368,7 @@ até chegarmos em
 ```
          qt
          V
-AAABBBCCC
-         X
+AAABBBCCC 
 ```
 
 {% katexmm %}
@@ -398,7 +396,6 @@ e finalmente iremos ultrapassar o início da entrada:
 qi
 V
  AAABBBCCC$
-X
 ```
 
 {% katexmm %}
@@ -439,7 +436,6 @@ AAABBBCCC
 qg
 V
  AAABBBCCC
-X
 ```
 
 ```
@@ -475,7 +471,6 @@ V
  q0'
  V
  AAABBBCCC$
-X
 ```
 
 {% katexmm %}
