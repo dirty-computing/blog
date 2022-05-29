@@ -1,9 +1,9 @@
 ---
 layout: post
-title: "Uma demonstração de que Autômatos de Fila equivalem a Máquinas de Turing em poder computacional"
+title: "Uma demonstração de que Autômatos de Fila equivalem a Máquinas de Turing em poder computacional, parte 1"
 author: "Jefferson Quesado"
 tags: computação-teórica autômatos matemática
-base-assets: "/assets/automato-fila-equiv-mt"
+base-assets: "/assets/automato-fila-equiv-mt-pt1/"
 ---
 
 O objetivo aqui é fazer um Autômato de Fila que consiga emular o funcionamento de uma
@@ -11,8 +11,13 @@ Máquina de Turing. Assumindo o teorema de que Máquinas de Turing são capazes 
 qualquer computação, a tarefa estaria completa. Porém, a primeira demonstração aqui será
 mostrando que existe um algoritmo que transforma um Autômato de Fila em uma Máquina de Turing.
 
+Essa demonstração será feita em duas partes. Nesta primeira parte, iremos simular um autômato de fila
+através de uma máquina de Turing. Na segunda parte, iremos simular uma máquina de Turing através
+de um autômato de fila;
+
 Antes de podermos prosseguir, precisamos antes estabelecer algumas definições do que é cada
-um desses autômatos, funções de transição e aceitação de entradas.
+um desses autômatos, funções de transição e aceitação de entradas. Assim, daremos o fundamento
+necessário para as duas partes desta demonstração.
 
 # Definições
 
@@ -656,7 +661,7 @@ $$
 \end{array}
 $$
 
-Todas as transições $\delta\epsilon$ geram exatamente um único caracter na saída, portanto temos
+Todas as transições $\delta_\Omega$ geram exatamente um único caracter na saída, portanto temos
 que $Q_{\Omega^{2+}} = \emptyset$, portanto:
 
 $$
@@ -756,11 +761,36 @@ $$
 	(\chi(q_a), A)&\mapsto&(q_{t_A}, \tau(q_a), \Rightarrow)\\
 	(\chi(q_b), B)&\mapsto&(q_{t_B}, \tau(q_b), \Rightarrow)\\
 	(\chi(q_c), C)&\mapsto&(q_{t_C}, \tau(q_c), \Rightarrow)\\
-	(\chi(q_c), C)&\mapsto&(q_{t_\$}, \tau(q_0), \Rightarrow)\\
+	(\chi(q_c), \$)&\mapsto&(q_{t_\$}, \tau(q_0), \Rightarrow)\\
 \end{array}
 $$
 
+Das transições terminadoras, que levam a $q_f$:
+
+$$
+\begin{array}{lcl}
+	(\chi(q_0), b)&\mapsto&(q_f, b, \Rightarrow)\\
+	(\chi(q_a), b)&\mapsto&(q_f, b, \Rightarrow)\\
+	(\chi(q_b), b)&\mapsto&(q_f, b, \Rightarrow)\\
+	(\chi(q_c), b)&\mapsto&(q_f, b, \Rightarrow)\\
+\end{array}
+$$
+
+Assim, conseguimos escrever uma Máquina de Turing que consegue simular o comportamento de um autômato de fila.
+
+Eis a execução para o reconhecimento de $AAABBBCCC$:
+
+> aqui, estou usando `0` para representar $\tau(q_0)$, `a` para representar $\tau(q_a)$, `b` para representar $\tau(q_b)$,
+> `c` para representar $\tau(q_c)$ na fita. Estados do tipo $\chi(q_x)$ são representados simplesmente como $qx$.
 {% endkatexmm %}
+
+
+![Máquina de Turing emulando o comportamento de um autômato de fila reconhecendo a palavra AAABBBCCC]({{ page.base-assets | append: "mt-af-AAABBBCCC.gif" | relative_url }})
 
 {% katexmm %}
 {% endkatexmm %}
+
+----------
+
+Com isso, terminamos a primeira parte desta demonstração. O próximo passo é provar que podemos usar autômatos de fila para rodar
+máquinas de Turing, não importa o quão complicadas elas sejam.
