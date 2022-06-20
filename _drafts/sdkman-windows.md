@@ -116,8 +116,8 @@ terminal outro dia. Apelidei-o de `source-zerante`. Ele precisa lidar com a remo
 
 ```bash
 (
+	PATH="${PATH/:?c?Program Files (x86)?Gow?bin:/:}"
 	export HOME="`pwd`"
-	export PATH="${PATH/:?c?Program Files (x86)?Gow?bin:/:}"
 
 	remove-sdkman-from-1path() {
 		echo "$1" | sed -E 's/(^|:)[^:]*\.sdkman[^:]*:/\1/'
@@ -144,9 +144,11 @@ Abri um novo terminal, naveguei até a pasta de testes e fiz o `source source-ze
 
 # Pré-requisitos
 
-Basicamente, precisa ter instalado o `git-bash`.
+Precisa ter instalado o `git-bash`. Particularmente recomendo usar como GUI (interface com usuário gráfica) para o Git o Git Extensions.
 
 # Instalando o Sdkman!, happy ending
+
+Siga
 
 # Problemas comuns na instalação
 

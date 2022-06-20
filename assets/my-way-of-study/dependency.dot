@@ -1,0 +1,8 @@
+digraph problem {
+	rankdir=LR
+	source -> exec[label="compila para"]
+	exec -> out[label="gera saída"]
+	in -> out[label="fornecido ao exec"]
+	out -> diff[label="entrada do diff"]
+	res -> diff[label="entrada do diff"]
+}
