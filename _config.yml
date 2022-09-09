@@ -27,4 +27,4 @@ permalink: /:categories/:year/:month/:day/:title
 
 # Build settings
 markdown: kramdown
-exclude: ["README.md", "bin/"]
+exclude: ["README.md", "bin/", "Makefile"]
