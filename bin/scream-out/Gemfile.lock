@@ -1,0 +1,23 @@
+PATH
+  remote: .
+  specs:
+    scream-out (0.0.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    mercenary (0.4.0)
+    nokogiri (1.13.8-x64-mingw32)
+      racc (~> 1.4)
+    racc (1.6.0)
+
+PLATFORMS
+  x64-mingw32
+
+DEPENDENCIES
+  mercenary
+  nokogiri
+  scream-out!
+
+BUNDLED WITH
+   2.2.25

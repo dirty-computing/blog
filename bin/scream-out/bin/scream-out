@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+require 'scream-out'
+require 'mercenary'
+
+Mercenary.program("scream-out") do |p|
+    p.description "grita em um canal do Discord os últimos posts de um RSS que batem com o último git commit"
+    p.version ScreamOut::VERSION
+    p.syntax "scream-out [options] <discord-webhook>"
+    p.option "feed_path", "--feed-path PATH", "Caminho para o feed, sobrescrever env var FEED_PATH"
+    p.option "git", "-g PATH", "--git PATH", "Caminho para o repositório git, padrão é diretório atual"
+    p.option "verboso", "-V", "--verbose", "Verbosidade"
+
+    p.action do |args, options|
+        puts "imprimindo os args: #{args}"
+        puts "imprimindo os args: #{options}"
+
+        if args.empty?
+            puts "Esperava o webhook"
+            abort
+        end
+        ScreamOut::oi if args[0] == 'oi'
+    end
+end
