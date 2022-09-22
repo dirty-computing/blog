@@ -22,7 +22,8 @@ Aqui um índice para que você possa navegar para a parte adequada:
 1. [Problemas comuns na instalação](#problemas-comuns-na-instalação)
    1. [zip](#zip)
    1. [nome de usuário com espaços e acentos](#nome-de-usuário-com-espaços-e-acentos)
-1. Testando para garantir que tudo funciona
+1. [Testando para garantir que tudo funciona](#testando-para-garantir-que-tudo-funciona)
+1. [O que é o comando `sdk` afinal?](#o-que-é-o-comando-sdk-afinal)
 
 # Zerando meu ambiente
 
