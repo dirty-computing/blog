@@ -3,6 +3,7 @@ layout: post
 title: "Qual é a diferença entre socket e porta?"
 author: "Jefferson Quesado"
 tags: conceito redes ipc
+base-assets: /assets/porta-socket/
 ---
 
 > Baseado na minha resposta sobre
@@ -74,7 +75,7 @@ comunicação. Ela prevê dois tipos de sockets comumente usados:
 
 Ambos são pontos de conexão para se realizar [IPC](https://pt.stackoverflow.com/q/211430/64969) e são usados da mesma maneira: lê-se e escreve-se dados. A diferença entre os dois sockets é com quem a comunicação será feita. Sockets Unix são para conexões dentro do mesmo computador (como _pipes_), já sockets de rede são para computadores em rede.
 
-[plugue-porco]: https://ae01.alicdn.com/kf/HTB12WDFRpXXXXXhXFXXq6xXFXXXa/Criativo-LED-Controle-Inteligente-de-Luz-Bonito-do-Porco-Plugue-Luz-Da-Noite-de-Multi-fun.jpg
+[plugue-porco]: {{ page.base-assets | append: "porco.jpg" | relative_url }}
 [wiki-computerport]: https://en.wikipedia.org/wiki/Computer_port_(hardware)
 [a-jsbueno]: https://pt.stackoverflow.com/a/277762/64969
 [berk-soc]: https://en.wikipedia.org/wiki/Berkeley_sockets
