@@ -13,7 +13,7 @@ Bem, vamos lá... Como calcular o comprimento desse barbante?
 
 # O problema
 
-Um basbante é colado de modo simestricamente perfeito ao redor de um cilindro. Esse barbante dá exatas quatro voltas da base do cilindro até o seu topo.
+Um barbante é colado de modo simestricamente perfeito ao redor de um cilindro. Esse barbante dá exatas quatro voltas da base do cilindro até o seu topo.
 A circunferência do cilindro é 4cm e seu comprimento é 12cm. Qual o comprimento do cilindro?
 
 # Estratégias de solução
