@@ -285,7 +285,7 @@ $$
   em $F(v)$ fosse $v$
 - Reduzi o problema para um problema de comprimento de arco
 - Relembrei a fórmula para achar o comprimento de arco de uma função
-  $\mathbb{R}\mapsto\mathbb{N}^n$
+  $\mathbb{R}\mapsto\mathbb{R}^n$
 - Apliquei a fórmula de comprimento de arco na curva achada anteriormente
 - Foi usada a identidade pitagórica que descreve que $\sin^2 x + \cos^2 x = 1$
   para deixar a integral mais simples
