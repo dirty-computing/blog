@@ -102,18 +102,18 @@ $$
 Bem, peguemos uma função qualquer. Por exemplo:
 
 $$
-f(x) = x^2
+f(x) = \frac{2}{3}\sqrt{x^3}
 $$
 
-Quanto de tinta se gastaria cobrindo essa curva no intervalo de $x \in \left[1, 3\right]$.
+Quanto de tinta se gastaria cobrindo essa curva no intervalo de $x \in \left[4, 9\right]$.
 Como calcular isso?
 
 Para isso, precisamos definir os pontos que irá compor nosso arco. Por exemplo, ele começa em
-$(1,1)$ e vai até $(3,9)$. Podemos transformar isso em uma função do "tempo" da caneta
+$(4,5\frac{1}{3})$ e vai até $(9,18)$. Podemos transformar isso em uma função do "tempo" da caneta
 percorrendo esse intervalo:
 
 $$
-pos_f(t) = (t, t^2)
+pos_f(t) = (t, \frac{2}{3}\sqrt{t^3})
 $$
 
 Se pegarmos $t'$, um infinitésimo depois de $t$, teremos então praticamente uma reta que vai
@@ -122,7 +122,7 @@ todos os intervalos infinitesimais do começo até o final, então teremos calcu
 do arco nesse intervalo. Ou seja:
 
 $$
-\int^3_1 len(t)dt
+\int^9_4 len(t)dt
 $$
 
 E como é definido o comprimento do segmento $\overrightarrow{pos_f(t), pos_f(t')}$? Bem,
@@ -136,5 +136,160 @@ Como se interessa a distância entre os pontos $pos_f(t), pos_f(t')$, podemos tr
 ambos os pontos de tal modo que $pos_f(t)$ seja coincidente com a origem.
 
 > Demonstração dessa propriedade será feita em outro blog post.
+
+Nessa situação, $pos_f(t')$ após o translado vai coincidir com $pos_f'(t)\times(t'-t)$.
+Como a ideia é pegar isto em um instante infinitesimal, podemos considerar que o
+movimento do arco nesse infinitésimo de deslocamento foi uma reta infinitesimal.
+Então, vai ser basicamente a magnitude $|pos_f'(t)\times(t'-t)|$, pitágoras como antes
+mencionado.
+
+Só recapitulando a função:
+
+$$
+pos_f(t) = (t, \frac{2}{3}\sqrt{t^3})
+$$
+
+Portanto, a derivada dela em $t$ será:
+
+$$
+pos_f'(t) = (1, \sqrt{t})
+$$
+
+Portanto, o tanto de arco criado no infinitésimo ao redor do tempo $t$ será de:
+
+$$
+|pos_f'(t)| = \sqrt{1^2 + (\sqrt{t})^2} =\\
+\sqrt{1 + t}
+$$
+
+Como se deseja a integral dessa função de 4 até 9,
+
+$$
+\int^9_4 \sqrt{1 + t} dt = \left. \frac{2}{3}\left(\sqrt{1 + t}\right)^3\right|^9_4 =\\
+\frac{2}{3} \left(10\sqrt{10} - 5\sqrt{5}\right) = \\
+\frac{10}{3}\sqrt{5}\left(2\sqrt{2} - 1\right)
+$$
+
+Então, o comprimento do arco é isso. Em termos leigos pode ser entendimento com
+o quanto se gasta de caneta para percorrer uma distância em uma função.
+
+Aqui achamos o comprimento de uma função $\mathbb{R}\mapsto\mathbb{R}$. Porém,
+como na verdade a função acaba codificando uma coordenada no plano cartesiano,
+o que nos interessou foi o mapeamento $\mathbb{R}\mapsto\mathbb{R}^2$, onde a
+primeira ordenada é $X$.
+
+Nada impede de pegar este conceito e expandir, seja para um par ordenado onde
+nenhuma das funções sejam exatamente $X$, seja para $\mathbb{R}^3$.
+
+Então, para uma curva descrita pela função $\mathbb{R}\mapsto\mathbb{R}^3$:
+
+$$
+f(t) = \left\{
+    \begin{array}{l}
+        X(t)\\
+        Y(t)\\
+        Z(t)
+    \end{array}
+\right.
+$$
+
+O comprimento de arco dela entre os pontos $a$ e $b$ será de:
+
+$$
+arclen(a, b, f) = \int^b_a\sqrt{X'(t)^2+Y'(t)^2+Z'(t)^2}dt
+$$
+
+## Calculando o comprimento de arco do barbante
+
+Temos a função que descreve a curva da bastante:
+
+$$
+pos(v) = \left\{
+    \begin{array}{ll}
+        \cos(\frac{2}{3}\times\pi\times{v})\times r & x\\
+        \sin(\frac{2}{3}\times\pi\times{v})\times r & y\\
+        v & z
+    \end{array}
+\right.
+$$
+
+A derivada em relação ao parâmetro $v$ é:
+
+$$
+pos'(v) = \left\{
+    \begin{array}{ll}
+        -\frac{2}{3}\times\pi\times\sin(\frac{2}{3}\times\pi\times{v})\times r & x\\
+        \frac{2}{3}\times\pi\times\cos(\frac{2}{3}\times\pi\times{v})\times r & y\\
+        1 & z
+    \end{array}
+\right.
+$$
+
+Aplicando o valor calculado de $r$:
+
+$$
+pos'(v) = \left\{
+    \begin{array}{ll}
+        -\frac{2}{3}\times\pi\times\sin(\frac{2}{3}\times\pi\times{v})\times \frac{2}{\pi} & x\\
+        \frac{2}{3}\times\pi\times\cos(\frac{2}{3}\times\pi\times{v})\times \frac{2}{\pi} & y\\
+        1 & z
+    \end{array}
+\right. \\= 
+\left\{
+    \begin{array}{ll}
+        -\frac{4}{3}\times\sin(\frac{2}{3}\times\pi\times{v}) & x\\
+        \frac{4}{3}\times\cos(\frac{2}{3}\times\pi\times{v}) & y\\
+        1 & z
+    \end{array}
+\right.
+$$
+
+O comprimento de arco será:
+
+$$
+arclen(a, b, pos) =
+    \int^b_a\sqrt{
+        \left(-\frac{4}{3}\times\sin(\frac{2}{3}\times\pi\times{v})\right)^2 +
+        \left(\frac{4}{3}\times\cos(\frac{2}{3}\times\pi\times{v})\right)^2 +
+        1^2
+    }dv\\
+    = \int^b_a\sqrt{
+        \frac{16}{9}\times\sin(\frac{2}{3}\times\pi\times{v})^2 +
+        \frac{16}{9}\times\cos(\frac{2}{3}\times\pi\times{v})^2 +
+        1
+    }dv
+$$
+
+Usando o fato de que $\sin(\theta)^2 + \cos(\theta)^2 = 1$:
+
+$$
+arclen(a, b, pos) =
+    \int^b_a\sqrt{
+        \frac{16}{9} + 1
+    }dv = \int^b_a\sqrt{
+        \frac{25}{9}
+    }dv = \int^b_a\frac{5}{3}dv = \left.v\times\frac{5}{3}\right|^a_b
+$$
+
+No nosso caso em específico, o valor inicial é 0 e o final é 12:
+
+$$
+arclen(0, 12, pos) = \left.v\times\frac{5}{3}\right|^{12}_0 = 12\times\frac{5}{3} - 0\times\frac{5}{3} \\
+    = 20
+$$
+
+# Resumo
+
+- Identifiquei uma função que representa as posições do barbante
+- Fiz ajuste fino nessa função de tal modo que a ordenada no eixo Z
+  em $F(v)$ fosse $v$
+- Reduzi o problema para um problema de comprimento de arco
+- Relembrei a fórmula para achar o comprimento de arco de uma função
+  $\mathbb{R}\mapsto\mathbb{N}^n$
+- Apliquei a fórmula de comprimento de arco na curva achada anteriormente
+- Foi usada a identidade pitagórica que descreve que $\sin^2 x + \cos^2 x = 1$
+  para deixar a integral mais simples
+- Calculei a integral resultante, $\left.v\times\frac{5}{3}\right|^a_b$
+- Dá 20
 
 {% endkatexmm %}
