@@ -3,7 +3,6 @@ layout: post
 title: "Streams paralelizadas em Java"
 author: "Jefferson Quesado"
 tags: java paralelismo stream programação-funcional
-draft: "true"
 base-assets: "/assets/parallel-stream/"
 ---
 
@@ -17,8 +16,8 @@ de programação competitiva:
 Bem, isso me pareceu um problema pronto para se atacar com `reduce`, típico da
 programação funcional...
 
-Mas, antes de mais nada, você já parou qual o tempo mínimo de espera para
-somar ma lista com `n` números aleatórios?
+Mas, antes de mais nada, você já parou pra pensar: qual o tempo mínimo de
+espera para somar uma lista com `n` números aleatórios?
 
 # Fazendo somas
 
@@ -66,7 +65,14 @@ O que antes se esperava por 6 operações, agora é esperado pelo **tempo** de 3
 operações. Por mais que se realizem 5 operações, só precisa esperar por 3.
 Por quê? Bem, magia.
 
-Mas não qualquer magia, mas magia do paralelismo. Como eu posso pegar
+> Antes que você, leitor, se pergunte "onde está a sexta operação que
+> o Jeff deixou pra trás!?" saiba que, com o carinho adequado, ela poderia
+> ter sido omitida da primeira árvore de soma, mas como eu já gerei a imagem
+> e usei como base o elemento neutro, tem essa operação que surgiu a mais.
+> Se, no lugar de ter usado o elemento neutro, eu tivesse pegue o primeiro
+> elemento e acumulado a partir dele, então se teriam 5 operações.
+
+Não qualquer magia, mas sim a magia do paralelismo. Como eu posso pegar
 acumuladores intermediários e eu sei operar em cima deles, então tanto faz
 a ordem com a qual faço as operações. Eu já posso operar os elementos 0 e 1
 da lista ao mesmo tempo em que opera 2 e 3 e também simultaneamente 4 e 5.
@@ -74,7 +80,7 @@ da lista ao mesmo tempo em que opera 2 e 3 e também simultaneamente 4 e 5.
 Então, em cima desses 3 intermediários (`0,1` e `2,3` e `4,5`) eu preciso
 fazer a acumulação desses elementos, e agora para esse caso não é mais possível
 paralelizar. Mas, se tivesse mais um par, o `6,7`, poderia acumular ele com `4,5`
-paraleloao acúmulo de `0,1` com `2,3`, resultando num tempo total de
+paralelo ao acúmulo de `0,1` com `2,3`, resultando num tempo total de
 espera idêntico de 3 operações.
 
 Então, se eu souber como juntar dois elementos acumulados, eu posso colocar
@@ -143,7 +149,7 @@ Essa definição já leva em consideração alguns pontos fortes:
 3. possivelmente `c` pode ser vazio (com `i = 0`)
 4. `c` sempre será o maior possível prefixo encontrado entre esses dois
 
-Agora, como encontrar essa stirng `c` de fato? Podemos receber as duas strings
+Agora, como encontrar essa string `c` de fato? Podemos receber as duas strings
 `a` e `b` e comparar caracter a caracter. No momento em que eu achar um caracter
 distinto, retorno o prefixo até (aberto) aquele caracter. Caso eu passe por tudo,
 pego o prefixo de `a` até o menor dos comprimentos das strings.
@@ -173,7 +179,7 @@ Tome uma coleção `l` de elementos `L`. Queremos reduzir essa coleção usando
 a operação `op2: (L, L) => L`.
 
 Bem, temos duas opções para essa lista: ou ela é do tipo `[hl | TL]`, com o
-elemento `hl` sendo o cabeçalho da lista e a lista `TL`; ou ela é do tipo `[]`,
+elemento `hl` sendo o cabeçalho da lista e o resto da lista `TL`; ou ela é do tipo `[]`,
 lista vazia.
 
 Podemos definir então em cima de `op2` uma função `op_red: ([L]) => L|neutral`,
@@ -233,6 +239,11 @@ function op_red_half(lista: L[]): L|null { // aqui nulo marca o neutro
     return op2(left_red, right_red);
 }
 ```
+
+> Essa implementação em si não gera aquela árvore de operações acima descrita,
+> pois separa exatamente no meio, portanto 3 elementos para cada lado. De toda
+> sorte, a quantidade de operações totais e em paralelo e tempo de espera total
+> se mantém.
 
 Já ficou bem dividido agora, sempre resolvendo metade do problema por vez.
 Se o cálculo de `left_red` e de `right_red` forem feitos de maneira
@@ -566,7 +577,7 @@ Collector.of(
 ```
 
 Muito bem, parece razoável. Vamos primeiro ver sobre a questão da criação
-do container (`MHolder::first`). Ele tem dentro de si mantém como estado
+do container (`MHolder::first`). Ele tem dentro de si o indicador
 que está no estado de fazer a primeira acumulação. Ao receber uma string,
 ele preenche o valor de seu `prefix`, o valor inicial de `len` e marca
 como já foi iniciado (`first = false`).
@@ -598,7 +609,7 @@ não é o elemento neutro e, se for, retorna `this`. Caso contrário, faz o
 cálculo do prefixo baseado nos prefixos próprio e do parâmetro e nos tamanhos
 de prefixo próprio e do parâmetro.
 
-Só isso? Bem, na verdade... não. Existe um último lemento que não tocamos ainda
+Só isso? Bem, na verdade... não. Existe um último elemento que não tocamos ainda
 no assunto... ele é o varargs no final do método
 `Collector.Characteristics... characteristics`. Mas, o que são essas
 características do coletor?
@@ -614,7 +625,7 @@ O que isso quer dizer? Bem, eles são dicas de otimização para que o executor
 dos pipelines das streams possam tomar uma decisão mais acertada do como
 lidar com as streams.
 
-a propriedade `IDENTITY_FINISH` deve ser usada apenas quando o coletor for
+A propriedade `IDENTITY_FINISH` deve ser usada apenas quando o coletor for
 do tipo `Collector<T, R, R>`. Iremos retornar novamente a essas características
 após uma breve sidequest...
 
@@ -716,7 +727,7 @@ detalhe de implemetação? Então, vamos ver?
 ```java
 public Contador<T> implements Collector<T, Set<T>, Integer> {
     public Supplier<Set<T>> supplier() {
-        return Set::new;
+        return HashSet::new; // aqui usando HashSet só porque posso instanciá-lo
     }
 
     public BiConsumer<Set<T>,T> accumulator() {
@@ -745,7 +756,7 @@ E normalmente não se cria coletores assim (normalmente). O padrão
 para criação dos coletores é feita assim:
 
 ```java
-Collector.of(Set::new, Set::add, (antigo, novo) -> {
+Collector.of(HashSet::new, Set::add, (antigo, novo) -> {
         antigo.addAll(novo);
         return antigo;
     }, Set::size);
@@ -794,7 +805,7 @@ Bem, esse cara aqui indica uma coisa importante para o executor da pipeline:
 
 Mas, como isso pode ser útil? Lembra que foi mencionado acima que para fazer
 reduções basta que a operação de redução seja associativa? Se além de ser
-associativa, ela for comutativa, então estamos nume situação em que não
+associativa, ela for comutativa, então estamos numa situação em que não
 importa a ordem com a qual os elementos vem, estamos bem.
 
 Exemplos de operações comutativas, que poderiam ser aplicadas para a
@@ -960,7 +971,7 @@ ligeiramente diferente se for fornecido um elemento `an` do tipo `A` que seja
 "neutro" e uma operação `(A, L) -> A`.
 
 Se a operação `(L, L) -> L` for associativa, então a redução poderá ser feita em
-paralelo, gastando tempo `O(log n)` considerando infinitos processamentos e
+paralelo, gastando tempo `O(log n)` considerando infinitos processadores e
 gratuidade na hora de sincronizar o processamento:
 
 ![Árvore de operações de soma]({{ page.base-assets | append: "soma-1.png" | relative_url }})
