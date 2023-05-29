@@ -44,11 +44,11 @@ trabalhando em cima dele, então algumas coisas ficam menos engessadas de escrev
 ```java
 // seja T o tipo da resposta da chamada GWT-RPC service.fazChamada
 AsyncCallback<T> callback = new AsyncCallbackBuilder<T>()
-		.onSuccess(this::fun1);
-		.onSuccess(this::fun2);
-		.onBefore(Loader::startLoading);
-		.onFinally(Loader::endLoading);
-		.onFailure(logger::consoleFailure);
+		.onSuccess(this::fun1)
+		.onSuccess(this::fun2)
+		.onBefore(Loader::startLoading)
+		.onFinally(Loader::endLoading)
+		.onFailure(logger::consoleFailure)
 		.onFailure(e -> showToastFailure(e.getMessage()))
 		.build();
 
@@ -63,12 +63,12 @@ menos assim:
 ```java
 // seja T o tipo da resposta da chamada GWT-RPC service.fazChamada
 new AsyncCallbackBuilder<T>()
-		.onSuccess(this::fun1);
-		.onSuccess(this::fun2);
-		.onBefore(Loader::startLoading);
+		.onSuccess(this::fun1)
+		.onSuccess(this::fun2)
+		.onBefore(Loader::startLoading)
 		.setAsyncCall(cb -> service.fazChamada(arg0, arg1, cb))
-		.onFinally(Loader::endLoading);
-		.onFailure(logger::consoleFailure);
+		.onFinally(Loader::endLoading)
+		.onFailure(logger::consoleFailure)
 		.onFailure(e -> showToastFailure(e.getMessage()))
 		.run();
 ```
@@ -95,8 +95,8 @@ Ficaria assim o código cliente:
 ```java
 // seja T o tipo da resposta da chamada GWT-RPC service.fazChamada
 AsyncCallbackBuilder.<T>getDefaultBuilder()
-		.onSuccess(this::fun1);
-		.onSuccess(this::fun2);
+		.onSuccess(this::fun1)
+		.onSuccess(this::fun2)
 		.setAsyncCall(cb -> service.fazChamada(arg0, arg1, cb))
 		.onFailure(e -> showToastFailure(e.getMessage()))
 		.run();
@@ -107,8 +107,8 @@ de modo privado. Também posso tentar pegar de modo "cru" o _builder_, caso não
 
 ```java
 AsyncCallbackBuilder.<T>getRawBuilder()
-		.onSuccess(this::fun1);
-		.onSuccess(this::fun2);
+		.onSuccess(this::fun1)
+		.onSuccess(this::fun2)
 		.setAsyncCall(cb -> service.fazChamada(arg0, arg1, cb))
 		.onFailure(logger::consoleFailure)
 		.run();
