@@ -26,8 +26,22 @@ if [ ! -f "$DRAFT" ]; then
 	exit 1
 fi
 
+get-today() {
+	local MAC=false
+	case `uname` in
+		[Dd]arwin)
+			MAC=true
+			;;
+	esac
+	if [ $MAC ]; then
+		date -I
+	else
+		date --iso
+	fi
+}
+
 git add "$DRAFT"
 
-POST="_posts/`date --iso`-${DRAFT#_drafts/}"
+POST="_posts/`get-today`-${DRAFT#_drafts/}"
 
 git mv -v "$DRAFT" "$POST"
