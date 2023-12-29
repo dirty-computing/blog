@@ -20,10 +20,15 @@ O artigo se dividirá nas seguintes seções:
 1. rodar o Jekyll
 1. fazer a ação de publicar (leia artigo [Movendo de draft para post]({% post_url 2021-12-28-publish-draft %}))
 
-E na parte 2 teremos:
+Na parte 2 teremos:
 
+1. regras e patterns simples
 1. criar um novo post (leia artigo [Criando posts com Makefile]({% post_url 2022-10-16-new-post %}))
 1. pegar menção de imagem (leia artigo [Automatizando menção de imagem]({% post_url 2022-10-19-automatizando-mencao-imagem %}))
+
+E por fim, na parte 3:
+
+1. iremos remover chamadas de bash e ficar apenas com ruby
 
 # Apanhado geral do Rakefile
 
