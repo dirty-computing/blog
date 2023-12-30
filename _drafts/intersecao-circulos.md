@@ -96,3 +96,242 @@ $$
 (\nabla_s \circ \nabla_r \circ \nabla_t)(x, y)
 $$
 {% endkatexmm %}
+
+# Circunferências de mesmo raio
+
+Para circunferências de mesmo raio existem menos casos. Começando da
+origem:
+
+1. mesma circunferência
+1. secantes
+1. tangentes
+1. não se tocam
+
+Não ocorre o "sem toque, por dentro" nem o "tangente, por dentro".
+
+# Fazendo as detecções
+
+O primeiro passo é determinar se as circunferências tem o mesmo raio
+ou não. Se elas tiverem o mesmo raio, só temos 4 categorias para elas.
+
+## Mesmo raio
+
+{% katexmm %}
+Para serem a mesma circunferência, os dois centros devem ser o mesmo.
+Para tal, $|\overline{c_1 c_2}| = 0$
+
+Agora, se a distância entre os centros for entre 0 e duas vezes o
+raio (a soma dos raios das duas circunferências), então elas são
+secantes. $0 < |\overline{c_1 c_2}| < 2r$
+
+Se for exatamentea soma dos raios, as circunferências de tangenciam.
+$|\overline{c_1 c_2}| = 2r$
+
+Se for maior do que a soma dos raios, então elas não se tocam.
+$|\overline{c_1 c_2}| > 2r$
+
+## Raios distintos
+
+Vamos assumir aqui que o raio da circunferência maior é $R$ e o da
+menor é $r$.
+
+Podemos pegar a lição apendida do caso de círculos de mesmo raio.
+
+Se for maior do que a soma dos raios, então elas não se tocam.
+$|\overline{c_1 c_2}| > R+r$
+
+Se for exatamente igual a soma dos raios, então são tangentes
+externas. $|\overline{c_1 c_2}| = R+r$
+
+Agora, entre  um pouco menor que a soma dos raios até o meomento
+que vira tangente interna, os círculos são secantes. Agora, quando
+será que eles são tangentes internas uma a outra?
+
+A resposta é simples: quando a distância entre os centros leva até
+pertinho da circunferência grande, e você só precisa caminhar mais
+$r$ até chegar na circunferência maior. Ou seja, a distância
+entre os centros mais o raio da menor é o raio da maior.
+
+Então, para serem tangentes internas, $|\overline{c_1 c_2}| + r = R$.
+Como estamos anotando com base na distância entre os pontos, podemos
+isolar essa variável e ficamos assim: $|\overline{c_1 c_2}| = R - r$
+
+Ou seja, é secante no intervalo  $R + r > |\overline{c_1 c_2}| > R - r$
+
+Para ser não secante interna, basta ter a distância entre os centros
+menor do que a necessária para ser tangente. $R - r > |\overline{c_1 c_2}| \geq 0$
+
+# Circunferências representada pelo centro e raio
+
+Dadas duas circunferências, $C_1 = (x_1, y_1, r_1)$ e $C_2 = (x_2, y_2, r_2)$,
+onde $r_i$ indica o raio e $(x_i, y_i)$ o centro da circunferência, como saber
+a posição relativa entre elas?
+
+Bem, vamos organizar de tal modo que $C_M$ e $C_m$ que $r_M \ge r_m$.
+Então, peguemos a distância entre os centros:
+$D = \sqrt{(x_M - x_m)^2 + (y_M - y_m)^2}$.
+
+Caso $D \gt r_M + r_m$, então as circunferências são não secantes
+externas.
+
+Caso $D = r_M + r_m$, então elas são tangentes externas. Em breve iremos achar o ponto de tangência.
+
+Agora, caso tenhamos $r_M + r_m \gt D \gt r_M - r_m$, então isso
+indica que as circunferências são secantes. Note que isso é
+verdade independnete se elas tem o mesmo raio ou se são raios
+distintos.
+
+Agora, para casos além desses, precisamos ramificar em
+**mesmo raio** e **raios distintos**.
+
+No caso específico de mesmo raio, a única outra possibilidade
+restante é com $D = r_m - r_m = 0$, onde as circunferências
+são sobrepostas uma na outra.
+
+Para o caso de raios distintos, temos o cenário de $D =
+r_M - r_m$, tangente interna.
+
+E por fim, se $r_M - r_m \gt D \ge 0$, temos não secantes internas.
+
+## Fórmula da circunferência
+
+Em geometria analítica, ao descrever uma curva, temos uma função
+que só é possível ter valores nela para os pontos da curva.
+
+Por exemplo, temos uma notação para a [curva do
+barbante]({% post_url 2022-11-17-comprimento-arco %}). Mas
+para esse caso específico aqui não precisamos de uma curva
+parametrizda (apesar de ser possível e fácil), apenas
+um conjunto de ponto que satisfaçam uma condição.
+
+No caso de um circunferência, os pontos são aqueles que estão
+a mesma distância do centro. Então, pegue um ponto
+qualquer, $(x, y)$, basta que a distância dela até o centro
+$(x_c, y_c)$ seja igual ao raio $r$. Daí temos que:
+
+$$
+\sqrt{\left(x - x_c\right)^2 + \left(y - y_c\right)^2} = r
+$$
+
+Ou então equivalentemente:
+
+$$
+\left(x - x_c\right)^2 + \left(y - y_c\right)^2 = r^2
+$$
+
+Manipulando mais um pouco em troca de mágica:
+
+$$
+\left(x - x_c\right)^2 + \left(y - y_c\right)^2 - r^2 = 0
+$$
+
+## Tangências externa e interna
+
+Para o caso de tangentes, tem um truque que podemos utilizar:
+o vetor entre os centros de ambas as circunferências.
+
+A interseção se situará na reta que liga os centros, então
+se for calculado o vetor entre os dois centros e manipular
+a sua magnitude para o tamanho do raio de uma das
+circunferências, então teremos que o ponto obtido por
+"somar" esse vetor esticado ao centro da circunferência
+se encontrará na circunferência e ele que será o ponto de
+interseção.
+
+Tomemos `C_1` como a circunferência base. Daí, o vetor
+entre os centros de `C_1` e `C_2` será:
+
+$$
+V = (x_2 - x_1, y_2 - y_1) = (x_v, y_v)
+$$
+
+Com $(x_v, y_v)$ devidamente calculado, o módulo dele
+é $|V| = \sqrt{x_v^2 + y_v^2}$. Podemos então transformar
+o vetor dessa magnitude $|V|$ em um vetor unitário
+dividindo por $|V|$:
+
+$$
+U = (x_v / |V|, y_v / |V|) = (x_u, y_u)
+$$
+
+E então basta multiplicar pelo raio da circunferência
+que obteremos o vetor adequado:
+
+$$
+V' = (x_u\times r_1, y_u\times r_1)
+$$
+
+Então, colocando o vetor em cima do centro obtemos o ponto
+de tangência:
+
+$$
+T = (x_1, y_1) + (x_u\times r_1, y_u\times r_1) =
+  (x_1 + x_u\times r_1, y_1 + y_u\times r_1)
+$$
+
+## Secante
+
+Para secante não conheço nenhuma estratégia interessante. Então,
+vamos achar um ponto `(x, y)` que satisfaça ambas as condições
+para `C_1` e `C_2`?
+
+Podemos resolver através de um sistema não linear:
+
+$$
+\left(x - x_{c_1}\right)^2 + \left(y - y_{c_1}\right)^2 - r_1^2 = 0\\
+\left(x - x_{c_2}\right)^2 + \left(y - y_{c_2}\right)^2 - r_2^2 = 0
+$$
+
+ou achando o valor de `y` dado `x` em termos de `C_1`, e então
+substituir em `C_2`.
+
+### Pelo sistema não linear
+
+TBD
+
+### Achando y = f(x)
+
+Temos que:
+
+$$
+\left(x - x_{c_1}\right)^2 + \left(y - y_{c_1}\right)^2 - r_1^2 = 0
+$$
+
+portanto:
+
+$$
+y^2 - 2 y_{c_1} y  + y_{c_1}^2  + \left(x - x_{c_1}\right)^2 - r_1^2 = 0
+$$
+
+Aplicando Bhaskara para achar $y$ em função de $x$:
+
+$$
+y = \frac{-\left(- 2 y_{c_1}\right) \pm \sqrt{\left(- 2 y_{c_1}\right)^2 - 4\left(y_{c_1}^2  + \left(x - x_{c_1}\right)^2 - r_1^2\right)}}{2}
+\\ \\
+= y_{c_1} \pm \sqrt{r_1^2 - \left(x - x_{c_1}\right)^2}
+$$
+
+Com isso, podemos substituir $y$ na equação do segundo círculo:
+
+$$
+\left(x - x_{c_2}\right)^2 + \left(y_{c_1} \pm \sqrt{r_1^2 - \left(x - x_{c_1}\right)^2} - y_{c_2}\right)^2 - r_2^2 = 0
+$$
+
+Manipulando um pouco os termos:
+
+$$
+\left(x - x_{c_2}\right)^2 + \left(\pm \sqrt{r_1^2 - \left(x - x_{c_1}\right)^2} + \left(y_{c_1} - y_{c_2}\right)\right)^2 - r_2^2 =
+\\
+\left(x - x_{c_2}\right)^2 + (r_1^2 - \left(x - x_{c_1}\right)^2) + \left(y_{c_1} - y_{c_2}\right)^2 \pm \left(\sqrt{r_1^2 - \left(x - x_{c_1}\right)^2} \times \left(y_{c_1} - y_{c_2}\right)\right) - r_2^2 =
+\\
+\left(x - x_{c_2}\right)^2 - \left(x - x_{c_1}\right)^2 + r_1^2 - r_2^2 + \left(y_{c_1} - y_{c_2}\right)^2 \pm \left(\sqrt{r_1^2 - \left(x - x_{c_1}\right)^2} \times \left(y_{c_1} - y_{c_2}\right)\right) =
+\\
+\left(\left(x - x_{c_2}\right) - \left(x - x_{c_1}\right)\right)\times\left(\left(x - x_{c_2}\right) + \left(x - x_{c_1}\right)\right) + r_1^2 - r_2^2 + \left(y_{c_1} - y_{c_2}\right)^2 \pm \left(\sqrt{r_1^2 - \left(x - x_{c_1}\right)^2} \times \left(y_{c_1} - y_{c_2}\right)\right) =
+\\
+\left(x_{c_1} - x_{c_2}\right)\times\left(2x - x_{c_1} - x_{c_2}\right) + r_1^2 - r_2^2 + \left(y_{c_1} - y_{c_2}\right)^2 \pm \left(\sqrt{r_1^2 - \left(x - x_{c_1}\right)^2} \times \left(y_{c_1} - y_{c_2}\right)\right) =
+$$
+
+
+<!-- \left(\left(x - x_{c_2}\right) - \left(x - x_{c_1}\right))\times\left(\left(x - x_{c_2}\right) + \left(x - x_{c_1}\right)\right)  + r_1^2 - r_2^2 + \left(y_{c_1} - y_{c_2}\right)^2 \pm \left(\sqrt{r_1^2 - \left(x - x_{c_1}\right)^2} \times \left(y_{c_1} - y_{c_2}\right)\right) =
+-->
+{% endkatexmm %}
