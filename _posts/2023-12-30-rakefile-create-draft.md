@@ -235,7 +235,7 @@ base-assets: \"/assets/#{radix}/\"
 Então, com o modelo em mãos, só abrir o arquivo e escrever:
 
 ```ruby
-ule(/^_drafts\/.*\.md$/) do |t|
+rule(/^_drafts\/.*\.md$/) do |t|
     fileName = t.name
 
     radix = fileName.sub /_drafts\/(.*)\.md/, '\1'
@@ -312,6 +312,10 @@ E obtenha como saída:
 {{ "%7B%7B page.base-assets | append: %22ferris.jpg%22 | relative_url %7D%7D" | url_decode }}
 ```
 
+E posso usar o output para colocar o Ferris aqui:
+
+![Ferris, como imagem de exemplo]({{ page.base-assets | append: "ferris.jpg" | relative_url }})
+
 A regra para criar isso:
 
 ```ruby
@@ -321,3 +325,18 @@ rule(/^assets\/.*\.(png|jpe?g|gif|svg):mention$/) do |t|
     {{ "puts %22%7B%7B page.base-assets | append: \%22#%7BreferenceFromBaseAssets%7D\%22 | relative_url %7D%7D%22" | url_decode }}
 end
 ```
+
+Por partes:
+
+- eu pego o algo (`t.name`)
+- removo apenas o `:mention` do final (na real, o último `:<string>`):
+  - separo em cima do `:` com `split(":")`
+  - pego um slice do vetor, indo da primeira posição `0` até a penúltima `-2`
+  - para pegar um slice, só usar `<ini>..<fim>`
+  - a última posição é `-1`, portanto a penúltima é `-2`
+  - junto tudo de novo com `join(":")`
+- removo o `assets/<nome da base dos assets>/`
+  - semelhante a como removi o `:mention`, mas removendo os 2 primeiros componentes de diretórios
+  - separo em cima do `/` com `split("/")`
+  - pego a terceira posição `2` até o fim com um splice `2..`
+  - junto tudo de novo com `join("/")`
