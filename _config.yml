@@ -19,6 +19,11 @@ gitlab_username:  jefferson.quesado
 stackoverflow_username: jefferson-quesado
 stackoverflow_userid: 64969
 
+repository:
+  base: "https://gitlab.com/computaria/blog/"
+  blob_root: "https://gitlab.com/computaria/blog/-/blob/master/"
+  tree_root: "https://gitlab.com/computaria/blog/-/tree/master/"
+
 plugins:
   - jekyll-katex
 
