@@ -4,7 +4,6 @@ title: "Quando o mock mocka o mockador"
 author: "Jefferson Quesado"
 tags: java testes-unitários mock mockito engenharia-de-software
 base-assets: "/assets/mock-mocks-mocker/"
-draft: "true"
 ---
 
 Quem me segue no Twitter deve ter percebido que eu estou em uma cruzada.
