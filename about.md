@@ -20,6 +20,8 @@ interessante ou mesmo do que estou mexendo atualmente.
 Dá uma olhadinha aqui do lado em [talks]({{ "/talks/" | prepend: site.baseurl }})
 que estou guardando como repositório de palestras e apresentações gravadas.
 
+Participei de alguns podcasts também, olha lá [podcasts]({{ "/podcasts/" | prepend: site.baseurl }})
+
 -----
 
 Outros locais interessantes do blog:
