@@ -56,8 +56,8 @@ dos Estados Unidos da América cumpra o seu contrato de
 Exterminação Mútua Garantida™.
 
 E, bem, você precisa testar aquilo ali. É extremamente importante
-que nessa situação a sua função `Doomsday.armagedon()` chame a
-função `POTUS.assuredMutualDestruction(Country theEnemyObliterateThem)`.
+que nessa situação a sua função `Doomsday.armageddon()` chame a
+função `POTUS.mutualAssuredDestruction(Country theEnemyObliterateThem)`.
 Se pudesse mockar um método estático e só verificar que aquela
 chamada ocorreu ia ser tão bom, né?
 
@@ -272,31 +272,31 @@ Bem, relembremos aqui o caso de Exterminação Mútua Garantida™,
 um contrato multilateral assinado pelas nações que produzem
 esse tipo de armamento.
 
-`Doomsday.armagedon()` chamava em circuntâncias especiais o
-`POTUS.assuredMutualDestruction(Country theEnemyObliterateThem)`, mas nem sempre.
+`Doomsday.armageddon()` chamava em circuntâncias especiais o
+`POTUS.mutualAssuredDestruction(Country theEnemyObliterateThem)`, mas nem sempre.
 Como fazer isso nese caso?
 
-Ben, minha sugestão foi: deixe seu código testável. `POTUS.assuredMutualDestruction`
+Ben, minha sugestão foi: deixe seu código testável. `POTUS.mutualAssuredDestruction`
 é borda do sistema. Vamos garantir que a borda do sistema foi alcançada.
 Para evitar criar mais abstrações, usemos algo que vai receber um `Country` e pronto.
 Um `Consumer<Country>`. Isso basta para representar. Como esse trecho de código
 a se testar é antigo, melhor não mexer na API pública já presente, que é
-`Doomsday.armagedon()`. Mas nada impede que `Doomsday.armagedon()` seja um
-proxy bem configurado para chamar `Doomsday.armagedon(Consumer<Country>)`,
-e colocar a lógica pesada na função `Doomsday.armagedon(Consumer<Country>)`. Sai de algo assim:
+`Doomsday.armageddon()`. Mas nada impede que `Doomsday.armageddon()` seja um
+proxy bem configurado para chamar `Doomsday.armageddon(Consumer<Country>)`,
+e colocar a lógica pesada na função `Doomsday.armageddon(Consumer<Country>)`. Sai de algo assim:
 
 
 
 ```diff
  public class Doomsday {
      // ...
-     public Apocalypse armagedon() {
-+        return armagedon(POTUS::assuredMutualDestruction); // Exterminação Mútua Garantida™
+     public Apocalypse armageddon() {
++        return armageddon(POTUS::mutualAssuredDestruction); // Exterminação Mútua Garantida™
 +    }
 +
-+    public Apocalypse armagedon(Consumer<Country> doomsdayHandler) {
++    public Apocalypse armageddon(Consumer<Country> doomsdayHandler) {
         // ...
--       POTUS.assuredMutualDestruction(theEnemy);
+-       POTUS.mutualAssuredDestruction(theEnemy);
 +       doomsdayHandler.accept(theEnemy);
 +
         // ...
