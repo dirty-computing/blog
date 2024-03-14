@@ -6,7 +6,8 @@ tags: bash meta
 base-assets: "/assets/automatizando-mencao-imagem/"
 ---
 
-No post {% post_url 2021-09-12-base-assets %} é mencionado que eu arranjei um jeito
+No post [Manipulando Liquid para permitir uma base dos assets]({% post_url 2021-09-12-base-assets %})
+é mencionado que eu arranjei um jeito
 de deixar mais bonitinho o agrupamento de imagem por pasta de assets. Mas, sabe de
 uma coisa? Eu vivo esquecendo como fazer o Liquid para importar a imagem.
 
