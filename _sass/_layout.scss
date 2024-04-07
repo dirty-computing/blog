@@ -169,6 +169,8 @@
  */
 .page-content {
     padding: $spacing-unit 0;
+
+    background-image: url('../assets/colocando-coelhinhos-no-computaria/wallpaper-computaria.png');
 }
 
 .page-heading {
@@ -211,6 +213,18 @@
     @include media-query($on-laptop) {
         font-size: 36px;
     }
+}
+
+.post-title:before {
+    position: relative;
+    content: "";
+    display: inline-block;
+    transform: scaleX(-1) rotate(-15deg) translateY(20%);
+    width: 80px;
+    height: 80px;
+    background-image: url('../assets/colocando-coelhinhos-no-computaria/coelho.png');
+    background-size: cover;
+    z-index: -1;
 }
 
 .post-content {
