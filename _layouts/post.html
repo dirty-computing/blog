@@ -11,7 +11,7 @@ layout: default
         <a href='{{ page.url | slugify | prepend: "/_posts/" | prepend: site.repository.blob_root | append: ".md" }}'>
           <span class="icon icon--gitlab">{% include icon-gitlab.svg %}</span>
         </a>
-        <a href='https://www.pixme.bio/jeffquesado' target="_blank">
+        <a href='https://www.pixme.bio/{% if page.pixmecoffe %}{{ page.pixmecoffe }}{% else %}jeffquesado{% endif %}' target="_blank">
           <span class="icon">{% include icon-pixme.svg %}</span>
         </a>
     </p>

@@ -3,117 +3,106 @@
 
 ---
 
-Example [Jekyll] website using GitLab Pages.  View it live at https://pages.gitlab.io/jekyll
+Bem vindo ao Computaria! Aqui tem o meu blog.
 
-[Learn more about GitLab Pages](https://pages.gitlab.io) or read the the [official GitLab Pages documentation](https://docs.gitlab.com/ce/user/project/pages/).
+Se quiser contribuir, só [abrir uma issue](../../issues) indicando como eu posso melhorar,
+ou com uma ideia; ou mesmo pode mandar um [merge request](../../merge_request) com um artigo
+seu ou com mudanças estruturais no blog. Colaborações são bem vindas! Por exemplo:
 
----
+- !1+s
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+# Estrutura do blog
 
-- [Getting Started](#getting-started)
-  - [Start by forking this repository](#start-by-forking-this-repository)
-  - [Start from a local Jekyll project](#start-from-a-local-jekyll-project)
-- [GitLab CI](#gitlab-ci)
-- [Using Jekyll locally](#using-jekyll-locally)
-- [GitLab User or Group Pages](#gitlab-user-or-group-pages)
-- [Did you fork this project?](#did-you-fork-this-project)
-- [Other examples](#other-examples)
-- [Troubleshooting](#troubleshooting)
+O blog é feito em [Jekyll](http://jekyllrb.com/). Você sempre pode consultar
+a [documentação do Jekyll](https://jekyllrb.com/docs/home/), ela é uma ótima amiga por sinal.
 
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+Cada artigo tem sua própria seção de `assets`. Isso me ajudou a organizar os artigos e
+evitar que o asset de um se misture com o asset do outro. Isso se aplica tanto a
+rascunhos quanto a posts publicados propriamente ditos. Considerando que um artigo
+é da forma `/_posts/{date-part}-{slug}.md` e um rascunho `/_drafts/{slug}.md`,
+os assets desse artigo ficam em `/assets/{slug}/`.
 
-## Getting Started
+Além dos assets, tem o [blog companion](https://gitlab.com/computaria/blog-companion) também.
+A ligação é através da raiz do repositório, então seria `/{slug}/` o companion relacionado
+ao artigo `{slug}`.
 
-You can get started with GitLab Pages using Jekyll easily by either forking this repository or by uploading a new/existing Jekyll project.
+## Requisitos para colaborar no blog
 
-Remember you need to wait for your site to build before you will be able to see your changes.  You can track the build on the **Pipelines** tab.
+Você precisa ter instalado Ruby 3.0 ou superior.
 
-### Start by forking this repository
+O Computaria foi testado com sucesso no Linux, no Mac e no Windows.
 
-1. Fork this repository.
-1. **IMPORTANT:** Remove the fork relationship.
-Go to **Settings (⚙)** > **Edit Project** and click the **"Remove fork relationship"** button.
-1. Enable Shared Runners.
-Go to **Settings (⚙)** > **Pipelines** and click the **"Enable shared Runners"** button.
-1. Rename the repository to match the name you want for your site.
-1. Edit your website through GitLab or clone the repository and push your changes.
+Algumas dependências do blog precisam (ou podem depender) de extensões nativas, é recomendável
+ter ao alcance `gcc`, `g++` e `make`.
 
-### Start from a local Jekyll project
+Para mais informações:
 
-1. [Install][] Jekyll.
-1. Use `jekyll new` to create a new Jekyll Project.
-1. Add [this `.gitlab-ci.yml`](.gitlab-ci.yml) to the root of your project.
-1. Push your repository and changes to GitLab.
+- [Criando o blog com Jekyll no GitLab](https://computaria.gitlab.io/blog/2021/08/30/criando-blog-jekyll)
 
-## GitLab CI
+## Colaborando criando um artigo
 
-This project's static Pages are built by [GitLab CI][ci], following the steps
-defined in [`.gitlab-ci.yml`](.gitlab-ci.yml):
+Temos um Rakefile que lida com boa parte da burocracia. Também, como autor externo,
+tem um `.env` para que você possa preencher com suas informações e colaborar o
+quanto desejar com artigos, sem precisar perder muito tempo.
 
+Para começar, rode `rake .env`. Você será apresentado a uma TUI que irá fazer
+algumas perguntas para você e irá preencher o arquivo `.env` com os
+valores informados. Você pode sempre olhar o [`.env.example`](.env.example)
+para ver quais são os valores.
+
+Fazer esse setup vai poupar tempo no futuro e ele fica salvo no repositório.
+
+Para criar um novo post, recomendo iniciar pelo rascunho dele.
+Simplesmente peça ao Rakefile que ele crie por você, e você será guiado
+pelo processo de criação:
+
+![Criando um post com rake](/assets/little-improves/rake-blah-md.png)
+
+Para citar posts, use `{% post_url 2021-09-17-desenhos-python-turtle %}` com
+o nome do arquivo do post.
+
+Assets ficam em uma pasta separada dentro dos assets, então coloque o que
+precisa dos assets na pasta adequada. Por exemplo, os assets da página
+da citação acima ficam em
+[`/assets/desenhos-python-turtle/`](/assets/desenhos-python-turtle/).
+
+A citação de imagens pode ser um tanto quanto sofrida, mas foi criado
+um modo para tentar facilitar isso. Existe tanto o comando `rake`
+quando o comando bash para fazer essa citação:
+
+```bash
+› bin/mention-image.sh assets/edita-svc-manualmente/1-iframe-cru.png
+{{ page.base-assets | append: "1-iframe-cru.png" | relative_url }}
+
+› rake assets/edita-svc-manualmente/1-iframe-cru.png:mention        
+{{ page.base-assets | append: "1-iframe-cru.png" | relative_url }}
 ```
-image: ruby:2.3
 
-variables:
-  JEKYLL_ENV: production
+O `bin/mention-image.sh` funciona melhor com o auto complete do ZSH.
 
-pages:
-  script:
-  - bundle install
-  - bundle exec jekyll build -d public
-  artifacts:
-    paths:
-    - public
-  only:
-  - master
-```
+Para publicar, use o comando `rake publish`, ele irá te guiar no processo.
 
-## Using Jekyll locally
+Para mais informações:
 
-To work locally with this project, you'll have to follow the steps below:
+- [Pequenas melhorias no Computaria][little-improves]
+- [Rakefile, parte 1 - publicar rascunho](https://computaria.gitlab.io/blog/2023/01/06/rakefile-publish-draft)
+- [Rakefile, parte 2 - criando rascunho](https://computaria.gitlab.io/blog/2023/12/30/rakefile-create-draft)
+- [Automatizando menção de imagem](https://computaria.gitlab.io/blog/2022/10/19/automatizando-mencao-imagem)
 
-1. Fork, clone or download this project
-1. [Install][] Jekyll
-1. Download dependencies: `bundle`
-1. Build and preview: `bundle exec jekyll serve`
-1. Add content
+## Frontmatter
 
-The above commands should be executed from the root directory of this project.
+O Rakefile gera automaticamente boa parte do frontmatter para você. Tem os mesmos
+campos padrões usados pelo Jekyll, e também os seguintes:
 
-Read more at Jekyll's [documentation][].
+- `pixmecoffe`: o seu nome de usuário na [Pix me a Coffee](https://www.pixme.bio)
+- `draft`: um booleano que indica se deve aparecer na listagem de arquivos,
+  ou se deve ser considerado um rascunho publicado para apreciação de terceiros
+- `base-assets`: uma variável no frontmatter para facilitar mencioanr imagens
 
-## GitLab User or Group Pages
+Para mais informações:
 
-To use this project as your user/group website, you will need one additional
-step: just rename your project to `namespace.gitlab.io`, where `namespace` is
-your `username` or `groupname`. This can be done by navigating to your
-project's **Settings**.
+- [Rascunhos publicados em Jekyll](https://computaria.gitlab.io/blog/2022/10/26/public-draft)
+- [Pequenas melhorias no Computaria][little-improves]
+- [Manipulando Liquid para permitir uma base dos assets](https://computaria.gitlab.io/blog/2021/09/12/base-assets)
 
-Read more about [user/group Pages][userpages] and [project Pages][projpages].
-
-## Did you fork this project?
-
-If you forked this project for your own use, please go to your project's
-**Settings** and remove the forking relationship, which won't be necessary
-unless you want to contribute back to the upstream project.
-
-## Other examples
-
-* [jekyll-branched](https://gitlab.com/pages/jekyll-branched) demonstrates how you can keep your GitLab Pages site in one branch and your project's source code in another.
-* The [jekyll-themes](https://gitlab.com/groups/jekyll-themes) group contains a collection of example projects you can fork (like this one) having different visual styles.
-
-## Troubleshooting
-
-1. CSS is missing! That means two things:
-    * Either that you have wrongly set up the CSS URL in your templates, or
-    * your static generator has a configuration option that needs to be explicitly
-    set in order to serve static assets under a relative URL.
-
-[ci]: https://about.gitlab.com/gitlab-ci/
-[Jekyll]: http://jekyllrb.com/
-[install]: https://jekyllrb.com/docs/installation/
-[documentation]: https://jekyllrb.com/docs/home/
-[userpages]: https://docs.gitlab.com/ce/user/project/pages/introduction.html#user-or-group-pages
-[projpages]: https://docs.gitlab.com/ce/user/project/pages/introduction.html#project-pages
+[little-improves]: https://computaria.gitlab.io/blog/2024/04/09/little-improves

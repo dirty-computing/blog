@@ -4,6 +4,7 @@ title: "Colocando coelhinhos no Computaria e enlouquecendo"
 author: "Kauê Fraga Rodrigues"
 tags: html css frontend
 base-assets: "/assets/colocando-coelhinhos-no-computaria/"
+pixmecoffe: kauefraga
 ---
 
 Olá! Me chamo Kauê, tenho 16 anos e é um prazer estar redigindo este texto como o primeiro convidado do Computaria 😊

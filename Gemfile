@@ -9,6 +9,10 @@ gem 'wdm', '~> 0.1.0' if Gem.win_platform?
 gem 'execjs', '~> 2.8.1'
 gem 'duktape', '~> 2.6.0.0'
 
+group :development do
+  gem 'dotenv', '~> 3.1'
+end
+
 group :jekyll_plugins do
   gem 'jekyll-katex'
 end
