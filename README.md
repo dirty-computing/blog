@@ -56,7 +56,7 @@ Para criar um novo post, recomendo iniciar pelo rascunho dele.
 Simplesmente peça ao Rakefile que ele crie por você, e você será guiado
 pelo processo de criação:
 
-![Criando um post com rake](/assets/little-improves/rake-blah-md.png)
+![Criando um post com rake](/assets/little-improves/rake-blah.md.png)
 
 Para citar posts, use `{% post_url 2021-09-17-desenhos-python-turtle %}` com
 o nome do arquivo do post.
