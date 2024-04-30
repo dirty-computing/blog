@@ -74,7 +74,7 @@ $$
 # Conjuntos e bags
 
 Conjuntos são caracterizados por uma operação central: $\in$. Essa
-operação tem no lado esquerdo um conjunto e no lado direito um elemento.
+operação tem no lado direito um conjunto e no lado esquerdo um elemento.
 Em cima apenas disso e sem grandes detalhes você consegue derivar a teoria
 ingênua dos conjuntos (com todos os seus paradoxos que não vem ao caso
 discorrer aqui agora). Esse operador resulta em um resultado booleano:
