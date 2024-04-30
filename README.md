@@ -106,3 +106,12 @@ Para mais informações:
 - [Manipulando Liquid para permitir uma base dos assets](https://computaria.gitlab.io/blog/2021/09/12/base-assets)
 
 [little-improves]: https://computaria.gitlab.io/blog/2024/04/09/little-improves
+
+## Variáveis de ambiente
+
+As seguintes variáveis de ambiente são utilizadas (principalmente se você
+não criar o `.env`):
+
+- `COMPUTARIA_AUTHOR`: seu nome, como author do blog
+- `COMPUTARIA_PIXME`: o seu identificador no https://www.pixme.bio/
+- `BROWSER_NAME `: o nome do browser para abrir via `rake browser`, caso desejado diferente do padrão

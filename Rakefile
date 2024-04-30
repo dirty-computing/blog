@@ -12,6 +12,12 @@ task :run do |t|
     Jekyll::Commands::Serve.process conf
 end
 
+desc "Abre o browser com o blog"
+task :browser do |t|
+    require 'dotenv/load'
+    sh "open #{"-a #{ENV["BROWSER_NAME"]}" unless ENV["BROWSER_NAME"].nil?} http://localhost:4000/blog/"
+end
+
 desc "Publica um rascunho, perguntando ao usuário qual rascunho publicar"
 task :publish do |t|
     require "cli/ui"
