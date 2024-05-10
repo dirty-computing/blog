@@ -97,7 +97,12 @@ campos padrões usados pelo Jekyll, e também os seguintes:
 - `pixmecoffe`: o seu nome de usuário na [Pix me a Coffee](https://www.pixme.bio)
 - `draft`: um booleano que indica se deve aparecer na listagem de arquivos,
   ou se deve ser considerado um rascunho publicado para apreciação de terceiros
-- `base-assets`: uma variável no frontmatter para facilitar mencioanr imagens
+- `base-assets`: uma variável no frontmatter para facilitar mencionar imagens
+- `twitter`: o handler de twitter do autor, usado para a tag de metadados `twitter:creator`
+
+Os seguintes não são gerados pelo `rake`, mas você pode criar:
+
+- `excerpt`: usado no OpenGraph, para description
 
 Para mais informações:
 
@@ -115,3 +120,4 @@ não criar o `.env`):
 - `COMPUTARIA_AUTHOR`: seu nome, como author do blog
 - `COMPUTARIA_PIXME`: o seu identificador no https://www.pixme.bio/
 - `BROWSER_NAME `: o nome do browser para abrir via `rake browser`, caso desejado diferente do padrão
+- `TWITTER_HANDLER `: seu handler do Twitter

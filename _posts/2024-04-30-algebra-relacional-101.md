@@ -5,6 +5,7 @@ author: "Jefferson Quesado"
 tags: álgebra matemática álgebra-relacional conjuntos
 base-assets: "/assets/algebra-relacional-101/"
 pixmecoffe: jeffquesado
+excerpt: "Eu disse que desenho queries com álgebra e me perguntaram 'como assim'? Vem comigo no mundo da álgebra relacional"
 ---
 
 > Vindo de uma thread do [Twitter](https://twitter.com/JeffQuesado/status/1782748451941253349).

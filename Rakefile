@@ -53,6 +53,7 @@ rule(/^_drafts\/.*\.md$/) do |t|
     author = ENV["COMPUTARIA_AUTHOR"]
     author = "Jefferson Quesado" if author.nil?
     pixme = ENV["COMPUTARIA_PIXME"]
+    twitter = ENV["TWITTER_HANDLER"]
 
     fileName = t.name
 
@@ -71,6 +72,7 @@ base-assets: \"/assets/#{radix}/\"
         file.write "---\n"
         file.write template
         file.write "pixmecoffe: #{pixme}\n" unless pixme.nil?
+        file.write "twitter: #{twitter}\n" unless twitter.nil?
         file.write "---\n"
     end
     puts "escreveu em #{fileName}, abrindo..."
