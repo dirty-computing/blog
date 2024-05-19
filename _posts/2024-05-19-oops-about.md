@@ -9,7 +9,7 @@ twitter: jeffquesado
 ---
 
 Fui colocar no ar o carregador de pipeline, e acabei fazer algumas
-bagunças com o [Sobre]({{ "about" | prepend: site.baseurl }}).
+bagunças com o [Sobre]({{ "/about" | prepend: site.baseurl }}).
 "Quão bagunçado?" você pode se perguntar. Bem, deixe eu mostrar:
 
 ![Links que não deveriam existir]({{ page.base-assets | append: "bagunca.png" | relative_url }})
@@ -247,6 +247,7 @@ classes adequadamente.
 Agora, parto para [`/_includes/header.html`]({{ site.repository.blob_root}}/_includes/header.html).
 Ele estava gerando assim os links:
 
+{% raw %}
 ```html
 <div class="trigger">
 {% for my_page in site.pages %}
@@ -256,10 +257,12 @@ Ele estava gerando assim os links:
 {% endfor %}
 </div>
 ```
+{% endraw %}
 
 Isso evitava completamente de ser exibido. Agora, eu poderia pegar esse mesmo mecanismo
 que não a presença do `title` e construir em cima dele a adição da classe:
 
+{% raw %}
 ```html
 <div class="trigger">
 {% for my_page in site.pages %}
@@ -269,3 +272,4 @@ que não a presença do `title` e construir em cima dele a adição da classe:
 {% endfor %}
 </div>
 ```
+{% endraw %}

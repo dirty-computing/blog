@@ -6,6 +6,11 @@ tags: meta liquid jekyll
 base-assets: "/assets/paginas-discretas/"
 ---
 
+> As coisas aqui foram suplantadas pelo post
+> [Oops, quebrei o about, e agora?]({% post_url 2024-05-19-oops-about %}).
+> Poucas escolhas feitas aqui refletem o estado atual
+> do blog.
+
 Eu tava querendo por faz algum tempo um compilado das minhas
 apresentações. Mas, ao tentar colocar aqui uma nova página
 com o layout `page` (como é o [`/about/`]({{ "/about/" |
