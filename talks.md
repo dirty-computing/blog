@@ -3,6 +3,7 @@ layout: page
 permalink: /talks/
 show: false
 title: Talks
+interesting: true
 ---
 
 Algumas das talks que eu já dei no passado.

@@ -3,6 +3,7 @@ layout: page
 permalink: /podcasts/
 show: false
 title: Podcasts
+interesting: true
 ---
 
 # Todo mundo odeia Clean Code (Rock'n'Code)

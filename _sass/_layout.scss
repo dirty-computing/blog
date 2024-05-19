@@ -42,6 +42,10 @@
         }
     }
 
+    .page-link.large-hidden {
+        display: none;
+    }
+
     @include media-query($on-palm) {
         position: absolute;
         top: 9px;
@@ -88,6 +92,10 @@
                 margin-right: 0;
             }
             margin-left: 20px;
+        }
+
+        .page-link.large-hidden {
+            display: block;
         }
     }
 }

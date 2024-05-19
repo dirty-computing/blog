@@ -61,12 +61,13 @@ rule(/^_drafts\/.*\.md$/) do |t|
     require "cli/ui"
     title = CLI::UI::Prompt.ask('Qual o título?')
     tags = CLI::UI::Prompt.ask('Quais as tags (separadas por espaço)?')
+    assetsDir = "/assets/#{radix}/"
 
     template =  "layout: post
 title: \"#{title}\"
 author: \"#{author}\"
 tags: #{tags}
-base-assets: \"/assets/#{radix}/\"
+base-assets: \"#{assetsDir}\"
 "
     File.open fileName, mode = 'w' do |file|
         file.write "---\n"
@@ -76,6 +77,12 @@ base-assets: \"/assets/#{radix}/\"
         file.write "---\n"
     end
     puts "escreveu em #{fileName}, abrindo..."
+    Rake::Task[assetsDir[1..]].invoke
     spawn("code #{fileName}", :out => :out, :err => :err)
     Process.wait
+end
+
+rule(/^assets\/[^\/]+\/?$/) do |t|
+    puts "criando diretório de assets #{t.name}"
+    mkdir t.name
 end

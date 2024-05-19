@@ -29,12 +29,7 @@ Participei de alguns podcasts também, olha lá [podcasts]({{ "/podcasts/" | pre
 Outros locais interessantes do blog:
 
 {% for my_page in site.pages %}
-  {%- assign my_page_parts = my_page.url | downcase | split: "."  -%}
-  {%- unless
-        my_page_parts[-1] == "css" or
-        my_page_parts[-1] == "xml" or
-        my_page_parts[0] == "/" or
-        my_page.url == page.url %}
+  {%- if my_page.interesting %}
   - [{% if my_page.title %}{{my_page.title}}{% else %}`{{my_page.url}}`{% endif %}]({{ my_page.url | prepend: site.baseurl }})
-  {%- endunless -%}
+  {%- endif -%}
 {% endfor %}
