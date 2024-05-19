@@ -5,6 +5,8 @@ permalink: /about/
 show: true
 ---
 
+{% include pipeline.html %}
+
 Olá, eu sou o Jefferson! Mas pode me chamar de Jeff, acho fofo =3
 
 Meus principais projetos acabo hospedando mais no GitLab, por uma questão
