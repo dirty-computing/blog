@@ -129,13 +129,13 @@ primeira coisa que fiz foi abrir a referência sobre iframe:
 Primeiras coisas que eu percebi que eu desejava:
 
 - remover a borda ([propriedade `frameboder="0"`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#frameborder))
-- impedir o scroll ([propriedade `scroll="no"`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#scrolling))
+- impedir o scroll ([propriedade `scrolling="no"`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#scrolling))
 
 Fui pela alternativa clássica de remover a borda e de impedir o scroll.
 Ainda precisava resolver a questão do tamanho:
 
 ```html
-<iframe src="https://www.pixme.bio/jeffquesado" frameboder="0" scroll="no"></iframe>
+<iframe src="https://www.pixme.bio/jeffquesado" frameboder="0" scrolling="no"></iframe>
 ```
 
 Inspecionei o conteúdo do iframe e cutuquei as propriedade `width` e
@@ -170,7 +170,7 @@ assim:
 ![Estágio final, flutuando a direita]({{ page.base-assets | append: "3-iframe-float.png" | relative_url }})
 
 Ótimo, tudo no lugar. Uma revisada na documentação pra saber se estava tudo
-perfeitinho e percebo que tanto o `scroll` quanto o `frameborder` estão
+perfeitinho e percebo que tanto o `scrolling` quanto o `frameborder` estão
 marcados como deprecados. Hmmmm, para a borda recomendou usar propriedades
 CSS, mas para o scroll recomendou apenas remover. Ok, então:
 

@@ -31,7 +31,7 @@ Pegando o exemplo acima para tuplas da forma $(left:, right:)$:
 
 $$
 (left: a, right: b)\\
-(left: b, rigleft: ht: a)
+(left: b, right: a)
 $$
 
 Quando lidamos com tuplas posicionais é como se o índice fosse
