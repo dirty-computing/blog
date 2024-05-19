@@ -28,7 +28,7 @@ if (queryParams.get("status") === "true") {
     }
 
     function startPipelineLoad() {
-        intervalId = setInterval(() => pipelineIFrame.contentWindow.location.reload()), 3000)
+        intervalId = setInterval(() => pipelineIFrame.contentWindow.location.reload(), 3000)
 
         document.getElementById("stopReload").style.display = "block";
         document.getElementById("playReload").style.display = "none";
