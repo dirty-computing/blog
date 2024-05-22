@@ -138,12 +138,14 @@ Ou seja, precisei colocar o arquivo JavaScript explicitamente para o Computaria.
 tudo que está solto na pasta do blog é colocado como asset disponível para o Jekyll publicar,
 criei o [`js/pipeline-loader.js`]({{ site.repository.blob_root }}/js/pipeline-loader.js):
 
+{% raw %}
 ```html
 <script src="{{ "/js/pipeline-loader.js" | prepend: site.baseurl }}" defer>
 </script>
 <div style="display: none" id="pipeline">
 </div>
 ```
+{% endraw %}
 
 E no script:
 

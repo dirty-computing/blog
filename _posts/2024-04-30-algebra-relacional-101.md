@@ -305,7 +305,7 @@ $$
 \operatorname*{\huge\sigma}_{v \% 2 == 0}\mathbb{N}
 $$
 
-A seleção é indicada pelo $\sigma$. Ele recebe como arugmneto uma bag e deixa
+A seleção é indicada pelo $\sigma$. Ele recebe como argumento uma bag e deixa
 passar apenas as tuplas que satisfaçam o predicado no subscrito. Posso ter
 vários subscritos, é a mesma coisa de ter várias seleções distintas:
 precisa satisfazer todos os predicados para a tupla ser selecionada.

@@ -8,7 +8,8 @@ pixmecoffe: jeffquesado
 twitter: jeffquesado
 ---
 
-Fui colocar no ar o carregador de pipeline, e acabei fazer algumas
+Fui colocar no ar o [carregador de pipeline]({% post_url 2024-05-19-pipeline-visible %}),
+e acabei fazer algumas
 bagunças com o [Sobre]({{ "/about" | prepend: site.baseurl }}).
 "Quão bagunçado?" você pode se perguntar. Bem, deixe eu mostrar:
 
@@ -147,7 +148,7 @@ assets como `assetsDir = "/assets/#{radix}/"` e invoquei
 # Correção no about
 
 Para começar, eu quero sumir com tudo que não seja de interessante
-de dentro da listagem do [`/about`]({{ "about" | prepend: site.baseurl }}). Bem, o jeito
+de dentro da listagem do [`/about`]({{ "/about" | prepend: site.baseurl }}). Bem, o jeito
 foi criando um novo campo no frontmatter. Adicionado o campo `interesting` que, se tiver
 com o valor `true`, vai ser listado no about. Toda a questão de quebrar a string
 em partes agora não se faz mais necessária:
