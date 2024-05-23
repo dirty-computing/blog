@@ -17,6 +17,9 @@ Impulso talks Java:
 Sou Java na Campus Party:
 - [Um parser em bash que identifica enums de um fonte Java](https://www.youtube.com/live/HKCz99cIiuE?si=67oARWCT6xbfqHmq)
 
+GambiConf
+- [Fazendo um chat com CSS 3, HTTP 1.1 e FAROFA 2 / Jefferson Quesado / GambiConf 2021](https://youtu.be/2SFB9ytv_rU?si=U1G6O9a9ojfOYHj5)
+
 # Slides
 
 - [Docker 4 Engineers](https://jeffque.github.io/docker4engineers/#0)
