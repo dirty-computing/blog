@@ -2,7 +2,7 @@ source "https://rubygems.org"
 ruby RUBY_VERSION
 
 # This will help ensure the proper Jekyll version is running.
-gem "jekyll", "4.2.0"
+gem "jekyll", "4.3.3"
 gem "webrick"
 gem "cli-ui"
 gem 'wdm', '~> 0.1.0' if Gem.win_platform?
