@@ -261,7 +261,7 @@ Ele estava gerando assim os links:
 {% endraw %}
 
 Isso evitava completamente de ser exibido. Agora, eu poderia pegar esse mesmo mecanismo
-que não a presença do `title` e construir em cima dele a adição da classe:
+que a não presença do `title` e construir em cima dele a adição da classe:
 
 {% raw %}
 ```html
