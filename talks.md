@@ -1,7 +1,7 @@
 ---
 layout: page
 permalink: /talks/
-show: false
+show: true
 title: Talks
 interesting: true
 ---

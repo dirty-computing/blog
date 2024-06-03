@@ -1,7 +1,7 @@
 ---
 layout: page
 permalink: /podcasts/
-show: false
+show: true
 title: Podcasts
 interesting: true
 ---

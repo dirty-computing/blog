@@ -25,7 +25,9 @@ body {
     font-kerning: normal;
 }
 
-
+.clean-background {
+    background-color: $background-color;
+}
 
 /**
  * Set `margin-bottom` to maintain vertical rhythm
