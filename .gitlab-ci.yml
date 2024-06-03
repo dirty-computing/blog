@@ -5,14 +5,20 @@ variables:
   LC_ALL: C.UTF-8
 
 before_script:
+  - echo -e "\e[0Ksection_start:`date +%s`:install-deps\r\e[0KInstalando dependêncidas gerais"
   - apk add gcc g++ make
   - gem install bundler
+  - echo -e "\e[0Ksection_end:`date +%s`:install-deps\r\e[0K"
+  - echo -e "\e[0Ksection_start:`date +%s`:install-bundle-deps\r\e[0KInstalando dependêncidas via bundle"
   - bundle install
+  - echo -e "\e[0Ksection_end:`date +%s`:install-bundle-deps\r\e[0K"
 
 test:
   stage: test
   script:
+  - echo -e "\e[0Ksection_start:`date +%s`:jekyll-build\r\e[0KIniciando o Jekyll"
   - bundle exec jekyll build -d test
+  - echo -e "\e[0Ksection_end:`date +%s`:jekyll-build\r\e[0K"
   artifacts:
     paths:
     - test
@@ -22,7 +28,9 @@ test:
 pages:
   stage: deploy
   script:
+  - echo -e "\e[0Ksection_start:`date +%s`:jekyll-build\r\e[0KIniciando o Jekyll"
   - bundle exec jekyll build -d public
+  - echo -e "\e[0Ksection_end:`date +%s`:jekyll-build\r\e[0K"
   artifacts:
     paths:
     - public
