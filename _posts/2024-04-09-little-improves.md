@@ -220,10 +220,12 @@ end
 
 Criamos a variável para indicar o Pixme a Coffe, mas não a usamos ainda.
 
+{% raw %}
 ```diff
 -        <a href='https://www.pixme.bio/jeffquesado' target="_blank">
 +        <a href='https://www.pixme.bio/{% if page.pixmecoffe %}{{ page.pixmecoffe }}{% else %}jeffquesado{% endif %}' target="_blank">
 ```
+{% endraw %}
 
 O foco é usar se tiver, e caso contrário manter o padrão (assim evitamos ter de
 alterar o frontmatter dos artigos anteriores). Então, caso a variável tenha valor, usemo-la.
