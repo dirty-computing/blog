@@ -8,6 +8,38 @@ pixmecoffe: jeffquesado
 twitter: jeffquesado
 ---
 
+# Novo capítulo: guerra das tags
+
+Após a publicação [Usando as tags - Parte 1: página de tags]({% post_url 2024-06-03-pagina-tags %}),
+as tags passaram a ser publicadas no hamburguer, e isso passou despercebido. Com isso, passei a adotar
+um novo/velho padrão para mostrar as páginas: apenas mostrar o que está com `show: true`,
+tal qual em [Criando páginas discretas]({% post_url 2023-08-31-paginas-discretas %}).
+
+Mas agora as motivações são distintas, bem distintas. Não pretendo mais evitar exibir
+coisas na barra superior e mostrar no hamburguer: quero mostrar em ambos. Então, como
+novo protocolo, vou mostrar na barra de navegação se tiver título e tiver `show == true`,
+portanto alterando o `header.html` assim:
+
+{% raw %}
+```diff
+       <div class="trigger">
+         {% for my_page in site.pages %}
+-          {% if my_page.title %}
+-          <a class="page-link{% unless my_page.show %} large-hidden{% endunless %}" href="{{ my_page.url | prepend: site.baseurl }}">{{ my_page.title }}</a>
++          {% if my_page.title and my_page.show %}
++          <a class="page-link" href="{{ my_page.url | prepend: site.baseurl }}">{{ my_page.title }}</a>
+           {% endif %}
+         {% endfor %}
+       </div>
+```
+{% endraw %}
+
+Abaixo a publicação original:
+
+------------
+
+<br>
+
 Fui colocar no ar o [carregador de pipeline]({% post_url 2024-05-19-pipeline-visible %}),
 e acabei fazer algumas
 bagunças com o [Sobre]({{ "/about" | prepend: site.baseurl }}).
