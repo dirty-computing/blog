@@ -41,3 +41,20 @@ Convidados:
 
 Canal:
 - [YouTube](https://www.youtube.com/@carlosenog)
+
+# Agile 2024 (Carlos Nogueira, Engineering Sessions)
+
+Engineering Sessions, summer edition (pt 1):
+
+- [YouTube](https://youtu.be/rq_iSKWR3SI?feature=shared)
+
+Host:
+- [Carlos Nogueira](https://twitter.com/carlosenog)
+
+Convidados:
+- Jefferson Quesado
+- [Rodolvo De Nadai](https://twitter.com/rdenadai)
+- [Victor Osório](https://twitter.com/vepo)
+
+Canal:
+- [YouTube](https://www.youtube.com/@carlosenog)
