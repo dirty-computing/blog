@@ -2,7 +2,7 @@
 layout: post
 title: "Meu take sobre o algoritmo de Dijkstra"
 author: "Jefferson Quesado"
-tags: grafos algoritmos heap estrutura-de-dados
+tags: grafos algoritmos heap estrutura-de-dados python
 base-assets: "/assets/dijkstra-algorithm/"
 pixmecoffe: jeffquesado
 twitter: jeffquesado
