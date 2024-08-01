@@ -611,7 +611,5 @@ para controlar a prioridade de qual o próximo vértice a ser resgatado.
 
 Se desejar olhar os fontes, você pode encontrá-los no repositório do blog, nesta pasta:
 [`{{ page.base-assets }}/py/`]({{ site.repository.tree_root }}/{{ page.base-assets }}/py).
-Ou então diretamente aqui pelo blog, em
-[`{{ page.base-assets }}/py/`]({{ page.base-assets | relative_url }}/py)
 
 {% endkatexmm %}
