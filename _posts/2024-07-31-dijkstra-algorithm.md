@@ -57,7 +57,7 @@ vértice dando alguns saltos. Um vértice $a$ é dito vizinho do vértice $b$
 se existir alguma aresta $\langle a, b\rangle \in E$; neste caso específico,
 eu consigo sair de $a$ e chegar em $b$ porque tem uma aresta ligando
 $a\rightarrow b$. Se por acaso eu consigo alcançar $c$ a partir de $b$
-porque existe $b\rightarrow c$, então eu consigo alcanár $c$ a partir de $a$
+porque existe $b\rightarrow c$, então eu consigo alcançar $c$ a partir de $a$
 também.
 
 A partir de um vértice, eu consigo alcançar alguns outros vértices do grafo.

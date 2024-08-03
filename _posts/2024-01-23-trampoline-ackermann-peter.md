@@ -43,7 +43,7 @@ ou no [Wolframalpha](https://mathworld.wolfram.com/AckermannFunction.html).
 
 Rodei `achermannPeter` para verificar se era possível usá-lo na
 demonstração da POC, o primeiro teste (`ackermannPeter(3, 3)`) demonstrou
-que se estava calculando corretmanete, mas era pouco para o que
+que se estava calculando corretamente, mas era pouco para o que
 se desejava fazer. Quando coloquei `ackermannPeter(4, 3)`, em algum
 tempo aconteceu o famoso _stack overflow_. Isso porque a chamada da função
 de Ackermann Peter é extremamente profunda, o simples fato de mudar o
