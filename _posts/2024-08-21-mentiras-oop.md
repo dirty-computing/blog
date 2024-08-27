@@ -19,6 +19,9 @@ Venho aqui expor algumas dessas mentiras.
 
 # Mentira #1: Você define seus tipos
 
+Ao fazer a propaganda de OOP, pessoal vende que a orientação a objetos é o
+único caminho verdadeiro para se ter tipagem bem feito. Mas... não é bem assim.
+
 Linguagens FP com tipagem permitem tipos bem ricos, inclusive melhor
 reuso entre tipos de for tipada estruturalmente.
 
@@ -60,6 +63,14 @@ Tudo isso só para mostrar que programação funcional acolhe e permite tipos.
 Um outro exemplo em que uso apenas a análise de tipos para guiar o jeito
 que eu codei, usando um estilo de programação mais funcional do que
 imperativo ou orientado a objetos, foi no artigo [Somando valores sem laços]({% post_url 2022-09-09-soma-valores-sem-loops %}).
+
+Além disso, a OOP em si não se preocupa com tipos. Se você pegar por exemplo Python,
+JavaScript, Ruby, todas essas linguagens que se dizem orientadas a objetos, você
+só pasosu a ter tipos recentemente. Antes era tudo duck-typing. Python passou a ter
+_type hints_ a partir da versão 3.5 (2015). Ruby passou a oficialmente ter suporte
+a tipos oficialmente através do RBS, lançado junto ao Ruby 3 em 2020.
+E JavaScript? Bem, JavaScript contnua sem tipos, desenvolveram até outras lingaugens
+em cima de JS para suportar tipos (como TypeScript, Dart).
 
 # Mentira #2: Reuso de software através de métodos
 
