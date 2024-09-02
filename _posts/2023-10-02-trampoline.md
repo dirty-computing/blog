@@ -2,7 +2,7 @@
 layout: post
 title: "Trampolim, exemplo em Java"
 author: "Jefferson Quesado"
-tags: recursão trampoline java
+tags: recursão trampoline java tail-call
 base-assets: "/assets/trampoline/"
 ---
 
