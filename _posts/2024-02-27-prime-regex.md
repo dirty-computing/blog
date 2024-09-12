@@ -83,7 +83,7 @@ $$
     S1&\mapsto&1, S1\\
     S2&\mapsto&1, S2\\
     S2&\mapsto&0, S1\\
-    S2&\mapsto&\epsilon
+    S1&\mapsto&\epsilon
 \end{array}
 $$
 
@@ -140,7 +140,7 @@ a capacidade de reconhecer palavras, nem de reconhecer palavras novas.
 
 {% katexmm %}
 
-Como toda linguagem fomal, a linguagem gerada pela gramática é sempre um
+Como toda linguagem fomal, a linguagem gerada por uma gramática é sempre um
 subconjunto (não necessariamente próprio) de $\Sigma^{*}$.
 
 Tomemos o autômato finito que estamos usando de exemplo principal:
