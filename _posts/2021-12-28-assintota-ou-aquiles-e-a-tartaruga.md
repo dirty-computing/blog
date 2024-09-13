@@ -3,6 +3,7 @@ layout: post
 title: "O que é uma assíntota?, ou sobre Aquiles e a Tartaruga"
 author: "Jefferson Quesado"
 tags: complexidade matemática
+base-assets: "/assets/assintota-ou-aquiles-e-a-tartaruga/"
 ---
 
 > Baseado na minha resposta sobre a pergunta [O que é assíntota?](https://pt.stackoverflow.com/a/269175/64969)
@@ -241,12 +242,12 @@ O gif [lide com isso, Aquiles][deal with it] portanto também deve ser usada sob
   - [`f(x) = sin(10*x)/x + x` vs `g(x) = x`][sin(10*x)/x + x vs x]
   - [`f(x) = |1/x| + x**2` vs `g(x) = x**2`][mod(1/x) + x**2 vs x**2]
 
-  [deal with it]: https://i.stack.imgur.com/k0UNy.gif
-  [aquiles vs tartaruga]: https://i.stack.imgur.com/p83VV.png
-  [plot 1/x]: https://i.stack.imgur.com/qqTAR.png
-  [polar plot e^(-0.1 t)]: https://i.stack.imgur.com/dus9i.png
-  [plot sen(10*x)/x + x vs x]: https://i.stack.imgur.com/4PEtv.png
-  [plot mod(1/x) + x**2 vs x**2]: https://i.stack.imgur.com/qyXhi.png
+  [deal with it]: {{ page.base-assets | append: "lide-com-isso-aquiles.gif" | relative_url }}
+  [aquiles vs tartaruga]: {{ page.base-assets | append: "aquiles-tartaruga.png" | relative_url }}
+  [plot 1/x]: {{ page.base-assets | append: "plot_1overx.png" | relative_url }}
+  [polar plot e^(-0.1 t)]: {{ page.base-assets | append: "polarplot_eexpminus01t.png" | relative_url }}
+  [plot sen(10*x)/x + x vs x]: {{ page.base-assets | append: "plot_sen10xoverxplus_x.png" | relative_url }}
+  [plot mod(1/x) + x**2 vs x**2]: {{ page.base-assets | append: "plot_mod1overxplusxsquared_vs_xsquared.png" | relative_url }}
   [e^(-0.1 t)]: https://www.wolframalpha.com/input/?i=plot+polar+r%3De**(-0.1*theta),+theta+in+%5B380,+400%5D
   [sin(10*x)/x + x vs x]: https://www.wolframalpha.com/input/?i=plot+f(x)+%3D+sin(10*x)%2Fx+%2B+x,+g(x)+%3D+x,+x+in+%5B1,+10%5D
   [mod(1/x) + x**2 vs x**2]: https://www.wolframalpha.com/input/?i=plot+f(x)+%3D+%7C1%2Fx%7C+%2B+x**2,+g(x)+%3D+x**2,+in+%5B-2,+2%5D
