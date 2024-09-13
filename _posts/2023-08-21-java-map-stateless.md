@@ -207,7 +207,7 @@ static <D, C> Mapeamento<D,C> removerMapeamento(Mapeamento<D, C> e, D chaveRemoc
 E para adicionar um novo mapeamento?
 
 ```java
-static <D, C> Mapeamento<D,C> removerMapeamento(Mapeamento<D, C> e, D chaveAdicionada, C novoValor) {
+static <D, C> Mapeamento<D,C> adicionarMapeamento(Mapeamento<D, C> e, D chaveAdicionada, C novoValor) {
     return criarMapeamento(
         d -> chaveAdicionada.equals(d)? novoValor: e.mapear(d),
         () -> {
