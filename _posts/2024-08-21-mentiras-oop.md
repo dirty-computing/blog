@@ -8,7 +8,7 @@ pixmecoffe: jeffquesado
 twitter: jeffquesado
 ---
 
-Você sabe o pq você usa OOP?
+Você sabe o por que você usa OOP?
 
 Então, existem motivos e motivos para se usar OOP. Alguns mais nobres, outros nem tanto.
 Mas finalmente tem aqueles motivos que são simplesmente errados. Mentiras.
@@ -23,7 +23,7 @@ Ao fazer a propaganda de OOP, pessoal vende que a orientação a objetos é o
 único caminho verdadeiro para se ter tipagem bem feito. Mas... não é bem assim.
 
 Linguagens FP com tipagem permitem tipos bem ricos, inclusive melhor
-reuso entre tipos de for tipada estruturalmente.
+reuso entre tipos se for tipada estruturalmente.
 
 Inclusive, Haskell tem um sistema de tipos bem rico. Vale a pena experimentar.
 Por exemplo, só pra ilustrar, peguei aqui
@@ -87,17 +87,20 @@ Então você pode usar clausuras e escrever menos.
 Um exemplo clássico aqui: somar os elementos de um array:
 
 Haskell:
+
 ```haskell
 foldl (\ x y -> x + y) 0 [1, 2, 3, 4]
 ```
 
 Java com streams:
+
 ```java
 int[] array = {1, 2, 3, 4};
 IntStream.of(array).reduce(0, (a, b) -> a + b);
 ```
 
 Java com iteração `for-each`:
+
 ```java
 int[] array = {1, 2, 3, 4};
 int acc = 0;
@@ -107,6 +110,7 @@ for (int n: array) {
 ```
 
 Java com iteração via índice do array (o mais imperativo possível), de trás pra frente:
+
 ```java
 int[] array = {1, 2, 3, 4};
 int acc = 0;
@@ -116,6 +120,7 @@ for (int i = array.length - 1; i >= 0; i--) {
 ```
 
 Java com iteração via índice do array, agora crescente:
+
 ```java
 int[] array = {1, 2, 3, 4};
 int acc = 0;
@@ -165,7 +170,7 @@ se dar o luxo de desperdiçar alguns kb de memória.
 
 # Pra fechar o assunto
 
-Independente de qqr coisa, o que vai realmente dominar no que um
+Independente de qualquer coisa, o que vai realmente dominar no que um
 paradigma/uma prática/uma maneira de codar é bom ou não é a sua capacidade
 de tirar o melhor dela, e sua disciplina.
 
