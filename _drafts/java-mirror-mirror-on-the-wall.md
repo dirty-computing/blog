@@ -1940,9 +1940,9 @@ feito uma alternativa processando anotações.
 De modo geral, em Java, anotações vão servir alguns propósitos:
 
 - gerar código
-- quebrar compilação
+- quebrar compilação/mudar warning
 - permitir processamento de bytecode
-- permitir criação de proxy dinâmico (ou equivalente)
+- permitir criação de proxy dinâmico/decorator (ou equivalente)
 
 Um uso de geração de código via anotações é o [Lombok](https://projectlombok.org/).
 Com o Lombok, você pode anotar na sua classe com `@EqualsAndHashCode` e
@@ -2146,6 +2146,16 @@ interface Peano {
 E assim usamos a anotação para controlar a evolução do código, quebrando a compilação
 quando ele deriva para algo desnecessário.
 
+Uma das maneiras que se pode usar anotações para manipular warnings do compilador
+é usando a `@SuppressWarnings`. Ao utilizar essa anotação, você suprime os avisos
+que você especificou. Inclusive aqui você pode anotar para remover warnings do Sonar
+Qube.
+
+Outro uso é quando há mistura de varargs com generics. Para se aprofundar mais,
+só conferir [este artigo do Baeldung](https://www.baeldung.com/java-safevarargs).
+Basicamente, ao anotar o método como `@SafeVarArgs`, estou dando algumas certezas
+para o compilador que algumas das tretas não estarão disponíveis.
+
 Podemos também ter anotações para fazer processamento de bytecode. Um exemplo de possível
 uso para isso é gerar um grafo de injeção de dependência estilo [Dagger](https://dagger.dev/).
 Apenas lendo o bytecode da aplicação (e eventualmente das libs) é possível determinar qual
@@ -2154,16 +2164,99 @@ a classe que implementa qual interface e determinar como construir os diversos e
 Note que o processamento de bytecode ocorre antes da aplicação estar no ar, portanto
 não é feito em runtime.
 
-E, finalmente, temos o caso de 
+Um outro caso bem bacana de processamento de bytecode é no relatório de cobertura do JaCoCo.
+O JaCoCo consegue ignorar alguns métodos automaticamente, mas para isso eles precisam estar
+anotados com `@*Generated*`, onde `*` aqui significa qualquer string. O JaCoCo vai inspecionar
+o bytecode atrás dessas anotações e, ao encontrar uma anotação assim, ele irá remover do
+relatório de cobertura a existência das linhas relativas a essa anotação.
 
+E, finalmente, temos o caso de criação de proxy ou decorator ou equivalente. E aqui que
+realmente os olhos brilham ao se falar de anotações. Porque com isso você pode fazer
+uma coisa a mais: aplicar programação orientada a aspeto (AOP, do inglês _aspect
+oriented programming_).
 
-> OBS: falar sobre anotações, escopo de onde a anotação mora (SOURCE vs CLASS vs RUNTIME)
+## Retenção da anotação e outras coisas a mais
 
-> OBS: target de anotação, tipo/field/param/método etc
+Para se criar uma anotação em Java, você precisa definir até onde essa anotação vai
+ficar. Existem 3 níveis:
 
+- SOURCE
+- CLASS
+- RUNTIME
+
+Para fazer reflexão você só pode usar anotações de runtime. Mas as vezes você não
+precisa disso, né? Em diversas casos, você só precisa processar o bytecode para
+gerar um novo código bacana para atender uma necessidade sua. Você pode simplesmente
+processar o código compilado e, em cima de anotações de lá, gerar o código. O Dagger
+na minha lembrança faz isso, e se não o faz ele tem a capacidade de fazer.
+
+Para esse tipo de processamento, escolher retenção de CLASS é o suficiente. Anotações
+de RUNTIME também podem ser usada para processamenot de bytecode. A diferença principal
+entre esses dois tipos de retenção é que na retenção CLASS, ao carregar a classe,
+o classloader remove as anotações antes de disponibilizar o `Class<?>`. Já
+a anotação que marcou a retenção como RUNTIME o classloader deixa disponível.
+
+Anotações de nível de SOURCE só existem a nível de código fonte mesmo. Compilou,
+perdeu. Exemplo disso são as anotações do Lombok, que só existem a níel de código fonte
+e depois disso elas são descartadas. O Lombok intercepta isso e gera o bytecode adeqaudo
+para criação de métodos.
+
+E, bem, a gente precisa de algum modo indicar os metadados da anotação, como qual
+o nível de retenção dela. Pra isso que existem anotações!
+
+Isso mesmo, para adicioar dados de anotação usamos anotações. Esse tipo de anotação
+que anota anotação é chamado de meta-anotação. Por exemplo, a anotação `@Getter` do
+Lombok está anotada assim:
+
+```java
+@Target({ElementType.FIELD, ElementType.TYPE})
+@Retention(RetentionPolicy.SOURCE)
+public @interface Getter {
+        // ...
+}
+```
+
+Além da meta-anotação `@Retention`, existe outra muito importante, chamada de `@Target`.
+Enquanto que em `@Retention` era definido até onde segurar aquela anotação, o `@Target`
+vai determinar quais elementos de código posso segurar com isso. Por exemplo, o `@Getter`
+do Lombok pode ser usado tanto em um campo quando na definição do tipo.
+
+## Parâmetros
+
+Além da anotação carrear dados por si mesma (como em `@SafeVarArgs` ou em `@Override`),
+ainda assim podemos precisar anotar de modo paramétrico. Por exemplo, o `@Retention`,
+você precisa determinar qual vai ser o nível em que a anotação irá viver.
+
+Ao declarar uma anotação, você pode dizer quais são os parâmetros dela. E isso permite
+adicionar muito mais metadados do que a anotação pura e simples. Isso permite que nos
+livremos dos xml's de configuração, de uma vez por todas.
+
+Pegando o exemplo de `@Retention`. Podemos dizer que o código é mais ou menos:
+
+```java
+@interface Retention {
+    RetentionPolicy value();
+
+}
+```
+
+Existe uma miríade de informações que podem ser adicionadas a uma anotação.
+Como já vimos antes, temos enumerações. Além disso, podemos colocar booleanos,
+inteiros e strings. E tudo isso tanto em escalar como em uma forma de vetores
+também.
+         
 > OBS: resgatar em runtime
 
+## AOP
+
 > OBS: AOP aspect oriented programming, tenant em multi-tenant por exemplo
+
+> OBS: comparar com decorator python (decorator python já faz AOP de cara,
+> no java precisa de algo por fora para fazer isso)
+
+## Outros usos de anotação
+
+> OBS: o caso de ler os campos anotados
 
 # Bolando a interface para falar com Java em Ruby
 
