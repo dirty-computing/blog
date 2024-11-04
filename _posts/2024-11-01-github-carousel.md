@@ -6,7 +6,6 @@ tags: svg html github md bash css
 base-assets: "/assets/github-carousel/"
 pixmecoffe: jeffquesado
 twitter: jeffquesado
-draft: "true"
 ---
 
 > Baseado nesta [minha publicação no Twitter](https://x.com/jeffquesado/status/1599361918795333632)
@@ -451,13 +450,9 @@ falando sobre o assunto.
 
 ```css
 .girassol {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     margin: 0;
-    width: 100%;
     height: 400px;
+    aspect-ratio: 1 / 1;
     background-image: url("girassol.png");
     background-repeat: no-repeat;
     background-size: contain;
@@ -490,13 +485,9 @@ e com isso eu tenho esse HTML:
                 }
 
                 .girassol {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
                     margin: 0;
-                    width: 100%;
                     height: 400px;
+                    aspect-ratio: 1 / 1;
                     background-image: url("{{ page.base-assets | append: "girassol.png" | relative_url }}");
                     background-repeat: no-repeat;
                     background-size: contain;
@@ -543,13 +534,9 @@ ele não está no mesmo diretório do que as imagens):
                 }
 
                 .girassol {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
                     margin: 0;
-                    width: 100%;
                     height: 400px;
+                    aspect-ratio: 1 / 1;
                     background-image: url("{{ page.base-assets | append: "girassol.png" | relative_url }}");
                     background-repeat: no-repeat;
                     background-size: contain;
@@ -586,13 +573,9 @@ ele não está no mesmo diretório do que as imagens):
                 }
 
                 .girassol {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
                     margin: 0;
-                    width: 100%;
                     height: 400px;
+                    aspect-ratio: 1 / 1;
                     background-image: url("{{ page.base-assets | append: "girassol.png" | relative_url }}");
                     background-repeat: no-repeat;
                     background-size: contain;
@@ -638,7 +621,7 @@ Ué... O que ocorreu? Será que o elemento tá no canto? Clica aqui embaixo para
 pintar de rosa o backgound:
 
 <script>
-    function toggleHilightCarrosselFalho() {
+    function toggleHighlightCarrosselFalho() {
         const spanCarrosselFalho = document.getElementById("carrossel-falho")
         if (spanCarrosselFalho.hasAttribute("data-highlight")) {
             spanCarrosselFalho.removeAttribute("data-highlight")
@@ -648,7 +631,7 @@ pintar de rosa o backgound:
     }
 </script>
 
-<button onclick="toggleHilightCarrosselFalho()">Toggle destaque</button>
+<button onclick="toggleHighlightCarrosselFalho()">Toggle destaque</button>
 
 Hmmm, então esse objeto está aí... mas não carregou?
 
@@ -673,14 +656,14 @@ na presença do atributo, mas também em uma classe específica
 do seletor CSS:
 
 ```css
-.highlight-opt[data-hilight="true"] {
+.highlight-opt[data-highlight="true"] {
     background-color: deeppink;
 }
 ```
 
 Do jeito que está construído o seletor acima, ele só será ativado
 caso o elemento HTML tenha a classe `.highlight-opt` e também
-o atributo `data-hilight` com o valor `true`.
+o atributo `data-highlight` com o valor `true`.
 
 Mas agora tem um problema, como consigo adicionar a classe ao `<img>`
 da importação do SVG? O SVG eu importei através da diretiva de markdown
@@ -735,27 +718,27 @@ questão, posso colocar no seletor do CSS para pegar as tags `img`
 filhas daquele seletor que foi definido inicialmente:
 
 ```css
-.highlight-opt[data-hilight="true"]>img {
+.highlight-opt[data-highlight="true"]>img {
     background-color: deeppink;
 }
 ```
 
 Esse `>` vai pegar o elemento `img` que seja filho imediato de um
-nó que satisfaça `.highlight-opt[data-hilight="true"]`. Se eu colocar
-um espaço ` ` no lugar do `>` (`.highlight-opt[data-hilight="true"] img`),
+nó que satisfaça `.highlight-opt[data-highlight="true"]`. Se eu colocar
+um espaço ` ` no lugar do `>` (`.highlight-opt[data-highlight="true"] img`),
 a interpretação é "um elemento `img` que seja descendente de um nó
-que satisfaça `.highlight-opt[data-hilight="true"]`".
+que satisfaça `.highlight-opt[data-highlight="true"]`".
 
 Inclusive essa questão do espaçamento pode gerar um incômodo no
 backender que está escrevendo o CSS. Por exemplo, eu costumeiramente
 colocava espaços entre as partes que deveriam ser satisfeitas do seletor
-CSS. Por exemplo, colocar `.highlight-opt [data-hilight="true"]`
-no lugar de `.highlight-opt[data-hilight="true"]`. Só que as semânticas
+CSS. Por exemplo, colocar `.highlight-opt [data-highlight="true"]`
+no lugar de `.highlight-opt[data-highlight="true"]`. Só que as semânticas
 são distintas demais entre esses dois seletores, e minha cabeça de
 backender se confundia com isso. Ao botar tudo junto, estou dizendo
 "um nó que seja da classe `highlight-opt` e que tenha o atributo
-`data-hilight` com valor `true`". Ao por o espaço, a interpretação
-é "um nó que tenha o atributo `data-hilight` com valor `true` que
+`data-highlight` com valor `true`". Ao por o espaço, a interpretação
+é "um nó que tenha o atributo `data-highlight` com valor `true` que
 seja descendente de um nó com classe `highlight-opt`".
 
 ### O que aconteceu com o SVG na imagem?
@@ -814,13 +797,9 @@ Vamos definir o formato geral do SVG primeiro?
 					/* injetar os frames aqui */
 				}
 				.girassol {
-					display: flex;
-					flex-direction: column;
-					align-items: center;
-					justify-content: center;
 					margin: 0;
-					width: 100%;
 					height: 400px;
+                    aspect-ratio: 1 / 1;
 					background-image: url(/* inserir imagem do girassol padrão */);
 					background-repeat: no-repeat;
 					background-size: contain;
@@ -846,13 +825,9 @@ cat <<EOG
 					/* injetar os frames aqui */
 				}
 				.girassol {
-					display: flex;
-					flex-direction: column;
-					align-items: center;
-					justify-content: center;
 					margin: 0;
-					width: 100%;
 					height: 400px;
+                    aspect-ratio: 1 / 1;
 					background-image: url(/* inserir imagem do girassol padrão */);
 					background-repeat: no-repeat;
 					background-size: contain;
@@ -880,13 +855,9 @@ cat <<EOG
 					`create_frames`
 				}
 				.girassol {
-					display: flex;
-					flex-direction: column;
-					align-items: center;
-					justify-content: center;
 					margin: 0;
-					width: 100%;
 					height: 400px;
+                    aspect-ratio: 1 / 1;
 					background-image: url(`create_base_64 girassol.png`);
 					background-repeat: no-repeat;
 					background-size: contain;
@@ -1137,13 +1108,9 @@ exibido parcialmente, não pus ele todo aqui):
 }
 				}
 				.girassol {
-					display: flex;
-					flex-direction: column;
-					align-items: center;
-					justify-content: center;
 					margin: 0;
-					width: 100%;
 					height: 400px;
+                    aspect-ratio: 1 / 1;
 					background-image: url("data:image/png;base64,iVBORw0KGgoAAAA...");
                     background-repeat: no-repeat;
                     background-size: contain;
