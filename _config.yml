@@ -13,9 +13,10 @@ description: > # this means to ignore newlines until "baseurl:"
   à programação, computação ou engenharia de software.
 baseurl: "/blog" # the subpath of your site, e.g. /blog
 url: "https://computaria.gitlab.io" # the base hostname & protocol for your site
-twitter_username: JeffQuesado
+#twitter_username: JeffQuesado
 github_username:  jeffque
 gitlab_username:  jefferson.quesado
+bsky_username: jeffquesado.ulivre.dev
 stackoverflow_username: jefferson-quesado
 stackoverflow_userid: 64969
 

@@ -32,6 +32,12 @@
           </li>
           {% endif %}
 
+          {% if site.bsky_username %}
+          <li>
+            {% include icon-bsky.html username=site.bsky_username %}
+          </li>
+          {% endif %}
+
           {% if site.stackoverflow_username %}
           <li>
             {% include icon-stackoverflow.html username=site.stackoverflow_username userid=site.stackoverflow_userid %}
