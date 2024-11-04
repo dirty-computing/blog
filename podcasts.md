@@ -58,3 +58,18 @@ Convidados:
 
 Canal:
 - [YouTube](https://www.youtube.com/@carlosenog)
+
+# Javismo Cultural, message oriented middleware (Carlos Nogueira, Engineering Sessions)
+
+Engineering sessions, S04E05:
+
+- [YouTube](https://youtu.be/IXMF-8o7eDw?si=I-s0jfn_SMiunn5c)
+
+Host:
+- Carlos Nogueira
+
+Convidados:
+- Hugo Prudente
+- Jefferson Quesado
+- Victor Osório
+- Zan Franceshi
