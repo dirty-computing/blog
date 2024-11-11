@@ -2,7 +2,7 @@
 layout: post
 title: "Conheça-te a ti mesmo! Reflexão e meta-programação em Java e Ruby"
 author: "Jefferson Quesado"
-tags: java ruby reflection meta-programming ipc typescript totalcross
+tags: java ruby python reflection meta-programming ipc typescript totalcross
 base-assets: "/assets/java-mirror-mirror-on-the-wall/"
 pixmecoffe: jeffquesado
 twitter: jeffquesado
@@ -110,7 +110,7 @@ Java nativo.
 E com isso passamos a desenvolver o sistema em 4 frentes:
 
 1. o _core_ do sistema, em Java, com restrição de ser compatível com
-  TotalCross, Android, Java Web e em algumas situações GWT
+   TotalCross, Android, Java Web e em algumas situações GWT
 2. a aplicação web em GWT, em Java
 3. a aplicação móvel em TotalCross, em Java
 4. a nova versão em Flutter, com parte do código em Dart e parte em Java
@@ -2197,7 +2197,7 @@ o classloader remove as anotações antes de disponibilizar o `Class<?>`. Já
 a anotação que marcou a retenção como RUNTIME o classloader deixa disponível.
 
 Anotações de nível de SOURCE só existem a nível de código fonte mesmo. Compilou,
-perdeu. Exemplo disso são as anotações do Lombok, que só existem a níel de código fonte
+perdeu. Exemplo disso são as anotações do Lombok, que só existem a nível de código fonte
 e depois disso elas são descartadas. O Lombok intercepta isso e gera o bytecode adeqaudo
 para criação de métodos.
 
@@ -2236,7 +2236,6 @@ Pegando o exemplo de `@Retention`. Podemos dizer que o código é mais ou menos:
 ```java
 @interface Retention {
     RetentionPolicy value();
-
 }
 ```
 
@@ -2244,15 +2243,596 @@ Existe uma miríade de informações que podem ser adicionadas a uma anotação.
 Como já vimos antes, temos enumerações. Além disso, podemos colocar booleanos,
 inteiros e strings. E tudo isso tanto em escalar como em uma forma de vetores
 também.
-         
-> OBS: resgatar em runtime
+
+## Um exemplo de anotação com retenção em runtime
+
+Pegar um exemplo próximo do real. Utilizei algo disso no trabalho.
+
+Eu tenho um objeto que é onde vou colocar os dados utilizados em uma operação.
+Após processada a operação, eu guardo esse registro para posteriormente poder
+desserializar e fazer o replay dessa operação. Alguns desses dados tem resgate
+de uso direto, outros precisam ser ignorados e deixados para o runtime
+preencher, e ainda tem outros que são resgatados de uma maneira porém para serem
+utilizados precisam passar por uma transformação. Então preciso que cada atributo
+tenha duas informações a mais sobre eles:
+
+- se deve ser ignorado ou não
+- qual a tratativa que ele deve receber antes de ser repassado para o objeto de
+  trabalho do replay
+
+Com isso, temos o objeto que guarda esses valores:
+
+```java
+class OperationalData {
+
+    private String someValue;
+    private Map<String, String> keyValue;
+    private SomeDeepObject deepObjet;
+    private ThisIsCurriedFunction curriedFunction;
+
+    // getters e setters
+}
+```
+
+A partir disso, conseguimos ter os objetos desejados em runtime, serializar
+e desserializar. Por uma questão de regras de negócio, ao fazer o replay,
+preenchemos parcialmente um objeto novo de `OperationalData` e, então, fazemos
+o merge do `OperationalData` da rodada anterior. Um dos motivos dessa escolha
+é o `curriedFunction`.
+
+O `curriedFunction` é uma função do tipo `String -> String -> Object`,
+onde `Object` é resgatado de um banco de dados com base nas strings passadas
+como parâmetros. Para serializar os dados de `curriedFunction` usados,
+a estratégia foi armazenar em níveis em um JSON. Por exemplo, se em algum
+momento for utilizada a seguinte consulta:
+
+```java
+operationalData.getCurriedFunction()
+    .find("catKey")
+    .find("innerKey");
+```
+
+Se a saída for um objeto assim:
+
+```json
+{
+    "cod": "c",
+    "qtd": 3,
+    "valor_unitario": "98.14"
+}
+```
+
+A serialização do objeto `curriedFuntion` será assim:
+
+```json
+{
+    "curriedFunction": {
+        "catKey": {
+            "innerKey": {
+                "cod": "c",
+                "qtd": 3,
+                "valor_unitario": "98.14"
+            }
+        }
+    },
+    // ...
+}
+```
+
+De modo semelhante, se a chamada contiver duas chamadas dentro da mesma
+"categoria":
+
+```json
+{
+    "curriedFunction": {
+        "catKey": {
+            "innerKey": {
+                "cod": "c",
+                "qtd": 3,
+                "valor_unitario": "98.14"
+            },
+            "anotherInnerKey": ...
+        }
+    },
+    // ...
+}
+```
+
+Colocando outra categoria:
+
+```json
+{
+    "curriedFunction": {
+        "catKey": {
+            "innerKey": {
+                "cod": "c",
+                "qtd": 3,
+                "valor_unitario": "98.14"
+            },
+            "anotherInnerKey": ...
+        },
+        "alternativeCat": {
+            "alternativeInnerKey": ...,
+            "anotherAlternativeInnerKey": ...
+        }
+    },
+    // ...
+}
+```
+
+Muito bem, temos o nosso objeto serializado explicado. Por um motivo
+de regras de negócio, os valores em `keyValue` precisam ser preenchidos
+durante o tempo de execução e isso faz parte da execução da operação,
+não pode ser usado o valor anterior, então esse atributo precisa ser
+ignorado. O resto, é usado normalmente, e preciso de uma lida especial
+com o `curriedFunction`.
+
+Então, com isso em mente, vamos escrever a anotação de `@ReplayAttribute`?
+
+```java
+@interface ReplayAttribute {
+    boolean ignored() default false;
+    MergeStrategy strategy() default STANDARD;
+}
+```
+
+Com isso precisamos definir o `MergeStrategy` também:
+
+```java
+enum MergeStrategy {
+    STANDARD,
+    CURRIED_FUNCTION,
+    ...;
+
+    void merge(OperationalData oldData, OperationalData newData, Field fi) {
+        try {
+            final var fieldName = fi.getName();
+            final var getterPreffix = fi.getType() == boolean.class? "is": "get";
+            final var getterName = getterPreffix +
+                    fieldName.substring(0, 1).toUpperCase() +
+                    fieldName.substring(1);
+            final var setterName = "set" +
+                    fieldName.substring(0, 1).toUpperCase() +
+                    fieldName.substring(1);
+
+            final var declaringClass = fi.getDeclaringClass();
+            final var getter = declaringClass.getDeclaredMethod(getterName);
+            final var setter = declaringClass.getDeclaredMethod(setterName, fi.getType());
+            final Object fieldValue = getter.invoke(oldData);
+
+            setter.invoke(newData, switch (this) {
+                case STANDARD -> fieldValue,
+                case CURRIED_FUNCTION -> {
+                    ...
+                }
+            });
+        } catch (IllegalAccessException | NoSuchMethodException e) {
+            throw new RuntimeException(e); // problema para o futuro
+        }
+    }
+}
+```
+
+Vamos destrinchar um pouquinho? O método `merge` permite inserir as coisas
+de `oldData` em `newData`, passando um `Field` de cada vez.
+
+Para acessar o setter específico, primeiro eu transformo o nome do `Field`
+(guardado em `fieldName`) no padrão setter: o prefixo `set` + o nome do campo,
+porém com a primeira letra maiúscula:
+
+```java
+final var setterName = "set" +
+        fieldName.substring(0, 1).toUpperCase() +
+        fieldName.substring(1);
+```
+
+Com o nome do setter em mãos, para resgatar o setter adequado preciso perguntar
+a classe que declara o campo `Field.getDeclaringClass()` qual o método que tem
+comom nome o `setterName` e que tem como parâmetro um único valor do tipo do
+campo `Field.getType()`:
+
+```java
+final var declaringClass = fi.getDeclaringClass();
+final var setter = declaringClass.getDeclaredMethod(setterName, fi.getType());
+```
+
+Para o nome do getter, primeiro precisa se atentar a um detalhe de convenção:
+se o campo for um `boolean` (isso não vale para `Boolean`, só para o primitivo
+`boolean`), o prefixo é `is`, caso contrário o prefixo é `get`. Com esse
+detalhe em mente, de resto é igual ao padrão para setter: o prefixo (que
+pode ser `get` ou `is`)  + o nome do campo, porém com a primeira letra
+maiúscula:
+
+```java
+final var getterPreffix = fi.getType() == boolean.class? "is": "get";
+final var getterName = getterPreffix +
+        fieldName.substring(0, 1).toUpperCase() +
+        fieldName.substring(1);
+```
+
+No caso para pegar o método é simplesmente o método com o nome do
+getter e sem parâmetros:
+
+```java
+final var declaringClass = fi.getDeclaringClass();
+final var getter = declaringClass.getDeclaredMethod(getterName);
+```
+
+Ok, muito bem, mas como vamos resolver a questão do `curriedFunction`?
+
+Temos aqui uma implementação muito vaga sobre como é sua interface:
+
+```java
+interface ThisIsCurriedFunction {
+    default Findable<String, Object> find(String category) {
+        return specifics -> find(category, specifics);
+    }
+
+    interface Findable<K, V> {
+        V find(K key);
+    }
+
+    Object find(String category, String specifics);
+}
+```
+
+Uma implementação da versão dela, pura:
+
+```java
+class CurriedFunctionProxy implements ThisIsCurriedFunction {
+
+    final BiFunction<String, String, Object> dbQuery;
+
+    CurriedFunctionProxy(BiFunction<String, String, Object> dbQuery) {
+        this.dbQuery = dbQuery;
+    }
+
+    @Override
+    public Object find(String category, String specifics) {
+        return dbQuery.apply(category, specifics);
+    }
+}
+```
+
+Só que essa classe não favorece em nada a serialização. Para respeitar a
+serialização escolhida, vamos usar uma alternativa com memoização:
+
+```java
+class MemoizedCurriedFunctionProxy implements ThisIsCurriedFunction {
+
+    @JsonIgnore
+    final BiFunction<String, String, Object> dbQuery;
+    @JsonIgnore
+    final HashMap<String, Map<String, Object>> data = new HashMap<>();
+
+    MemoizedCurriedFunctionProxy(BiFunction<String, String, Object> dbQuery) {
+        this.dbQuery = dbQuery;
+    }
+
+    @Override
+    public Object find(String category, String specifics) {
+        if (data.containsKey(category)) {
+            final var catMap = data.get(category);
+            if (catMap.containsKey(specifics)) {
+                return catMap.containsKey(specifics);
+            }
+        }
+        final var result = dbQuery.apply(category, specifics);
+        final var catMap = data.computeIfAbsent(category, k -> new HashMap<>());
+        catMap.put(specifics, result);
+        return result;
+    }
+
+    @JsonAnyGetter
+    public Map<String, Map<String, Object>> getData() {
+        return data;
+    }
+}
+```
+
+Aqui o `@JsonAnyGetter` serve para colocar no nível do objeto sendo serializado
+as chaves do mapa como sendo os campos do objeto. Se eu não tivesse colocado
+o `@JsonAnyGetter`, mantendo os `@JsonIgnore`, teríamos como serialização
+apenas:
+
+```json
+{}
+```
+
+Porém, desse jeito, podemos ter o esquema deseado:
+
+```java
+{
+    "catKey": {
+        "innerKey": {
+            "cod": "c",
+            "qtd": 3,
+            "valor_unitario": "98.14"
+        },
+        "anotherInnerKey": ...
+    },
+    "alternativeCat": {
+        "alternativeInnerKey": ...,
+        "anotherAlternativeInnerKey": ...
+    }
+}
+```
+
+Ok, muito bem. Agora, para desserializar isso? Vamos assumir que a versão
+desserializada não leve em consideração nada de banco de dados, apenas em cima
+dos valores desserializados. Aqui vou usar o `@JsonAnySetter` para fazer o
+trabalho simétrico ao que o `@JsonAnyGetter` proporcionou:
+
+```java
+class FromSerializedCurriedFunctionProxy implements ThisIsCurriedFunction {
+
+    @JsonIgnore
+    final HashMap<String, Map<String, Object>> data = new HashMap<>();
+
+    @Override
+    public Finable<String, Object> find(String category) {
+        if (data.containsKey(category)) {
+            return specifics -> null;
+        }
+        final var catMap = data.get(category);
+        return catMap::get;
+    }
+
+    @Override
+    public Object find(String category, String specifics) {
+        return this.find(category)
+                .find(specifics);
+    }
+
+    @JsonAnySetter
+    public void setData(String category, Map<String, Object> values) {
+        data.computeIfAbsent(category, h -> new HashMap<>())
+                .put(categpry, values);
+    }
+
+    // isso aqui vou usar depois
+    public boolean hasValue(String category, String specifics) {
+        if (!data.containsKey(category)) {
+            return false;
+        }
+        final var catMap = data.get(category);
+        return catMap.containsKey(specifics);
+    }
+}
+```
+
+Note que o `@JsonAnySetter` permite que o Jackson insira valores com chaves
+arbitrárias. O `@JsonAnySetter` precisa ser anotado em um método que receba uma
+string e um objeto, ou então em um campo `Map<String, ?>`.
+
+Para pedir para a interface que o Jackson serializou desserializar em uma
+instância especíica da classe `FromSerializedCurriedFunctionProxy`, precisamos
+alteraruma coisinha na interface:
+
+```java
+@JsonDeserialize(as = FromSerializedCurriedFunctionProxy.class)
+interface ThisIsCurriedFunction {
+    default Function<String, Object> find(String category) {
+        return specifics -> find(category, specifics);
+    }
+
+    Object find(String category, String specifics);
+}
+```
+
+Tendo isso em mãos, como seria a estratégia `CURRIED_FUNCTION`? Bem, primeiro
+vamos começar pegando o valor atual. Ele tem acesso para além do que foi usado
+na operação inicial. Basicamente, se não tiver na rodada anterior, pego da nova
+função.
+
+Então, o valor antigo é sabidamente nulo, então não tem o que entfeitar, só
+retornar o valor atual. Caso contrário, primeiro consultamos no valor que foi
+guardado anteriormente (`FromSerializedCurriedFunctionProxy#hasValue` que foi
+criado nessa classe específica). Caso tenha, retorne esse valor; caso
+contrário, retorne o valor da consulta atual. Envelope isso em um
+`MemoizedCurriedFunctionProxy` para podermos saber o que foi consultado nessa
+rodada e pronto.
+
+```java
+final ThisIsCurriedFunction newCurriedFunction = (ThisIsCurriedFunction) getter.invoke(newData);
+if (fieldValue == null) {
+    yield newCurriedFunction;
+}
+final FromSerializedCurriedFunctionProxy fromSerializedCurriedFunction = (FromSerializedCurriedFunctionProxy) fieldValue;
+yield new MemoizedCurriedFunctionProxy((cat, specifics) -> {
+    if (fromSerializedCurriedFunction.hasValue(cat, specifics)) {
+        return fromSerializedCurriedFunction.find(cat, specifics)
+    }
+    return newCurriedFunction.find(cat, specifics);
+});
+```
+
+Ainda precisamos saber como usar a anotação para poder chamar esse código.
+Então, vamos lá, a função `mergeInto`:
+
+```java
+class OperationalData {
+
+    private String someValue;
+    private Map<String, String> keyValue;
+    private SomeDeepObject deepObjet;
+    private ThisIsCurriedFunction curriedFunction;
+
+    // getters e setters
+
+    void mergeInto(OperationalData newData) {
+        Field[] oldFields = this.getClass().getDeclaredFields();
+
+        record AnnotatedField(Field fi, ReplayAttribute replayAttr) {
+            AnnotatedField(Field fi) {
+                this(fi, fi.getAnnotation(ReplayAttribute.class));
+            }
+            void merge(OperationalData oldData, OperationalData newData) {
+                replayAttr.strategy().merge(oldDate, newData, fi);
+            }
+        }
+
+        Stream.of(oldFields)
+                .map(AnnotatedField::new)                   // mapeia para o campo com a anotação
+                .filter(af -> af.replayAttr() != null)      // possuem de fato a anotação
+                .filter(af -> !af.replayAttr().ignored())   // não pode ser ignorado
+                .forEach(af -> af.merge(oldData, newData)); // pronto, o que não foi filtrado fora faz o merge
+    }
+}
+```
 
 ## AOP
 
+AOP é um subparadigma de programação que indica que uma parte do código irá ser
+processada dentro de um "aspecto". Por exemplo, podemos por o aspecto de
+"cronometrar a execução".
+
+Outros aspectos que já vi incluem:
+
+- garantir nível de acesso do usuário
+- loggar
+- selecionar o tenant de um app multi-tenant
+
+Sobre essa questão específica do multo-tenant, eu cheguei a trabalhar com isso.
+Lá era necessário escolher o tenant adequadamente (isso implica na escolha da
+conexão JDBC correta etc). Também tinha situações em algumas apps que eram de
+instância única que algumas operações no tenant específica eram extremamente
+críticas, necessitando assim que fossem executadas em modo de total isolamento.
+
+Para lidar com essas coisas, criei 3 anotações:
+
+- `@RequiresTenant`, para indicar que aquela função ou classe necessitava de
+  seleção de tenant
+- `@Tenant`, no próprio parâmetro para indicar quem era o tenant
+- `@TenantMutex`, para indicar que o tenant precisa ser acessado de modo
+   único dentro desse
+
+Um exemplo (artificial) de código que usaria essas anotações:
+
+```java
+@RestController
+@RequestMapping("/import/{tenant}")
+@RequiresTenant
+class ImportacaoDadosController {
+
+    @GetMapping("/{table}/count")
+    public int countLinesOfTable(@Tenant @PathVariable String tenant,
+                                 @PathVariable String table) {
+        return count(table);
+    }
+
+    @PostMapping
+    @TenantMutex
+    public void importData(@Tenant @PathVariable String tenant,
+                           @RequestBody InputStream data) {
+        handleData(data);
+    }
+}
+```
+
+Aqui o método `countLinesOfTable` tem duas variáveis de URL: a primeira é
+`{tenant}` e está anotada devidamente com `@PathVariable` e também `@Tenant`, e
+a segunda que está anotada como `@PathVariable`.
+
+Já o método `importData` tem também uma variável de `@PathVariable` que é o
+próprio `{tenant}`, do mesmo modo que `countLinesOfTable`. Tem também o
+parâmetro anotado com `@RequestBody`, que devido a como foi pedido o
+Spring-Boot vai fazer o mínimo de tratativa possível em cima e me entregar o
+mais _raw data_ possível, se não me engano vai lidar com possível compressão
+apenas. Note que esse método, entretanto, também está anotado com
+`@TenantMutex`.
+
+A inserção do aspecto vai garantir que o tenant vai ser colocado corretamente
+para a seleção da conexão JDBC ou que o acesso a um tenant seja único naquela
+aplicação.
+
+Vamos usar aqui algo do AspectJ para usar AOP. Detalhes variam, mas a ideia num
+modo geral é essa. Para usar os aspectos no AspectJ, precisamos definir duas
+coisas:
+
+- o ponto de corte
+- como lidar com o ponto de corte através de um _advice_
+
+Por exemplo, para pegar o ponto de corte "métodos executados dentro de classes
+anotadas com `@RequiresTenant`":
+
+```aspectj
+within(@RequiresTenant *) && execution(* *(..))
+```
+
+Esse é o ponto de corte. Para lidar com isso, precisamos criar um aspecto:
+
+```java
+@Aspect
+public class TenantAspect {
+
+    @Pointcut("within(@RequiresTenant *) && execution(* *(..))")
+    public void requiresTenant() {
+    }
+
+    @Around("requiresTenant()") // advice around
+    public Object around(ProceedingJoinPoint pjp) throws Throwable {
+        // OBS: lidar com o @Tenant real
+        return pjp.proceed(pjp.args());
+    }
+}
+```
+
+Ok, lidando com `requiresTenant`. Colocamos o _advice_ `@Around`. Esse tipo de
+_advice_ é pra você indicar processamentos que vão ocorrer ao redor do método
+sendo executado, do método que o aspecto irá interromper. O `@Around` permite
+ter todo o poder de um decorador nas mãos.
+
+Mas também tem a possibilidade de fornecer outros _advices_, como por exemplo
+`@Before` que vai executar antes do método ser chamado, `@AfterReturn` que será
+chamado após um retorno tranquilo do método.
+
+> OBS: como pegar o método do pjp?
+
+> OBS: como manipular os args do pjp.args()?
+
 > OBS: AOP aspect oriented programming, tenant em multi-tenant por exemplo
 
-> OBS: comparar com decorator python (decorator python já faz AOP de cara,
-> no java precisa de algo por fora para fazer isso)
+### Decoradores?
+
+Muita coisa que se faz em Java com anotações para alterar a execução de código
+é na prática por um decorador na função/classe. Mas anotações Java não se resumem
+a isso, como visto acima.
+
+Em Python, temos uma coisa que se escreve de modo *muito semelhante* a uma
+anotação Java. Abaixo um exemplo do uso de um decorador que remove um campo
+específico de um dicionário que se tem no retorno de uma função:
+
+```python
+@remove_property_etc_from_dict
+def createDict(input_obj):
+    if isinstance(input_obj, dict):
+        return input_obj
+    if isinstance(input_obj, str):
+        return json.loads(input_obj)
+    return None
+```
+
+A implementação de `remove_property_etc_from_dict` é na forma de uma função
+que retorna a função decorada. Decoradores em Python também podem ser para
+classes, mas aqui vou focar em funções. Aqui a implementação do decorador,
+que remove o campo `etc` no dicionário retornado:
+
+```python
+def remove_property_etc_from_dict(func):
+    def decorated_func(*args, **kwargs):
+        returned_dict = func(*args, **kwargs)
+        if returned_dict is None:
+            return None
+        returned_dict.pop('etc', None)
+        return returned_dict
+    return decorated_func
+```
+
+O decorador do Python tem uso imediato e já afeta o resultado da computação,
+pode até testar no IDLE agora. Nesse sentido, o decorador no Python é
+distinto do que se tem em anotações no Java. Escopo menor, poder menor, mas
+mais direto para utilizar.
 
 ## Outros usos de anotação
 
