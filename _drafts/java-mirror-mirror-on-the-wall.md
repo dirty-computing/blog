@@ -38,7 +38,7 @@ O software em si era um força de vendas. Ela se caracterizava por ter um portal
 web multi-tenant e, também, uma versão mobile com as mesmas funcionalidades do
 portal com um _catch_ a mais: ele era disponibilizado também offline, portanto
 vendedores deveriam ser capazes de lidar com as diversas e mais complexas regras
-de negócio mesmo estando desligados.
+de negócio mesmo estando desplugados.
 
 Entre as diversas atividades de tiragem de pedido, haviam diversas validações
 que eram disparadas em condições distintas. Em 2021 haviam mais de 90
@@ -142,17 +142,18 @@ homenagem ao Pokemon elefante cujo _signature move_ é girar:
 
 ![Donphan](https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/232.png)
 
-O ritual foi chamado de "rotação" (por isso o Donphan), as pessoas e as atividades
-eram atribuídas a números e botávamos no [https://random.org](https://random.org)
-para obter uma permutação verdadeiramente aleatória de pessoas e atividades.
+Criamos um ritual chamado de "rotação" (por isso o Donphan), no qual as pessoas
+e as atividades eram atribuídas a números e botávamos no
+[https://random.org](https://random.org) para obter uma permutação
+verdadeiramente aleatória de pessoas e atividades.
 
 Diversas encarnações e regras distintas foram tentadas, uma delas mais clara
 na minha cabeça é que a rotação era feita 2 vezes por dia, existiam mais
 atividades do que duplas disponíveis para atacar as atividades, e o tempo
 de passagem de conhecimento era de no máximo 5 minutos síncronos, após
 esse tempo os pares deveriam já estabelecer no que cada um iria atacar da
-atividade em si (ou se irião de _pair programming_ clássico, de acordo
-com a necessidade que a dupla sentia para a atividade).
+atividade em si (ou se iriam de _pair programming_ clássico, de acordo
+com a necessidade que a dupla sentisse para a atividade).
 
 Devo dizer que o pessoal que trabalha comigo fala bastante que eles cresceram
 em conhecimento técnico e no conhecimento de negócio da empresa. Também
@@ -168,7 +169,7 @@ alcançar, inspecionando a região de código ao redor de onde o outro tinha
 deixado a atividade, era só dar o próximo pasos.
 
 E se programava assim. A pessoa precisava se situar, olhar a programação,
-extrair daquilo informação para o próximo passo, e codificar o passo
+extrair daquilo informação para o próximo passo, e decidir qual o passo
 necessário para codificar.
 
 E o que esse prefácio todo tem a ver com reflexão no java? Porque, ao
@@ -278,7 +279,7 @@ a sessão a cada deploy). Ou então as vezes o usuário simplesmente
 tinha um azar de pegar uma atualização automática do Windows e
 o SO fechava o browser contra a vontade dele para se reiniciar.
 
-Bem, preciso dizer que isso era em uma tela crítica do sistema
+Preciso dizer que isso era em uma tela crítica do sistema
 que mantinha a principal operação do usuário? E que não era uma
 operação simples, mas sim parte de uma negociação entre o usuário
 e o cliente dele envolvendo diversas questões de venda e muitas
@@ -337,10 +338,10 @@ arriou, né?
 `local` aqui tinha serventia dupla. A primeira serventia é justamente essa,
 de apontar qual a tela deveria ser restaurada para continuar o serviço. Além
 disso, como a tela trabalhava com um objeto específico, isso também indicava
-qual o desserializador utilizar para povoar o objeto (o desserialiazdor fica
+qual o desserializador utilizar para povoar o objeto (o desserializador fica
 no backend porque existem informações que não são preenchidas apenas com dados
-que estavam no front, pois eles podme ter sido atualizadas por alguma importação
-de dados naquele intervalor de tempo).
+que estavam no front, pois eles podem ter sido atualizadas por alguma importação
+de dados naquele intervalo de tempo).
 
 A `versao` foi utilizado porque, bem... o sistema evolui, né? E com a evolução...
 o shape do objeto eventualmente vai mudar. Com a mudança do shape, posso
@@ -422,7 +423,7 @@ E, bem... agora falta o cadastro para tipos complexos que não são dicionários
 Como esses tipos são definidos, de maneira geral? Normalmente eles são definidos
 como sendo um nome (denominado chave) e dentro dessa chave eu tenho um valor. Então...
 se eu cadastrar todas as chaves desse tipo, e junto a essas chaves, funções para
-extrair os valores, então eu posso aplicar uma lógica de serailização semelhante
+extrair os valores, então eu posso aplicar uma lógica de serialização semelhante
 a que usei para serializar o mapa! Vamos lá!
 
 O `SerializerFromFields<T>` para funcionar precisar ter uma série de mapeamentos
@@ -498,7 +499,7 @@ o serializador de string!
         "\""
 ```
 
-E, bem... não var ser aqui me preocupar tanto assim em casos de caracteres
+E, bem... não vai ser aqui me preocupar tanto assim em casos de caracteres
 multi-bytes. Isso é discussão mais longa. O importante é que, agora, só com
 essas pequenas serializações já consigamos lidar com a figura geral.
 
@@ -573,7 +574,7 @@ List<Method> getters = listarMetodosBonitos(config, m -> m.getName().startsWith(
 ```
 
 Mas, sinceramente? Isso é potencialmente perigoso. Se eu quero um getter, para mim
-só interessa o getter que não tem atributos. Como resolver isso? Adicionando uma
+só interessa o getter que não tem parâmetros. Como resolver isso? Adicionando uma
 condição ao filtro, o de quantos argumentos tem o método:
 
 ```java
@@ -968,7 +969,7 @@ public Iterable<Class<?>> classHierarchy(Object o) {
         Class<?> current = o.getClass();
 
         @Override
-        public booolean hasNext() {
+        public boolean hasNext() {
             return current != null;
         }
 
@@ -1026,7 +1027,7 @@ qualquer chamada que for feita ao `next` ele passará adiante na `Stream`. É
 praticamente um modo de construir streams sem precisar acumular nem listar todos
 os elementos individualmente.
 
-Nesse caso, me parece uma ótimo alternativa para se buscar toda a hierarquia de
+Nesse caso, me parece uma ótima alternativa para se buscar toda a hierarquia de
 classes do objeto. Comecemos do objeto e, a partir dele, tenhamos a hierarquia de
 classes:
 
@@ -1073,14 +1074,14 @@ nesse nível de preocupação _generics_ não vai ser uma preocupação. As gara
 que a linguagem me fornece me dizem que eu vou precisar navegar por um DAG
 (grafo direcionado acíclico, em inglês _directed acyclic graph_).
 
-Bem dizer, eu quero visitar todos os tipos e subtipos. De interfaces. Mas
-para visitar todos os tipos e subtipos eu preciso visitar toda a hierarquia
+Bem dizer, eu quero visitar todos os tipos e supertipos. De interfaces. Mas
+para visitar todos os tipos e supertipos eu preciso visitar toda a hierarquia
 de classes de toda sorte. Bem, pois vamos lá. Vamos nos aproveitar do
 `mapMulti` agora, pra valer.
 
 Lembra que o `mapMulti` fornece um argumento que eu chamei de `next`?
 Em uma `Stream<T>` o tipo de `next` é `Consumer<U>`. No caso atual,
-vou de um `Stream<Class<?>>` e irei consumer outro `Class<?>`, mas
+vou de um `Stream<Class<?>>` e irei consumir outro `Class<?>`, mas
 apenas por coincidência.
 
 Para fazer a navegação por todos os tipos, usando um `Consumer`,
@@ -1202,7 +1203,7 @@ nas próximas iterações.
 Para evitar cair na insanidade, automatizar isso se tornou uma necessidade. Mas, como fazer isso?
 Bem, inspirado (de maneira muito superficial e porca) no Spring, a ideia era ter um conjunto de
 objetos gerenciados pelo motor de injeção de dependência e, ao detectar algum ponto aberto que
-teria uma dependência a si suprir, verificar se tinha algum objeto de tipo compatível e inserir
+teria uma dependência a se suprir, verificar se tinha algum objeto de tipo compatível e inserir
 esse objeto na dependência. Por uma questão de limitação de conhecimento técnico, não iria
 ser feito geração de código. Como a aplicação ainda estaria em "startup time", eu poderia criar
 sem medo os objetos em estado inválido e ajeitar o estado antes do término da inicialização
@@ -1605,7 +1606,7 @@ Os valores default são:
   vazio
 - `0`, para números (e suas variações como o 0L, o zero do long)
   - não se esquecer do zero para `BigDecimal`
-- `false`, para `boolean` (não para `Booolean`)
+- `false`, para `boolean` (não para `Boolean`)
 - nulo para todo o resto (incluindo para `Map`)
 - para `void`, bem, qualquer coisa funciona, vou retornar `null`
   por via das dúvidas
@@ -2221,7 +2222,7 @@ Enquanto que em `@Retention` era definido até onde segurar aquela anotação, o
 vai determinar quais elementos de código posso segurar com isso. Por exemplo, o `@Getter`
 do Lombok pode ser usado tanto em um campo quando na definição do tipo.
 
-## Parâmetros
+## Parâmetros de anotações
 
 Além da anotação carrear dados por si mesma (como em `@SafeVarArgs` ou em `@Override`),
 ainda assim podemos precisar anotar de modo paramétrico. Por exemplo, o `@Retention`,
@@ -2539,7 +2540,7 @@ apenas:
 {}
 ```
 
-Porém, desse jeito, podemos ter o esquema deseado:
+Porém, desse jeito, podemos ter o esquema desejado:
 
 ```java
 {
@@ -2699,6 +2700,10 @@ conexão JDBC correta etc). Também tinha situações em algumas apps que eram d
 instância única que algumas operações no tenant específica eram extremamente
 críticas, necessitando assim que fossem executadas em modo de total isolamento.
 
+> Note que esse artigo não é um tutorial para usar AOP com alguma ferramenta,
+> vou focar mais na parte de reflexão/metaprogramação do que em realmente
+> programação orientada a aspecto.
+
 Para lidar com essas coisas, criei 3 anotações:
 
 - `@RequiresTenant`, para indicar que aquela função ou classe necessitava de
@@ -2706,6 +2711,51 @@ Para lidar com essas coisas, criei 3 anotações:
 - `@Tenant`, no próprio parâmetro para indicar quem era o tenant
 - `@TenantMutex`, para indicar que o tenant precisa ser acessado de modo
    único dentro desse
+
+Aqui um exemplo de como seria a implementação dessas anotações (assumindo
+pacote `jeffque.aspect`):
+
+```java
+package jeffque.aspect;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.METHOD})
+public @interface RequiresTenant {
+}
+```
+
+```java
+package jeffque.aspect;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.PARAMETER)
+public @interface Tenant {
+}
+```
+
+```java
+package jeffque.aspect;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface TenantMutex {
+}
+```
 
 Um exemplo (artificial) de código que usaria essas anotações:
 
@@ -2760,7 +2810,28 @@ anotadas com `@RequiresTenant`":
 within(@RequiresTenant *) && execution(* *(..))
 ```
 
-Esse é o ponto de corte. Para lidar com isso, precisamos criar um aspecto:
+Esse é o ponto de corte. Tem duas condições que precisam ser satisfeitas.
+A primeira é que esteja dentro de um tipo. O tipo precisa estar anotado com
+`@RequiresTenant`. Poderia ser feita alguma limitação na identificação do
+tipo, mas escolhi pegar todo com `*`.
+
+A segunda condição é que seja em relação a qualquer execução. Aqui ele
+indica que é uma execução de qualquer tipo de retorno (primeiro `*`), qualquer nome
+de método (segundo `*`) com qualquer tipo/quantidade de parâmetro `(..)`. Por
+aqui como contraponto outro pointcut:
+`execution(int mcprol.aspectj.dummy.DummyCounter.add(int))`.
+Aqui a execução retorna um int, o método é o método `add` da classe
+`mcprol.aspectj.dummy.DummyCounter`, e recebe um argumento do tipo
+`int`. Esse exemplo foi pegue do repositório
+[https://github.com/mcprol/aspectj-sample-aspects](https://github.com/mcprol/aspectj-sample-aspects).
+Fiz um fork meu
+[https://github.com/jeffque/aspectj-sample-aspects](https://github.com/jeffque/aspectj-sample-aspects)
+para fazer alguns experimentos.
+
+> Não coloquei para aquele pointcut o método ser anotado com `@RequiresTenant`,
+> isso fica para um artigo mais longo sobre AOP.
+
+Para lidar com isso, precisamos criar um aspecto:
 
 ```java
 @Aspect
@@ -2772,8 +2843,9 @@ public class TenantAspect {
 
     @Around("requiresTenant()") // advice around
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
-        // OBS: lidar com o @Tenant real
-        return pjp.proceed(pjp.args());
+        // ainda vazio, só para testar
+        System.out.println("passou pelo TenantAspect");
+        return pjp.proceed(pjp.getArgs());
     }
 }
 ```
@@ -2787,11 +2859,135 @@ Mas também tem a possibilidade de fornecer outros _advices_, como por exemplo
 `@Before` que vai executar antes do método ser chamado, `@AfterReturn` que será
 chamado após um retorno tranquilo do método.
 
-> OBS: como pegar o método do pjp?
+No caso de invocação de método, o `ProceedingJoinPoint` vai ter uma asinatura
+do tipo `MethodSignature`. É seguro usar isso, por exemplo, dentro do _advice_
+`@Around`:
 
-> OBS: como manipular os args do pjp.args()?
+```java
+@Around("requiresTenant()")
+public Object around(ProceedingJoinPoint pjp) throws Throwable {
+    if (pjp.getSignature() instanceof MethodSignature sig) {
+        System.out.println("aqui a assinatura:" + sig);
+    }
+    return pjp.proceed(pjp.getArgs());
+}
+```
 
-> OBS: AOP aspect oriented programming, tenant em multi-tenant por exemplo
+Ok, agora eu preciso examinar qual o parâmetro que esteja anotado
+com `@Tenant`. Para isso, eu posso pegar o método a partir do
+`MethodSignature#getMethod()`. E com isso termina a questão
+específica de aspecto e voltamos a 100% meta programação!
+
+```java
+if (pjp.getSignature() instanceof MethodSignature sig) {
+    final var method = sig.getMethod();
+    // agora explorar o método
+}
+```
+
+A classe de reflexão de método fornece para a gente um jeito
+de pegar todas as anotações de todos os parâmetros,
+`Method#getParameterAnnotations()`. O retorno desse método é
+engraçado. Ele retorna um vetor com o tamanho igual à
+quantidade de parâmetros. Então, no exemplo:
+
+```java
+@GetMapping("/{table}/count")
+public int countLinesOfTable(@Tenant @PathVariable String tenant,
+                                @PathVariable String table) {
+    return count(table);
+}
+```
+
+Ele retornaria um array de 2 posições. Cada posição desse array
+consiste de quais anotações estão em cada parâmetro. Por exemplo,
+`Method#getParameterAnnotations()[0]` retornaria um array com
+duas posições, uma com a anotação `@Tenant` e outro com a anotação
+`@PathVariable`. Já `Method#getParameterAnnotations()[1]`
+retornaria apenas um vetor com uma única posição que é
+`@PathVariable`.
+
+Se eu tivesse o seguinte método sendo interceptado por aspectos:
+
+```java
+public int random(int a, @DummyAnnotation int b, int c) {
+    return a + b + c;
+}
+```
+
+Onde `@DummyAnnotation` é uma anotação com de retenção de runtime.
+O retorno de `Method#getParameterAnnotations()` seria um vetor
+de 3 posições, onde `Method#getParameterAnnotations()[0]` e
+`Method#getParameterAnnotations()[2]` são vetores vazios e
+`Method#getParameterAnnotations()[1]` é um vetor de uma posição
+contendo `@DummyAnnotation`.
+
+Dito isso, como retornar qual o parâmetro que usa o `@Tenant`?
+Bem, podemos devolver o índice com o parâmetro que é o `@Tenant`,
+usando números negativos para falhas: `-1` caso não ache nenhum e
+`-2` caso tenha mais de um `@Tenant` no mesmo método:
+
+```java
+public final int NOT_FOUND = -1;
+public final int CONFLICTING = -2;
+public int findParameterIndexWithAnnotation(Method m, Class<?> annotationClass) {
+    final var paramsAnnotations = m.getParameterAnnotations();
+    int idx = NOT_FOUND;
+
+    for (int i = 0; i < paramsAnnotations.length; i++) {
+        final var singleParamAnnotations = paramsAnnotations[i];
+        for (var annotation: singleParamAnnotations) {
+            if (annotationClass.isInstance(annotation)) {
+                // deu match
+                if (idx != NOT_FOUND) {
+                    // deu choque, pode retornar conflito
+                    return CONFLICTING;
+                }
+                idx = i;
+            }
+        }
+    }
+    return idx;
+}
+```
+
+Para usar e pegar o tenant adequado, vamos capturar esse valor. Caso
+seja valor de falha (menor que zero), abortar. Caso contrário, pegar
+o valor e verificar se é string (precisa ser string). Se não for,
+abortar. Se for, configurar o tenant.
+
+```java
+@Around("requiresTenant()")
+public Object around(ProceedingJoinPoint pjp) throws Throwable {
+    if (pjp.getSignature() instanceof MethodSignature sig) {
+        System.out.println(sig);
+        final var method = sig.getMethod();
+        final var idxTenant = findParameterIndexWithAnnotation(method, Tenant.class);
+
+        if (idxTenant < 0) {
+            // não achou, abortando
+            throw new RuntimeException("problemas com o método que assinala o tenant");
+        }
+        final Object tenantObj = pjp.getArgs()[idxTenant];
+
+        if (tenantObj instanceof String tenant) {
+            configurarTenant(tenant);
+        } else {
+            // achou, mas não é string
+            throw new RuntimeException("tenant não é string?");
+        }
+    }
+    try {
+        // se chegou aqui, o tenant está configurado corretamente
+        return pjp.proceed(pjp.getArgs());
+    } finally {
+        // precisa liberar para evitar efeitos colaterais nocivos
+        // por exemplo, no caso de `configurarTenant` alterar valores
+        // dentro de ThreadLocal
+        liberarTenant(tenant);
+    }
+}
+```
 
 ### Decoradores?
 
@@ -2834,9 +3030,20 @@ pode até testar no IDLE agora. Nesse sentido, o decorador no Python é
 distinto do que se tem em anotações no Java. Escopo menor, poder menor, mas
 mais direto para utilizar.
 
+Note que, como não é uma anotação, não posso deixar a cargo de reflexão apenas
+um esquema para identificar o `@Tenant`, como foi feito no exemplo de AOP.
+Para fazer algo semelhante, vou precisar passar para o decorador mais dicas
+para que ele consiga determinar o tenant.
+
 ## Outros usos de anotação
 
-> OBS: o caso de ler os campos anotados
+Mostrei acima alguns usos, mas está longe de ser uma lista exaustiva. Os
+usos que eu mais fiz foram os acima, mas note que nunca escrevi em nenhum
+momento um processador de anotação, para linkar com o `javac`.
+
+Também não fiz algo para fazer geração, por exemplo, para gerar código
+JSON, por exemplo para exportar um exemplo de classe Java em um schema
+que o TypeScript entenda.
 
 # Bolando a interface para falar com Java em Ruby
 
