@@ -8,7 +8,7 @@ pixmecoffe: jeffquesado
 twitter: jeffquesado
 ---
 
-> O que é uma hikari pool?
+> O que é o hikari pool?
 
 Essa simples pergunta em
 [uma publicação no BlueSky](https://bsky.app/profile/milila.bsky.social/post/3lclm74m6q225)
@@ -190,8 +190,8 @@ jdbc:pstmt-nullsafe:<url de conexão sem jdbc:>
 
 Então, para realizar os
 [testes](https://gitlab.com/geosales-open-source/pstmt-null-safe/-/blob/master/src/test/java/br/com/softsite/pstmtnullsafe/DriverTest.java?ref_type=heads),
-conectei com o SQLite, e usei o indicar do Xerial para pedir para pedir
-uma conexão em memória:
+conectei com o SQLite, e usei o indicar do Xerial para pedir
+uma conexão em memória através da URI de conexão:
 
 ```txt
 jdbc:sqlite::memory:
@@ -202,6 +202,16 @@ então:
 
 ```txt
 jdbc:pstmt-nullsafe:sqlite::memory:
+```
+
+Dissecando a URI acima:
+
+```txt
+jdbc:pstmt-nullsafe:sqlite::memory:
+\__/ \____________/ \____/ \_____/
+ |     |             |       |
+ JDBC  meu driver    |       em memória, não use arquivo
+                    driver do Xerial SQLite
 ```
 
 Tá, e como indicar isso? O `Driver#acceptsURL` deve retornar verdade
