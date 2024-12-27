@@ -11,6 +11,9 @@ twitter: jeffquesado
 Ok, Twitter foi bloqueado no Brasil. E [Bluesky](https://bsky.app/)
 subiu em proeminência. O que fazemos? Nos adaptemos, claro.
 
+> Nota do período histórico: Esse artigo começou a ser escrito em 4/set/2024, durante o Grande Êxodo.
+> [Reportagem sobre o assunto](https://oglobo.globo.com/politica/noticia/2024/09/18/entenda-por-que-o-twitter-virou-x-usuarios-relatam-volta-da-rede-social.ghtml).
+
 Bluesky fornece uma API bem rica e amigável para devs, então
 vou aproveitar para automatizar a publicação de material do Computaria
 nele. Por hora, vou deixar a automatização interna dentro do meu
@@ -505,7 +508,7 @@ para resgatar essas informações e coloco no select. Ficando mais ou menos assi
 
 ![Combo box mostrando as opções de artigos já escritos]({{ page.base-assets | append: "index-html-combobox.png" | relative_url }})
 
-Com isso, consigo publicar? Consegue sim!
+Com isso, consigo publicar? Consigo sim!
 
 No select precisamos ter um dado que é a exibição para o humano e outro que é o valor a ser
 submetido como informação de formulário. Para mim, só o slug é o suficiente para identificar qual
@@ -587,7 +590,111 @@ export function getPostSlugs(): string[] {
 }
 ```
 
-> OBS: submissão de form
+### Um backend básico
+
+Eu escolhi trabalhar com submissão de forms e Vercel, temos aqui que a vida é facilitada.
+O conteúdo do formulário é todo preenchido em `request.body`. Por exemplo, ao submeter
+o artigo [Calculando o comprimento de um barbante num rolo, the hard
+way]({% post_url 2022-11-17-comprimento-arco %}), temos que o conteúdo do `request.body`
+é:
+
+```json
+{
+    "postSlug": "2022-11-17-comprimento-arco.md"
+}
+```
+
+Como eu descobri isso? Fazendo um `console.log(Objet.entries(request.body))`. A função
+`Object.entries` retorna um array de elementos. Cada elemento desse array contém apenas
+duas posições: um nome e o valor associado a esse nome. Por exemplo, ao pedir as entradas
+da requisição, ele imprime isso:
+
+```js
+[ [ 'postSlug', '2022-11-17-comprimento-arco.md' ] ]
+```
+
+Com isso, eu posso pegar o slug do post e passar pelos processos naturais de processamento
+e publicação fazendo um simples acesso direto: `request.body.postSlug`. Sabendo o slug eu
+consigo o URI da publicação e também posso usar para pegar o título e uma espécie de
+descrição do post (representado pelas taga envolvidas).
+
+Como fazer isso? Bem simples! Basta pegar dentro da variável de ambiente `COMPUTARIA_POSTS`.
+De lá eu navego para `_posts/` e então coloco o slug no final para obter o caminho completo
+do arquivo.
+
+O processo de escrever as facetas, enriquecer com thumb já foi descrito, mas pra chegar lá
+precisamos de 3 informações da postagem:
+
+- a URI
+- o título
+- uma descrição
+
+E, olha só! Exatamente o que foi dito anterior que conseguimos pegar!
+
+Então vamos pegar uma função que dado o slug pega essas informações? Uma espécie de
+`postSlug2PostInfo`. Nesse caso, como vai ter leitura de arquivo, precisamos lidar
+com esse caso como se fosse assíncrono. A entrada por vir uma simples string ou então
+não existir, vir nula. A saída eventualmente vai ser URI, título e descrição. Logo,
+essa função vai ter essa assinatura:
+
+```ts
+async function postSlug2PostInfo(postSlug: string | null): Promise<{
+    uri: string;
+    title: string;
+    description: string;
+}>
+```
+
+Por uma questão de conveniência, se o `postSlug` passado for nulo eu retorno uma postagem
+aleatória. Vamos primeiro explorar o mundo da postagem aleatória/quando o campo
+tá em branco?
+
+```ts
+async function postSlug2PostInfo(postSlug: string | null): Promise<{
+    uri: string;
+    title: string;
+    description: string;
+}> {
+    if (postSlug) {
+        // ...
+    }
+    return getRandomPost()
+}
+```
+
+Certo, e como seria esse `getRandomPost`? Vamos limitar ao máximo o acesso
+a disco. A solução é listar todos os arquivos do diretório de postagens e, para
+o caso de ser selecionado, aí sim de fato ler o arquivo.
+
+Vamos começar listando os arquivos. Para tal, usei
+[`fs.readdirSync`](https://nodejs.org/api/fs.html#fsreaddirsyncpath-options).
+Daqui precisamos ter um jeito de ler o arquivo, algo assim:
+
+```ts
+fs.readdirSync(computariaDir)
+        .map(s => async () => (
+            // dá um jeito de ler a parada aqui
+        ))
+```
+
+Eu preciso retornar 3 valores nessa API: 
+
+- URI (depende só do slug)
+- Título
+- "Descrição"
+
+Aqui, a URI só necessita do slug:
+
+```ts
+function slug2postUri(s: string): string {
+    return `https://computaria.gitlab.io/blog/${s.substring(0,4)}/${s.substring(5,7)}/${s.substring(8,10)}/${s.substring(11, s.length - 3)}`
+}
+```
+
+O formato das datas no slug está `yyyy-MM-dd`, já no blog ele muda para `yyyy/MM/dd`. E
+finalmente faço a remoção da extensão do arquivo.
+
+> OBS: processando o arquivo
 
 ### Trocando por HTMX
 
@@ -615,6 +722,8 @@ E o lado do front-end? Bem, para habilitar o HTMX na minha tela, preciso apenas
 adicionar o script HTMX na aplicação. Segui
 a [documentação oficinal](https://htmx.org/docs/#via-a-cdn-e-g-unpkg-com) e coloquei o JS
 da CDN dentro do `<head>` para baixar o script, junto a um checksum.
+
+> OBS: cálculo do sha384 https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity
 
 Basicamente não há mais motivos para existir nenhum script pessoal meu, já que originalmente
 eu estava usando apenas com o fim de refletir o estado do DOM de acordo com as respostas
@@ -668,7 +777,3 @@ o carregamento da tela); no final ficou assim:
 </form>
 <div id="response">Esperando...</div>
 ```
-
-## Automatizando
-
-> OBS: rake publicando batendo na API localhost:3000 submetendo form
