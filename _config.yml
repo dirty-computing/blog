@@ -20,6 +20,8 @@ bsky_username: jeffquesado.ulivre.dev
 stackoverflow_username: jefferson-quesado
 stackoverflow_userid: 64969
 
+pixmeurl: "https://pixmeacoffee.vercel.app"
+
 repository:
   base: "https://gitlab.com/computaria/blog/"
   blob_root: "https://gitlab.com/computaria/blog/-/blob/master/"

@@ -64,7 +64,7 @@ pages:
 
 Uma coisa que incomodava bastante era que o `faicon.ico` o browser sempre
 reclamava na aba de "networks" do developer console. Então, chegou a hora de por o
-ícone. Temporariamente escolhi o café do [Pix me a coffee](https://www.pixme.bio/),
+ícone. Temporariamente escolhi o café do [Pix me a coffee]({{ site.pixmeurl }}),
 a versão usada no [Editando SVG na mão para pedir café]({% post_url 2024-03-16-edita-svg-manualmente %}).
 
 A primeira tentativa foi literalemnte por na pasta `/public` o ícone. A primeira tentativa
@@ -222,9 +222,15 @@ Criamos a variável para indicar o Pixme a Coffe, mas não a usamos ainda.
 
 {% raw %}
 ```diff
--        <a href='https://www.pixme.bio/jeffquesado' target="_blank">
-+        <a href='https://www.pixme.bio/{% if page.pixmecoffe %}{{ page.pixmecoffe }}{% else %}jeffquesado{% endif %}' target="_blank">
+-        <a href='{{ site.pixmeurl }}/jeffquesado' target="_blank">
++        <a href='{{ site.pixmeurl }}/{% if page.pixmecoffe %}{{ page.pixmecoffe }}{% else %}jeffquesado{% endif %}' target="_blank">
 ```
+
+
+> Note do futuro: o DNS venceu, então para ficar mais fácil usar eu substituí
+> o que antigamente era o site direto pela variável do config `{{ site.pixmeurl }}`.
+> Antes era a URL diretamente
+
 {% endraw %}
 
 O foco é usar se tiver, e caso contrário manter o padrão (assim evitamos ter de

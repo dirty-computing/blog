@@ -112,7 +112,7 @@ Se liga no que aconteceu, eu comecei a encarar a página do Computaria e reparei
 nos ícones do lado dos metadados do artigo. Os ícones em questão são as logos do
 GitLab e do [pixmeacoffee](https://github.com/bolodissenoura/pixmeacoffee) 🤩
 
-Na hora me lembrei do fundo do dashboard do [pixmeacoffee](https://www.pixme.bio/).
+Na hora me lembrei do fundo do dashboard do [pixmeacoffee]({{ site.pixmeurl }}).
 Esse aqui:
 
 ![Dashboard do pixmeacoffee com vários cafés ao fundo, bem discretos]({{ page.base-assets | append: "dashboard-pixmeacoffee.png" | relative_url }})
@@ -122,6 +122,6 @@ pelo artista [@arorok_](https://twitter.com/arorok_), abri um canvas no [Krita](
 e fiz um fundo inspirado no pixmeacoffee. Se você está lendo esse post, provavelmente
 pode ver o fundo que eu fiz.
 
-Inclusive, quer me pagar um café 😅? [Pix me a coffee](https://www.pixme.bio/kauefraga)!
+Inclusive, quer me pagar um café 😅? [Pix me a coffee]({{ site.pixmeurl }}/kauefraga)!
 
 Obrigado por ler e ao Jeff pelo convite ❤

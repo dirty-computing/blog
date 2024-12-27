@@ -72,7 +72,7 @@ base-assets: "/assets/edita-svg-manualmente/"
     }
 </script>
 
-<iframe id="pixmeacoffe" src="https://www.pixme.bio/jeffquesado" width="400"
+<iframe id="pixmeacoffe" src="{{ site.pixmeurl }}/jeffquesado" width="400"
     height="800" class="pixmeacoffe" loading="lazy" sandbox="allow-scripts">
 </iframe>
 
@@ -87,7 +87,7 @@ com uma treta quando atacaram a [AlertPix](https://alertpix.live/)
 acusando injustamente baseado no valor mais competitivo.
 
 Falei com o fundador da AlertPix para por as doações no Computaria
-e ele me deu a ideia de usar o [Pix me a Coffe](https://pixme.bio),
+e ele me deu a ideia de usar o [Pix me a Coffe]({{ site.pixmeurl }}),
 já que o AlertPix é mais voltado para streamers justamente dando
 o alerta na live ao receber um pix. Já o foco do Pix me a Coffe
 é justamente essa de ter uma porta aberta e bonitinha para que
@@ -115,7 +115,7 @@ através da tag iframe se consegue colocar informações
 de um HTML provido por outro site dentro do meu site:
 
 ```html
-<iframe src="https://www.pixme.bio/jeffquesado"></iframe>
+<iframe src="{{ site.pixmeurl }}/jeffquesado"></iframe>
 ```
 
 Só que ficou mais feio do que eu imaginei que ia ficar:
@@ -135,7 +135,7 @@ Fui pela alternativa clássica de remover a borda e de impedir o scroll.
 Ainda precisava resolver a questão do tamanho:
 
 ```html
-<iframe src="https://www.pixme.bio/jeffquesado" frameboder="0" scrolling="no"></iframe>
+<iframe src="{{ site.pixmeurl }}/jeffquesado" frameboder="0" scrolling="no"></iframe>
 ```
 
 Inspecionei o conteúdo do iframe e cutuquei as propriedade `width` e
@@ -143,7 +143,7 @@ Inspecionei o conteúdo do iframe e cutuquei as propriedade `width` e
 400 x 800:
 
 ```html
-<iframe src="https://www.pixme.bio/jeffquesado" frameborder="0" width="400"
+<iframe src="{{ site.pixmeurl }}/jeffquesado" frameborder="0" width="400"
     height="800" scrolling="no">
 </iframe>
 ```
@@ -162,7 +162,7 @@ Coloquei para testar um estilo inline com `float: right`, e eis que ficou
 assim:
 
 ```html
-<iframe src="https://www.pixme.bio/jeffquesado" frameborder="0" width="400"
+<iframe src="{{ site.pixmeurl }}/jeffquesado" frameborder="0" width="400"
     height="800" scrolling="no" style="float: right">
 </iframe>
 ```
@@ -175,7 +175,7 @@ marcados como deprecados. Hmmmm, para a borda recomendou usar propriedades
 CSS, mas para o scroll recomendou apenas remover. Ok, então:
 
 ```html
-<iframe src="https://www.pixme.bio/jeffquesado" width="400"
+<iframe src="{{ site.pixmeurl }}/jeffquesado" width="400"
     height="800" style="float: right; border-width: 0px">
 </iframe>
 ```
@@ -218,7 +218,7 @@ Assim, podemos remover o estilo inline do iframe e dizer
 que ele é da classe `pixmeacoffe`:
 
 ```html
-<iframe src="https://www.pixme.bio/jeffquesado" width="400"
+<iframe src="{{ site.pixmeurl }}/jeffquesado" width="400"
     height="800" class="pixmeacoffe">
 </iframe>
 ```
@@ -233,7 +233,7 @@ Bem, veja só! Existe! Atributo [`load="lazy"`](https://developer.mozilla.org/en
 Olhando o console da web o Firefox ainda me mostrou a seguinte mensagem:
 
 > Partitioned cookie or storage access was provided to
-> “[https://www.pixme.bio/jeffquesado](https://www.pixme.bio/jeffquesado)” because it
+> “[{{ site.pixmeurl }}/jeffquesado]({{ site.pixmeurl }}/jeffquesado)” because it
 > is loaded in the third-party context and dynamic state partitioning is enabled.
 > [[Learn more]](https://developer.mozilla.org/docs/Mozilla/Firefox/Privacy/Storage_access_policy/Errors/CookiePartitionedForeign?utm_source=devtools&utm_medium=firefox-cookie-errors&utm_campaign=default)
 
@@ -243,7 +243,7 @@ A primeira alternativa é deixar em branco, mas isso não foi bom para o banner,
 já que ele se monta usando JS. Então dei a permissão `allow-scripts`:
 
 ```html
-<iframe src="https://www.pixme.bio/jeffquesado" width="400"
+<iframe src="{{ site.pixmeurl }}/jeffquesado" width="400"
     height="800" class="pixmeacoffe" loading="lazy" sandbox="allow-scripts">
 </iframe>
 ```
