@@ -59,7 +59,7 @@ Outras coisas também comuns de se ter em _pools_ de objetos:
 
 # Conexão com o banco de dados JDBC
 
-Bem, vamos nos aproximar ao HikariCP. Vamos falar aqui de conesões com banco
+Bem, vamos nos aproximar ao HikariCP. Vamos falar aqui de conexões com banco
 de dados em Java.
 
 No java, pedimos para estabelecer uma conexão com o banco de dados. Existe a
