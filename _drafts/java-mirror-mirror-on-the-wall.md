@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "Conheça-te a ti mesmo! Reflexão e meta-programação em Java e Ruby"
+title: "Conheça-te a ti mesmo! Reflexão e meta-programação em Java"
 author: "Jefferson Quesado"
-tags: java ruby python reflection meta-programming ipc typescript totalcross
+tags: java python reflection meta-programming ipc typescript totalcross
 base-assets: "/assets/java-mirror-mirror-on-the-wall/"
 pixmecoffe: jeffquesado
 twitter: jeffquesado
@@ -1447,7 +1447,7 @@ replicar. Mas eu posso criar a decoração passando o objeto que eu quero
 delegar a computação:
 
 ```java
-<T> Consumet<T> oiEuSouGokuProxy(Consumer<T> objReal) {
+<T> Consumer<T> oiEuSouGokuProxy(Consumer<T> objReal) {
     return t -> {
         System.out.println("Oi, eu sou o Goku");
         objReal.accept(t);
@@ -3044,11 +3044,3 @@ momento um processador de anotação, para linkar com o `javac`.
 Também não fiz algo para fazer geração, por exemplo, para gerar código
 JSON, por exemplo para exportar um exemplo de classe Java em um schema
 que o TypeScript entenda.
-
-# Bolando a interface para falar com Java em Ruby
-
-> OBS: padronização de objetos de ação, etc
-
-> OBS: camada de Ruby em TK totalmente oca, fala com o java e monta a interface
-
-> OBS: botões de ação, ação marcada como @anotação
