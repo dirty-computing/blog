@@ -554,7 +554,7 @@ Com o resultado esperado.
 Basicamente os `icon-<media>.html` perderam sentido de ser. O
 [`icon-gitlab.html`]({{ site.repository.blob_root }}/_includes/icon-gitlab.html)
 vai ser mantido por conta do exemplo usado nesta publicação e também por conta
-das coisas no [sobre](/about).
+das coisas no [sobre]({{ "/about" | prepend: site.baseurl }}).
 
 O `icon-stackoverflow` também é usado na mesma página. Então vou manter esses
 dois. Já os outros não tem necessidade. Vou remover e deixar o
