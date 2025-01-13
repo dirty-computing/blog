@@ -53,7 +53,7 @@ Ok, ok, erro meu. A tag aqui no [dev.to](https://dev.to) precisa ser separada
 por vírgulas... por isso ficou "tag muito extensa". 
 
 Mas depois de ajeitar isso ele continuou reclamando de `design-pattern` e de
-`resource-pool`. Testei colocar underscore `_`, ponto `.`, espaço ` `, e nada
+`resource-pool`. Testei colocar underscore `_`, ponto `.`, espaço, e nada
 resolveu. Tive de me render ao que estava de escrito na caixinha de erro:
 remover os caracteres que não sejam alfanuméricos. Então coloquei
 `designpatterns` no lugar do original `design-pattern` e `resourcepool` no
@@ -128,7 +128,7 @@ Mas a outra parte que me pegou legal...
 ![Parágrafos quebrados no meio]({{ page.base-assets | append: "broken-paragraphs.png" | relative_url }})
 
 Hmmm, o que poderia ser? Parece que ele está quebrando linha onde não devia?
-Pois bem, isso já aconteceu comigo antes. No GitHub. QUal a solução? Deixar
+Pois bem, isso já aconteceu comigo antes. No GitHub. Qual a solução? Deixar
 tudo em uma looooonga linha 🤷‍♂️
 
 Tá, mas por que disso? EU estava acostumado ao flavored markdown **me
