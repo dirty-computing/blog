@@ -363,15 +363,230 @@ postar conteúdo.
 
 ### Deixando mais profissional o blob serializado
 
-> OBS: salvar no file system, sistema de cache etc
-
 Aquilo que usei antes serviu para a primeira vez. Mas, e se eu quiser mudar a
 foto que uso de thumb? Como fazer?
 
 A primeira coisa que fui atrás de fazer é como deixar de modo mais previsível o
-que vai ser serializado.
+que vai ser serializado. Então descobri o `JSON.stringify`. Só que ele fazia
+uma lambança com o `CID`! No lugar de transformar a referência em
 
-> OBS: salvar no file system, sistema de cache etc
+```json
+{
+    // ...
+    "ref": "CID(bafkreieg6lyhynujrhegdnvvh45pumpr24psnuhfk7gg2b4lm2x2aolf4q)",
+}
+```
+
+transformou em
+
+```json
+{
+    // ...
+    "ref": {
+        "$link":"bafkreieg6lyhynujrhegdnvvh45pumpr24psnuhfk7gg2b4lm2x2aolf4q"
+    },
+}
+```
+
+Pois bem, como resolver isso? Até porque preciso devolver o objeto pra ser um
+`CID`, né? Basicamente transformando o objeto em uma versão cuja referência não
+é um `CID` mas sim uma string! Eu vou pegar um `BlobRef` e transformar em algo
+cuja referência foi stringificada. Vou chamar de `BlobRefStringfied`! Mas, como
+seria ele?
+
+Para o que me interessa, ele tem 4 campos:
+
+```ts
+type BlobRefStringfied = {
+    ref: string,
+    mimeType: string,
+    size: number,
+    original: // calma, calabreso, vamos chegar aqui...
+}
+```
+
+Onde `ref` é a representação em string do que era o `ref: CID` em `BlobRef`. E
+o `original`? Pela definição do tipo `BlobRef`, ele tem um campo `original`
+também, que é um `JsonBlobRef`. Por sua vez, `JsonBlobRef` é um _union type_
+de `UntypedJsonBlobRef` com `TypedJsonBlobRef`:
+
+```ts
+type UntypedJsonBlobRef = {
+    mimeType: string;
+    cid: string;
+}
+
+type TypedJsonBlobRef = {
+    $type: "blob";
+    ref: CID;
+    mimeType: string;
+    size: number;
+}
+
+type JsonBlobRef = UntypedJsonBlobRef | TypedJsonBlobRef
+```
+
+Arrá! É uma tagged union! Eu consigo saber qual o tipo específico se olhar para
+o campo `$type`!
+
+```ts
+function isTypedJsonBlobRef(blob: JsonBlobRef): blob is TypedJsonBlobRef {
+    return (blob as any)["$type"] != null
+}
+```
+
+E com isso me preocupar com proteger apenas no caso em que for de fato um
+`TypedJsonBlobRef`. Eu posso dizer então que `BlobRefStringfied.original` tem
+como tipo uma união entre `UntypedJsonBlobRef` e um tipo parecido com
+`TypedJsonBlobRef`, porém removendo o `ref: CID` e adicionando um
+`ref: string`. Posso declarar tudo na mão, ou...
+
+Usar o tipo `Omit` do TS. Assim, posso pegar o `TypedJsonBlobRef` e derivar um
+novo tipo sem esse campo `ref`: `Omit<TypedJsonBlobRef, "ref">`. E para
+expandir esse tipo obtido? Posso simplesmente fazer um tipo de interseção
+passando `{ref: string}`:
+
+```ts
+type BlobRefStringfied = {
+    ref: string,
+    mimeType: string,
+    size: number,
+    original: (UntypedJsonBlobRef | Omit<TypedJsonBlobRef, "ref"> & { ref: string })
+}
+```
+
+Certo, agora eu tenho o tipo bem definido, mas como que deixo protegido em
+relação a objetos do tipo `CID`? Bem, o `.toString()` de um objeto `CID`
+retorna o código dele, então posso fazer uma interpolação para lidar com isso:
+
+```ts
+// blob é o parâmetro
+{
+    ...blob.original,
+    ref: `CID(${blob.original.ref.toString()})`
+}
+```
+
+Mas só posso fazer isso se for um `TypedJsonBlobRef`!
+
+```ts
+// blob é o parâmetro
+const original: (UntypedJsonBlobRef | Omit<TypedJsonBlobRef, "ref"> & { ref: string }) = (isTypedJsonBlobRef(blob.original))? {
+            ...blob.original,
+            ref: `CID(${blob.original.ref.toString()})`
+        }: {
+            ...blob.original
+        }
+```
+
+O `BlobRef` é garantido ter o `CID` no campo `ref`, então posso simplesmente
+sempre proteger ele:
+
+```ts
+function blobRefAsPlainObj(blob: BlobRef): BlobRefStringfied {
+    const original: (UntypedJsonBlobRef | Omit<TypedJsonBlobRef, "ref"> & { ref: string }) = (isTypedJsonBlobRef(blob.original))? {
+            ...blob.original,
+            ref: `CID(${blob.original.ref.toString()})`
+        }: {
+            ...blob.original
+        }
+    
+
+    return {
+        ref: `CID(${blob.ref.toString()})`,
+        mimeType: blob.mimeType,
+        size: blob.size,
+        original
+    }
+}
+```
+
+Com isso eu consigo serializar. E para desserializar e deixar de fato útil?
+Uma das coisas que descobri é que o `BlobRef` tem umas funções que eu não
+estava pensando antes. Devido a essas funções, precisei fazer umas gambiarras,
+copiando código original do `BlobRef` pra tornar minimamente compatível com o
+que estou criando na mão:
+
+```ts
+import { ipldToJson } from '@atproto/common-web';
+// ...
+return {
+    ...valoresApenas,
+    ipld() {
+        return {
+            $type: 'blob',
+            ref: this.ref,
+            mimeType: this.mimeType,
+            size: this.size,
+        }
+    },
+    toJSON() {
+        return ipldToJson(this.ipld())
+    }
+}
+```
+
+E... bem, funcionou, o TS não reclamou de tipo e o upload de fato funciona.
+Vamos adentrar agora como que determinei os valores?
+
+Para começar, preciso ler de algum lugar os dados do meu cache. Então,
+desserializar, e a desserialização posso assumir que será um objeto do tipo
+`BlobRefStringfied`:
+
+```ts
+const buff = fs.readFileSync(fileName)
+const json = JSON.parse(buff.toString()) as BlobRefStringfied
+```
+
+Show! Agora, preciso converter o `ref` dele para ser um objeto `CID` e também
+do campo `original`, se for o caso. Para criar um objeto do tipo `CID` se usa
+a função `CID.parse(source: string)`.
+
+Para detectar se o `original` é do tipo `TypedJsonBlobRef`, só verificar a
+presença do campo `$type`:
+
+```ts
+function isTypedJsonBlobRefStringfied(blob: unknown): blob is Omit<TypedJsonBlobRef, "ref"> & {ref: string} {
+    return (blob as any)["$type"] != null
+}
+```
+
+Então, para desserializar:
+
+```ts
+    const buff = fs.readFileSync(fileName)
+    const json = JSON.parse(buff.toString()) as BlobRefStringfied
+
+    const original = isTypedJsonBlobRefStringfied(json.original) ? {
+        ...json.original,
+        ref: CID.parse(removeCIDmarksFromString(json.original.ref))
+    }: {
+        ...json.original
+    }
+    const jsonCidNormalized = {
+        ...json,
+        ref: CID.parse(removeCIDmarksFromString(json.ref)),
+        original
+    }
+
+    return {
+        ...jsonCidNormalized,
+        ipld() {
+            return {
+                $type: 'blob',
+                ref: this.ref,
+                mimeType: this.mimeType,
+                size: this.size,
+            }
+        },
+        toJSON() {
+            return ipldToJson(this.ipld())
+        }
+    }
+```
+
+Com isso eu consigo fazer a serialização e a desserialização, mas ainda preciso
+definir onde irei fazer o cache em si.
 
 Para fazer o cache dos dados do upload, me baseei em duas coisas:
 
