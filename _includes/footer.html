@@ -14,35 +14,19 @@
 
       <div class="footer-col footer-col-2">
         <ul class="social-media-list">
-          {% if site.gitlab_username %}
-          <li>
-            {% include icon-gitlab.html username=site.gitlab_username %}
-          </li>
+          {%- assign social_media_shown = site.data.social_media | where_exp: "social_media", "social_media.show != false" -%}
+          {% for social_media in social_media_shown -%}
+          {%- if social_media.username_literal -%}
+            {%- assign username =  social_media.username_literal -%}
+          {%- else -%}
+            {%- assign username =  site[social_media.username] -%}
           {% endif %}
-
-          {% if site.github_username %}
-          <li>
-            {% include icon-github.html username=site.github_username %}
-          </li>
-          {% endif %}
-
-          {% if site.twitter_username %}
-          <li>
-            {% include icon-twitter.html username=site.twitter_username %}
-          </li>
-          {% endif %}
-
-          {% if site.bsky_username %}
-          <li>
-            {% include icon-bsky.html username=site.bsky_username %}
-          </li>
-          {% endif %}
-
-          {% if site.stackoverflow_username %}
-          <li>
-            {% include icon-stackoverflow.html username=site.stackoverflow_username userid=site.stackoverflow_userid %}
-          </li>
-          {% endif %}
+          <li>{%- include social/icon.html
+                         username=username
+                         media_base_url=social_media.media_base_url
+                         media_url_literal=social_media.media_url_literal
+                         media_name=social_media.media_name -%}</li>
+          {% endfor %}
         </ul>
       </div>
 

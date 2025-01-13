@@ -1,0 +1,1 @@
+<a href="{%- if include.media_url_literal -%}{{include.media_url_literal}}{%- else -%}{{ include.media_base_url }}/{{ include.username }}{% endif %}"><span class="icon icon--{{include.media_name}}">{% include icon-{{include.media_name}}.svg %}</span><span class="username">{{ include.username }}</span></a>
