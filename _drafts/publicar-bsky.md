@@ -202,9 +202,174 @@ Agora, o mais interessante disso na verdade é que eu posso reutilizar o blob!
 
 ### Serializando o blob com console.log e resgate manual
 
-> OBS: toda a treta de serializar esse cara na mão e restaurar o objeto
+Minha primeira ideia foi pegar o objeto. Primeiro, testei dando um
+`console.log`:
+
+```js
+{
+  ref: CID(bafkreieg6lyhynujrhegdnvvh45pumpr24psnuhfk7gg2b4lm2x2aolf4q),
+  mimeType: 'image/jpeg',
+  size: 26533,
+  original: {
+    '$type': 'blob',
+    ref: CID(bafkreieg6lyhynujrhegdnvvh45pumpr24psnuhfk7gg2b4lm2x2aolf4q),
+    mimeType: 'image/jpeg',
+    size: 26533
+  }
+}
+```
+
+Ok, e o que seria esse `CID`? Após pesquisar um pouco, vi que vinha desse
+pacote [`multiformats/cid`](https://github.com/multiformats/cid). Basicamente
+é um padrão de identificador para sistemas distribuídos. O que importa para mim
+é que o Bluesky usa.
+
+Ok, posso salvar esse objeto em JS para resgatar depois, no caso passando o que
+é `CID` para uma string, salvando portanto como:
+
+```js
+{
+  ref: "CID(bafkreieg6lyhynujrhegdnvvh45pumpr24psnuhfk7gg2b4lm2x2aolf4q)",
+  mimeType: 'image/jpeg',
+  size: 26533,
+  original: {
+    '$type': 'blob',
+    ref: "CID(bafkreieg6lyhynujrhegdnvvh45pumpr24psnuhfk7gg2b4lm2x2aolf4q)",
+    mimeType: 'image/jpeg',
+    size: 26533
+  }
+}
+```
+
+Ok, tudo tranquilo, mas vou precisar transformar os campos `ref` em objetos do
+tipo `CID` afinal. E como faço isso?
+
+No começo eu não tinha reparado muita coisa, não vi onde de fato eram usados
+objetos do tipo `CID`, simplesmente assumi que poderia ser em qualquer lugar.
+Isso significava que eu precisaria descer em todos os campos para desserializar
+corretamente, para quando identificar um `CID` chamar o contrutor de objeto
+`CID` corretamente.
+
+Começamos com um objeto desconhecido. Então, vamos fazer uma [introspecção
+fofa]({% post_url 2025-01-10-java-mirror-mirror-on-the-wall %}) para saber mais
+detalhes dele mesmo. O primeiro caso é: e se for nulo? Bem, aqui retorno o
+próprio nulo:
+
+```ts
+// v: unknown
+
+if (v == null) {
+    return null
+}
+```
+
+E se for uma string? Bem, nesse caso eu preciso primeiro verificar se essa
+string começa com `CID(`, porque se começar preciso proteger (e se não começar
+devolvo verbatim):
+
+```ts
+// v: unknown
+if (typeof v === 'string') {
+    if (v.startsWith("CID(")) {
+        return CID.parse(v.substring("CID(".length, v.length - 1))
+    }
+    return v
+}
+```
+
+E se for um array? Bem, aí vamos normalizar cada objeto do array
+individualmente:
+
+```ts
+if (v instanceof Array) {
+    return v.map(normalizeCID)
+}
+```
+
+Estamos acabando as possibilidades... e se for um objeto? Bem, nesse caso vou
+precisar caminhar pelos campos individualmente. Vou pegar as `Objects.entries`
+do objeto e normalizar cada entrada individualmente.
+
+No começo, vamos começar com o objeto vazio, `{}`, pronto para colocar coisas
+dentro. Como vou começar com ele, para cada nova entrada, vou expandir o meu
+objeto acumulado e inserir a nova entrada normalizada:
+
+```ts
+// acc é o objeto de acumulação
+// key é o nome do campo atual
+// value é o valor do campo atual
+
+const safeValue: any = normalizeCID(value)
+return {
+    ...acc,
+    [key]: safeValue
+}
+```
+
+A redução como um todo fica:
+
+```ts
+// v: unknown
+if (typeof v === 'object') {
+    return Object.entries(v).reduce((acc, [key, value]) => {
+        const safeValue: any = normalizeCID(value)
+        return {
+            ...acc,
+            [key]: safeValue
+        }
+    }, {})
+}
+```
+
+E, finalmente, e se `v` não for de nenhum desses tipos?
+
+O tipo string é o único que precisa de tratamento direto para ser CID. O resto
+por incrível que pareça não precisa de lida direta, mas preciso verificar o
+conteúdo deles justamente por serem complexos. E os tipos complexos são objetos
+e arrays, ambos tratados já. Portanto, caso não encontre o tipo adequado,
+simplesmente devolve o valor direto porque ele não precisa ser protegido.
+
+Ficou assim a função ao todo para resgatar o valor:
+
+```ts
+function normalizeCID(v: unknown): unknown {
+    if (v == null) {
+        return null
+    }
+    if (typeof v === 'string') {
+        if (v.startsWith("CID(")) {
+            return CID.parse(v.substring("CID(".length, v.length - 1))
+        }
+        return v
+    }
+    if (v instanceof Array) {
+        return v.map(normalizeCID)
+    }
+    if (typeof v === 'object') {
+        return Object.entries(v).reduce((acc, [key, value]) => {
+            const safeValue: any = normalizeCID(value)
+            return {
+                ...acc,
+                [key]: safeValue
+            }
+        }, {})
+    }
+    return v
+}
+```
+
+Com isso eu consigo montar novamente o objeto para enviar ele na função de
+postar conteúdo.
 
 ### Deixando mais profissional o blob serializado
+
+> OBS: salvar no file system, sistema de cache etc
+
+Aquilo que usei antes serviu para a primeira vez. Mas, e se eu quiser mudar a
+foto que uso de thumb? Como fazer?
+
+A primeira coisa que fui atrás de fazer é como deixar de modo mais previsível o
+que vai ser serializado.
 
 > OBS: salvar no file system, sistema de cache etc
 
@@ -859,8 +1024,6 @@ adicionar o script HTMX na aplicação. Segui
 a [documentação oficinal](https://htmx.org/docs/#via-a-cdn-e-g-unpkg-com) e coloquei o JS
 da CDN dentro do `<head>` para baixar o script, junto a um checksum.
 
-> OBS: cálculo do sha384 https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity
-
 Basicamente não há mais motivos para existir nenhum script pessoal meu, já que originalmente
 eu estava usando apenas com o fim de refletir o estado do DOM de acordo com as respostas
 do servidor.
@@ -913,3 +1076,37 @@ o carregamento da tela); no final ficou assim:
 </form>
 <div id="response">Esperando...</div>
 ```
+
+#### Cálculo do checksum
+
+O HTMX em si já veio com o checksum. Mas... e se não tivesse vindo? Já peguei
+um caso em que uma extensão do HTMX não tinha o checksum, precisei calcular.
+
+A maneira de integridade mais padrão que eu vi é usando o sha384. Ao menos foi
+[essa a referência que achei](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity).
+Então, como computar isso?
+
+Uma alternativa é usando o [https://www.srihash.org](https://www.srihash.org).
+Manda a URL do recurso que você quer e felicidade.
+
+Outra alternativa seria localmente. Você precisa ter acesso ao arquivo. Por
+exemplo, via curl:
+
+```bash
+curl -sL https://unpkg.com/htmx.org@2.0.2
+```
+
+O `-s` é para o curl ser silencioso, não mostrar a velocidade de download e
+tal, coisas que não são dados literais. o `-L` é porque o link pode gerar um
+redirecionamento, e eu preciso lidar com isso. Eu poderia ter também o
+`htmx.js`, mas por preguiça não o tenho.
+
+Ok, tendo acesso ao arquivo, só mandar por uma pipeline bobinha que faz esse
+cálculo (extraído [da referência da
+MDN](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity)):
+
+```bash
+curl -sL https://unpkg.com/htmx.org@2.0.2 | openssl dgst -sha384 -binary | openssl base64 -A
+```
+
+E _quase pronto_. Precisa por um `sha384-` na frente. E agora pronto.
