@@ -58,7 +58,7 @@ E qual o formato geral do `icon-<media>.html`? Por exemplo, o
 Basicamente um link `<a>` com href usando o `username` passado como parâmetro.
 O conteúdo é um `<span>` com classes `icon` e `icon--<media>`, e o conteúdo
 desse `<span>` é um SVG incluído via Liquid:
-{%- raw %}`{% include icon-<media>.svg %}`{% endraw %}. O SVG tem como regra
+{%- raw %}`{% include icon-<media>.svg %}`{% endraw %}.
 
 E depois tem um `span` com o `username` com a classe `username`.
 
@@ -288,7 +288,7 @@ E...
 ![Sintaxe inválida, username=site[social_media.username]]({{ page.base-assets | append: "erro-liquid.png" | relative_url }})
 
 Ok, ok... e se no lugar de usar diretamente o `site[social_media.username]` eu
-atribuit a uma variável?
+atribuir a uma variável?
 
 {% raw %}
 ```html
