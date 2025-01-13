@@ -694,7 +694,143 @@ function slug2postUri(s: string): string {
 O formato das datas no slug está `yyyy-MM-dd`, já no blog ele muda para `yyyy/MM/dd`. E
 finalmente faço a remoção da extensão do arquivo.
 
-> OBS: processando o arquivo
+Para obter a descrição, preciso encontrar o campo `tags` dentro do frontmatter.
+E para obter o título eu preciso encontrar o campo `title` dentro do
+frontmatter. Portanto, preciso identificar o frontmatter propriamente dito, e
+lidar com o seu começo e fim.
+
+Graças aos poderes da padronização e da [criação dos drafts através do
+rake]({% post_url 2023-12-30-rakefile-create-draft %}), eu sei que o meu
+frontmatter terá exatamente três traços, `---`. Então, que tal modelar a
+leitura do frontmatter como uma máquina de estados?
+
+Basicamente, eu tenho o estado inicial `BEGIN`, que, se encontrar a linha `---`
+vai para o estado `FRONTMATTER`. Caso contrário, `BEGIN` irá para o estado
+`POST` e portanto não terá o que eu preciso de útil. Então eu continuo no
+estado `FRONTMATTER` até encontrar uma nova linha `---`, que aí indica o fim do
+frontmatter e o começo propriamente dito do post, portanto justo que o estado
+seja `POST` após achar esse valor.
+
+Enquanto estou no estado `FRONTMATTER`, as linhas que começam com `title:` e
+com `tags:` me interessam, pois vou trabalhar com elas.
+
+Ao encontrar o título, faço uma pequena tratativa na linha, pra pegar tudo
+depois da primeira aspas até o final, ignorando a última aspas:
+
+```ts
+function extractTitle(s: string): string {
+    const start = s.indexOf('"')
+    return s.substring(start + 1, s.length - 1).replace(/\\"/g, '"')
+}
+```
+
+No caso da descrição, eu só removo o nome do campo do começo mesmo, e aplico um
+`trim` só pra não ficar sobrando espaço em branco a toa:
+
+```ts
+description = line.substring("tags:".length).trim()
+```
+
+E essa magia toda se dá ao fazer um _line reading_. Mas, como fazemos isso no
+Node? Através do pacote padrão do Node `readline`. Eu posso pegar um stream de
+dados e transformar em leitura de linha assim:
+
+```ts
+import * as readline from 'readline'
+
+// ...
+// abrir um arquivo chamado arquivo
+const lineReader = readline.createInterface({ input: arquivo, crlfDelay: Infinity })
+```
+
+E com isso eu posso iterar (com `await`) em cima das linhas:
+
+```ts
+import * as readline from 'readline'
+
+// ...
+// abrir um arquivo chamado arquivo
+const lineReader = readline.createInterface({ input: arquivo, crlfDelay: Infinity })
+
+for await (const line of lineReader) {
+    // ...
+}
+```
+
+Sempre bom lembrar de liberar os recursos (já que JS não tem
+`try-with-recourses` que nem o Java nem `defer` como Go):
+
+```ts
+import * as readline from 'readline'
+
+// ...
+// abrir um arquivo chamado arquivo
+const lineReader = readline.createInterface({ input: arquivo, crlfDelay: Infinity })
+
+for await (const line of lineReader) {
+    // ...
+}
+
+lineReader.close()
+```
+
+A função inteira de extração dessas informações vdo frontmatter ficou assim:
+
+```ts
+export async function getPostInfo(postSlug: string): Promise<{
+    uri: string
+    title: string,
+    description: string
+} | null> {
+    if (!fs.existsSync(computariaDir + postSlug)) {
+        return null
+    }
+    return {
+        uri: slug2postUri(postSlug),
+        ...await titleDescription(computariaDir + postSlug)
+    }
+}
+
+async function titleDescription(post: string) : Promise<{ title: string, description: string }> {
+    let title = post
+    let description = post
+    const arquivo = fs.createReadStream(post)
+    const lineReader = readline.createInterface({ input: arquivo, crlfDelay: Infinity })
+
+    let state: "BEGIN" | "FRONTMATTER" | "POST" = "BEGIN"
+    for await (const line of lineReader) {
+        if (line === '---') {
+            if (state === 'BEGIN') {
+                state = 'FRONTMATTER'
+                continue;
+            }
+            if (state === 'FRONTMATTER') {
+                state = 'POST'
+                break;
+            }
+        }
+        if (state === 'BEGIN') {
+            state = 'POST'
+            break;
+        }
+        if (line.startsWith("title:")) {
+            title = extractTitle(line)
+            continue
+        }
+        if (line.startsWith("tags:")) {
+            description = line.substring("tags:".length).trim()
+            continue
+        }
+    }
+
+    lineReader.close()
+    arquivo.close()
+    return {
+        title,
+        description,
+    }
+}
+```
 
 ### Trocando por HTMX
 
