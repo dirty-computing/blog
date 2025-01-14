@@ -2,7 +2,7 @@
 layout: post
 title: "Deixando a pipeline visível para acompanhar deploy do blog"
 author: "Jefferson Quesado"
-tags: meta js frontend server-side-event jekyll
+tags: meta js frontend jekyll
 base-assets: "/assets/pipeline-visible/"
 pixmecoffe: jeffquesado
 twitter: jeffquesado
