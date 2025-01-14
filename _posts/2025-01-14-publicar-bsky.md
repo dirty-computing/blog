@@ -11,7 +11,7 @@ twitter: jeffquesado
 Ok, Twitter foi bloqueado no Brasil. E [Bluesky](https://bsky.app/)
 subiu em proeminência. O que fazemos? Nos adaptemos, claro.
 
-> Nota do período histórico: Esse artigo começou a ser escrito em 4/set/2024, durante o Grande Êxodo.
+> Nota do período histórico: Esse artigo começou a ser escrito em 4/set/2024, durante o Grande êXodo.
 > [Reportagem sobre o assunto](https://oglobo.globo.com/politica/noticia/2024/09/18/entenda-por-que-o-twitter-virou-x-usuarios-relatam-volta-da-rede-social.ghtml).
 
 Bluesky fornece uma API bem rica e amigável para devs, então
@@ -1325,3 +1325,20 @@ curl -sL https://unpkg.com/htmx.org@2.0.2 | openssl dgst -sha384 -binary | opens
 ```
 
 E _quase pronto_. Precisa por um `sha384-` na frente. E agora pronto.
+
+## Limitações
+
+Por enquanto, o sistema não foi feito para ser completo nem complexo. Faltam
+questões essenciais para uma publicação web, como segurança. Mas, isso fica
+para depois.
+
+Ele foi concebido por hora para funcionar como uma ferramenta auxiliar a o que
+eu tenho no computador. Além da questão da segurança que é determinada por
+variável de ambiente (assim eu controlo quando eu levanto a aplicação), falta
+também uma comunicação com o próprio blog. Estou trabalhando com extração de
+informações dos arquivos do repositório, quem sabe no futuro eu não adapte o
+próprio computaria para gerar um arquivo facilmente parseável para esse tipo de
+publicação?
+
+Os fontes do envio para o Bluesky você encontra [no repositório de envio de
+mensagens do computaria](https://gitlab.com/computaria/computaria-mensageria/-/tree/main/at-bsky).
