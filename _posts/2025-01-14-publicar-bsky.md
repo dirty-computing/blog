@@ -148,7 +148,7 @@ A URI é a exata mesma que vou usar na _facet_. A imagem (thumb) vai ser
 a foto da Baby, mascote do Computaria. Título e descrição vai ser completamente
 arbitrário.
 
-Pegue aqui um exemplo de publicação: [post no Bluesky](https://bsky.app/profile/jeffquesado.bsky.social/post/3l4daer53752v).
+Pegue aqui um exemplo de publicação: [post no Bluesky](https://bsky.app/profile/jeffquesado.ulivre.dev/post/3l4daer53752v).
 
 Para esse exemplo, eu subi um blob com a Baby e linkei no objeto, usei como título `Somando valores sem laços`,
 como descrição usei as tags da publicação `javascript programação algoritmos` e URI da
