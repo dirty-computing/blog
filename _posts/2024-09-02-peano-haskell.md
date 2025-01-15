@@ -78,7 +78,7 @@ preciso indicar quem é `Show Nat`, mais ou menos assim:
 ```haskell
 instance Show Nat where
     show = someFancyFunction
-````
+```
 
 O padrão é nomear a função que ele chamará com `show<Type>`, então
 no caso aqui seria chamar de `showNat`. Bem, vamos precisar que a função
