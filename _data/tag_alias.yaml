@@ -6,3 +6,5 @@
   alias: [ md ]
 - tag: bash
   alias: [ shell, shell-script ]
+- tag: design-pattern
+  alias: [ design-patterns ]
