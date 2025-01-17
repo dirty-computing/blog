@@ -1,0 +1,19 @@
+---
+layout: default
+---
+
+<div class='home'>
+
+<h1 class='page-heading'>Posts por tag</h1>
+
+<ul class='post-list'>
+    {% for tag in page.sitetags %}
+        <li>
+            <span class='post-meta'>{{ tag.posts.size }} posts</span>
+            <h2>
+                <a class='post-link' href='{{ tag.url | prepend: site.baseurl }}'>{{ tag.tag }}</a>
+            </h2>
+        </li>
+    {% endfor %}
+</ul>
+</div>

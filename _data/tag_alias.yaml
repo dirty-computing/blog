@@ -1,0 +1,8 @@
+- tag: javascript
+  alias: [ js ]
+- tag: typescript
+  alias: [ ts ]
+- tag: markdown
+  alias: [ md ]
+- tag: bash
+  alias: [ shell, shell-script ]
