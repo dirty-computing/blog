@@ -1,21 +1,28 @@
 task :default => :run
 
-desc "Inicia o blog em modo de desenvolvimento na porta 4000, depois é só abrir http://localhost:4000/blog/"
-task :run do |t|
+desc "Inicia o blog em modo de desenvolvimento na porta 4000 (ou a passada como parâmetro), depois é só abrir http://localhost:4000/blog/"
+task :run,[:port] do |t, args|
     require "jekyll"
-    conf = Jekyll.configuration({
+    opts = {
         'show_drafts' => true,
         'watch' => true,
         'serving' => true
-    })
+    }
+    opts['port'] = args.port unless args.port.nil?
+    conf = Jekyll.configuration(opts)
     Jekyll::Commands::Build.process conf
     Jekyll::Commands::Serve.process conf
 end
 
 desc "Abre o browser com o blog"
-task :browser do |t|
+task :browser,[:port] do |t, args|
     require 'dotenv/load'
-    sh "open #{"-a #{ENV["BROWSER_NAME"]}" unless ENV["BROWSER_NAME"].nil?} http://localhost:4000/blog/"
+    port = unless args.port.nil?
+        args.port
+    else
+        4000
+    end
+    sh "open #{"-a #{ENV["BROWSER_NAME"]}" unless ENV["BROWSER_NAME"].nil?} http://localhost:#{port}/blog/"
 end
 
 desc "Publica um rascunho, perguntando ao usuário qual rascunho publicar"
