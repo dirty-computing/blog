@@ -2,7 +2,7 @@
 layout: post
 title: "Manipulando query string para melhor permitir compartilhar uma página carregada dinamicamente"
 author: "Jefferson Quesado"
-tags: js frontend jekyll rakefile
+tags: js frontend jekyll rakefile meta
 base-assets: "/assets/genomics-daily-query/"
 pixmecoffe: jeffquesado
 twitter: jeffquesado
