@@ -1,4 +1,4 @@
-image: ruby:3.0-alpine
+image: ruby:3.2-alpine
 
 variables:
   JEKYLL_ENV: production
@@ -10,6 +10,7 @@ before_script:
   - apk add gcc g++ make
   - gem install bundler
   - echo -e "\e[0Ksection_end:`date +%s`:install-deps\r\e[0K"
+  - gem --version
   - echo -e "\e[0Ksection_start:`date +%s`:install-bundle-deps\r\e[0KInstalando dependêncidas via bundle"
   - bundle install
   - echo -e "\e[0Ksection_end:`date +%s`:install-bundle-deps\r\e[0K"
