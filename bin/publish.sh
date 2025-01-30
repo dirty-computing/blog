@@ -41,7 +41,17 @@ get-today() {
 }
 
 git add "$DRAFT"
+SLUG="${DRAFT#_drafts/}"
 
-POST="_posts/`get-today`-${DRAFT#_drafts/}"
+POST="_posts/`get-today`-${SLUG}"
 
 git mv -v "$DRAFT" "$POST"
+
+ASSETS_DIR="assets/${SLUG%.md}/"
+
+if [ "`ls -A "${ASSETS_DIR}" | wc -l`" -eq 0 ]; then
+	echo "Removendo assets dir: ${ASSETS_DIR}"
+	rmdir -v "${ASSETS_DIR}"
+else 
+	git add "${ASSETS_DIR}"
+fi
