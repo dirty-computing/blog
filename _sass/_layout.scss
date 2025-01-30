@@ -1,9 +1,11 @@
+@use "common" as c;
+
 /**
  * Site header
  */
 .site-header {
-    border-top: 5px solid $grey-color-dark;
-    border-bottom: 1px solid $grey-color-light;
+    border-top: 5px solid c.$grey-color-dark;
+    border-bottom: 1px solid c.$grey-color-light;
     min-height: 56px;
 
     // Positioning context for the mobile navigation icon
@@ -20,7 +22,7 @@
 
     &,
     &:visited {
-        color: $grey-color-dark;
+        color: c.$grey-color-dark;
     }
 }
 
@@ -33,8 +35,8 @@
     }
 
     .page-link {
-        color: $text-color;
-        line-height: $base-line-height;
+        color: c.$text-color;
+        line-height: c.$base-line-height;
 
         // Gaps between nav items, but not on the last one
         &:not(:last-child) {
@@ -46,12 +48,12 @@
         display: none;
     }
 
-    @include media-query($on-palm) {
+    @include c.media-query(c.$on-palm) {
         position: absolute;
         top: 9px;
-        right: calc($spacing-unit / 2);
-        background-color: $background-color;
-        border: 1px solid $grey-color-light;
+        right: calc(c.$spacing-unit / 2);
+        background-color: c.$background-color;
+        border: 1px solid c.$grey-color-light;
         border-radius: 5px;
         text-align: right;
 
@@ -69,7 +71,7 @@
                 height: 15px;
 
                 path {
-                    fill: $grey-color-dark;
+                    fill: c.$grey-color-dark;
                 }
             }
         }
@@ -106,13 +108,13 @@
  * Site footer
  */
 .site-footer {
-    border-top: 1px solid $grey-color-light;
-    padding: $spacing-unit 0;
+    border-top: 1px solid c.$grey-color-light;
+    padding: c.$spacing-unit 0;
 }
 
 .footer-heading {
     font-size: 18px;
-    margin-bottom: calc($spacing-unit / 2);
+    margin-bottom: calc(c.$spacing-unit / 2);
 }
 
 .contact-list,
@@ -123,50 +125,50 @@
 
 .footer-col-wrapper {
     font-size: 15px;
-    color: $grey-color;
-    margin-left: calc($spacing-unit / 2 * -1);
-    @extend %clearfix;
+    color: c.$grey-color;
+    margin-left: calc(c.$spacing-unit / 2 * -1);
+    @include c.clearfix;
 }
 
 .footer-col {
     float: left;
-    margin-bottom: calc($spacing-unit / 2);
-    padding-left: calc($spacing-unit / 2);
+    margin-bottom: calc(c.$spacing-unit / 2);
+    padding-left: calc(c.$spacing-unit / 2);
 }
 
 .footer-col-1 {
-    width: -webkit-calc(30% - (#{$spacing-unit} / 2));
-    width:         calc(30% - (#{$spacing-unit} / 2));
+    width: -webkit-calc(30% - (#{c.$spacing-unit} / 2));
+    width:         calc(30% - (#{c.$spacing-unit} / 2));
 }
 
 .footer-col-2 {
-    width: -webkit-calc(30% - (#{$spacing-unit} / 2));
-    width:         calc(30% - (#{$spacing-unit} / 2));
+    width: -webkit-calc(30% - (#{c.$spacing-unit} / 2));
+    width:         calc(30% - (#{c.$spacing-unit} / 2));
 }
 
 .footer-col-3 {
-    width: -webkit-calc(40% - (#{$spacing-unit} / 2));
-    width:         calc(40% - (#{$spacing-unit} / 2));
+    width: -webkit-calc(40% - (#{c.$spacing-unit} / 2));
+    width:         calc(40% - (#{c.$spacing-unit} / 2));
 }
 
-@include media-query($on-laptop) {
+@include c.media-query(c.$on-laptop) {
     .footer-col-1,
     .footer-col-2 {
-        width: -webkit-calc(50% - (#{$spacing-unit} / 2));
-        width:         calc(50% - (#{$spacing-unit} / 2));
+        width: -webkit-calc(50% - (#{c.$spacing-unit} / 2));
+        width:         calc(50% - (#{c.$spacing-unit} / 2));
     }
 
     .footer-col-3 {
-        width: -webkit-calc(100% - (#{$spacing-unit} / 2));
-        width:         calc(100% - (#{$spacing-unit} / 2));
+        width: -webkit-calc(100% - (#{c.$spacing-unit} / 2));
+        width:         calc(100% - (#{c.$spacing-unit} / 2));
     }
 }
 
-@include media-query($on-palm) {
+@include c.media-query(c.$on-palm) {
     .footer-col {
         float: none;
-        width: -webkit-calc(100% - (#{$spacing-unit} / 2));
-        width:         calc(100% - (#{$spacing-unit} / 2));
+        width: -webkit-calc(100% - (#{c.$spacing-unit} / 2));
+        width:         calc(100% - (#{c.$spacing-unit} / 2));
     }
 }
 
@@ -176,7 +178,7 @@
  * Page content
  */
 .page-content {
-    padding: $spacing-unit 0;
+    padding: c.$spacing-unit 0;
 
     background-image: url('../assets/colocando-coelhinhos-no-computaria/wallpaper-computaria.png');
 }
@@ -190,13 +192,13 @@
     list-style: none;
 
     > li {
-        margin-bottom: $spacing-unit;
+        margin-bottom: c.$spacing-unit;
     }
 }
 
 .post-meta {
-    font-size: $small-font-size;
-    color: $grey-color;
+    font-size: c.$small-font-size;
+    color: c.$grey-color;
 }
 
 .post-link {
@@ -210,7 +212,7 @@
  * Posts
  */
 .post-header {
-    margin-bottom: $spacing-unit;
+    margin-bottom: c.$spacing-unit;
 }
 
 .post-title {
@@ -218,7 +220,7 @@
     letter-spacing: -1px;
     line-height: 1;
 
-    @include media-query($on-laptop) {
+    @include c.media-query(c.$on-laptop) {
         font-size: 36px;
     }
 }
@@ -236,12 +238,20 @@
 }
 
 .post-content {
-    margin-bottom: $spacing-unit;
+    margin-bottom: c.$spacing-unit;
+
+    h1 {
+        font-size: 38px;
+
+        @include c.media-query(c.$on-laptop) {
+            font-size: 34px;
+        }
+    }
 
     h2 {
         font-size: 32px;
 
-        @include media-query($on-laptop) {
+        @include c.media-query(c.$on-laptop) {
             font-size: 28px;
         }
     }
@@ -249,7 +259,7 @@
     h3 {
         font-size: 26px;
 
-        @include media-query($on-laptop) {
+        @include c.media-query(c.$on-laptop) {
             font-size: 22px;
         }
     }
@@ -257,7 +267,7 @@
     h4 {
         font-size: 20px;
 
-        @include media-query($on-laptop) {
+        @include c.media-query(c.$on-laptop) {
             font-size: 18px;
         }
     }

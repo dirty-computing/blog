@@ -1,9 +1,11 @@
+@use "common" as c;
+
 /**
  * Syntax highlighting styles
  */
 .highlight {
     background: #fff;
-    @extend %vertical-rhythm;
+    @include c.vertical-rhythm;
 
     .highlighter-rouge & {
       background: #eef;

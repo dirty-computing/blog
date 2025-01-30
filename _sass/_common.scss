@@ -1,0 +1,65 @@
+@use "sass:color";
+@use "sass:math";
+
+// Our variables
+$base-font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+$base-font-size:   16px;
+$base-font-weight: 400;
+$small-font-size:  $base-font-size * 0.875;
+$base-line-height: 1.5;
+
+$spacing-unit:     30px;
+
+$text-color:          #111;
+$background-color:    #fdfdfd;
+$brand-color:         #2a7ae2;
+
+$grey-color:          #828282;
+$grey-color-light-raw: color.adjust($grey-color, $lightness: 40%);
+$grey-color-dark-raw:  color.adjust($grey-color, $lightness: -25%);
+
+$grey-color-dark: color.change($grey-color-dark-raw,
+    $red: math.round(color.channel($grey-color-dark-raw, "red")),
+    $green: math.round(color.channel($grey-color-dark-raw, "green")),
+    $blue: math.round(color.channel($grey-color-dark-raw, "blue"))
+);
+
+$grey-color-light: color.change($grey-color-light-raw,
+    $red: math.round(color.channel($grey-color-light-raw, "red")),
+    $green: math.round(color.channel($grey-color-light-raw, "green")),
+    $blue: math.round(color.channel($grey-color-light-raw, "blue"))
+);
+
+// Width of the content area
+$content-width:    800px;
+
+$on-palm:          600px;
+$on-laptop:        800px;
+
+
+
+// Use media queries like this:
+// @include media-query($on-palm) {
+//     .wrapper {
+//         padding-right: $spacing-unit / 2;
+//         padding-left: $spacing-unit / 2;
+//     }
+// }
+@mixin media-query($device) {
+    @media screen and (max-width: $device) {
+        @content;
+    }
+}
+
+@mixin clearfix {
+
+    &:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+}
+
+@mixin vertical-rhythm {
+    margin-bottom: calc($spacing-unit / 2);
+}
