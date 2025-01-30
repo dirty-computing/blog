@@ -34,5 +34,6 @@ pages:
   artifacts:
     paths:
     - public
+    - Gemfile.lock
   only:
   - master
