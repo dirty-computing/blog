@@ -33,7 +33,7 @@ alpine-test:
   stage: test
   before_script:
     - echo -e "\e[0Ksection_start:`date +%s`:install-deps\r\e[0KInstalando dependêncidas gerais"
-    - apk add gcc g++ make -y
+    - apk add gcc g++ make
     - gem install bundler
     - echo -e "\e[0Ksection_end:`date +%s`:install-deps\r\e[0K"
     - gem --version
