@@ -34,8 +34,12 @@ pages:
   - bundle exec jekyll build -d public
   - echo -e "\e[0Ksection_end:`date +%s`:jekyll-build\r\e[0K"
   artifacts:
-    paths:
-    - public
-    - Gemfile.lock
+    when: on_success
+      paths:
+      - public
+      - Gemfile.lock
+    when: on_failure
+      paths:
+      - Gemfile.lock
   only:
   - master
