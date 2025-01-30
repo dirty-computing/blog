@@ -8,7 +8,7 @@ variables:
 before_script:
   - echo -e "\e[0Ksection_start:`date +%s`:install-deps\r\e[0KInstalando dependêncidas gerais"
   - apt update
-  - apt install gcc g++ make
+  - apt install gcc g++ make -y
   - gem install bundler
   - echo -e "\e[0Ksection_end:`date +%s`:install-deps\r\e[0K"
   - gem --version
