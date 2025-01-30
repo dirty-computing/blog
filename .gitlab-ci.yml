@@ -1,4 +1,4 @@
-image: ruby:3.2-alpine
+image: ruby:3.2-slim
 
 variables:
   JEKYLL_ENV: production
