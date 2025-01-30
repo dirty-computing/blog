@@ -3,6 +3,7 @@ image: ruby:3.0-alpine
 variables:
   JEKYLL_ENV: production
   LC_ALL: C.UTF-8
+  BUNDLE_FROZEN: true
 
 before_script:
   - echo -e "\e[0Ksection_start:`date +%s`:install-deps\r\e[0KInstalando dependêncidas gerais"
