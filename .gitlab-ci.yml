@@ -28,6 +28,29 @@ test:
   except:
   - master
 
+alpine-test:
+  image: ruby:3.2-alpine
+  stage: test
+  before_script:
+    - echo -e "\e[0Ksection_start:`date +%s`:install-deps\r\e[0KInstalando dependêncidas gerais"
+    - apk add gcc g++ make -y
+    - gem install bundler
+    - echo -e "\e[0Ksection_end:`date +%s`:install-deps\r\e[0K"
+    - gem --version
+    - echo -e "\e[0Ksection_start:`date +%s`:install-bundle-deps\r\e[0KInstalando dependêncidas via bundle"
+    - bundle install
+    - echo -e "\e[0Ksection_end:`date +%s`:install-bundle-deps\r\e[0K"
+  script:
+    - echo -e "\e[0Ksection_start:`date +%s`:jekyll-build\r\e[0KIniciando o Jekyll"
+    - bundle exec jekyll build -d public
+    - echo -e "\e[0Ksection_end:`date +%s`:jekyll-build\r\e[0K"
+  artifacts:
+    when: always
+    paths:
+    - public
+    - Gemfile.lock
+  when: manual
+
 pages:
   stage: deploy
   script:
