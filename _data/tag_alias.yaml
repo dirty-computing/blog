@@ -8,3 +8,5 @@
   alias: [ shell, shell-script ]
 - tag: design-pattern
   alias: [ design-patterns ]
+- tag: maven
+  alias: [ mvn ]
