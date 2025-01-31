@@ -10,8 +10,7 @@ gem 'execjs', '~> 2.8.1'
 gem 'duktape', '~> 2.6.0.0'
 
 gem 'sass-embedded', '~> 1.83'
-gem 'google-protobuf'
-gem 'google-protobuf', force_ruby_platform: true if RUBY_PLATFORM.include?('linux-musl')
+gem 'google-protobuf', force_ruby_platform: RUBY_PLATFORM.include?('linux-musl')
 
 group :development do
   gem 'dotenv', '~> 3.1'
