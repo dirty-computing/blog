@@ -314,7 +314,7 @@ Vou criar dois perfis:
         <id>graalvm-24</id>
     </profile>
     <profile>
-        <id>graalvm-24</id>
+        <id>graalvm-20</id>
     </profile>
 </profiles>
 ```
