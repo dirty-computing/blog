@@ -9,6 +9,9 @@ gem 'wdm', '~> 0.1.0' if Gem.win_platform?
 gem 'execjs', '~> 2.8.1'
 gem 'duktape', '~> 2.6.0.0'
 
+gem 'sass-embedded', '~> 1.83'
+gem 'google-protobuf', force_ruby_platform: RUBY_PLATFORM.include?('linux-musl')
+
 group :development do
   gem 'dotenv', '~> 3.1'
 end
