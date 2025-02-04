@@ -33,6 +33,7 @@ test:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "master"
 
 pages:
+  stage: build
   extends: .run-jekyll
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master"
