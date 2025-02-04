@@ -235,3 +235,142 @@ vem não é exatamente surpresa (mas também não fiz os exatos mesmos passos
 também, apenas aproximadamente e de modo mais controlado).
 
 # Fallout
+
+Ok, vamos ver o resultado. Vamos baixar os artefatos. Ele baixa tudo, mas tudo
+bem, melhor do que baixar cada item criado individualmente pelo Jekyll.
+
+Quando abri o `index.html` pela primeira vez pensei "pronto, quebrei foi tudo!"
+O CSS estava todo mal formatado, as coisas ilegíveis, parecia o primeiro
+instante da abertura do Computaria como descrevi no post
+[Quebrei o CSS com a publicação anterior, e agora?]({% post_url 2025-01-30-quebrei-css %}).
+Então me lembrei que talvez seja só o caminho do CSS que esteja apontando para
+um lugar que o browser não consegue carregar. Vamos testar essa hipótese?
+
+No `index.html`, vamos ver como ele aponta para a folha de estilo...
+
+```html
+<link rel="stylesheet" href="/blog/css/main.css">
+```
+
+ARRÁ! É isso! Ele tá apontando para um lugar que não existe! No temrinal tratei
+de criar o link simbólico `blog` para o diretório atual
+
+```bash
+ln -s ./ blog
+```
+
+E... continua quebrado? Tá. Quebrei tudo. Abro o `main.css` em desespero e...
+ele tá perfeitinho do jeito que eu esperaria ele estar. Então o que houve?
+
+Ah! As referências são todas a `/blog`, não a `./blog` nem a `blog`. Uma
+referência assim significa pegar a partir da autoridade (que normalmente é
+determinado por protocolo/endereço/porta) o caminho. Por exemplo, no caso do
+Computaria significa `https://computaria.gitlab.io`. Então, o `href` em
+`<link rel="stylesheet" href="/blog/css/main.css">` aponta para um recurso em
+`https://computaria.gitlab.io/blog/css/main.css`. Mas quem é a autoridade no
+caso do protocolo `file://`? Nada por que logo em seguida já começa o path?
+(Inclusive é por isso que no protocolo `file` você sempre vê começando com 3
+barras, diferente do `https://<site>/<caminho>/<do>/<arquivo>.html` tem
+`file:///home/<fulano>/<caminho>/<do>/<arquivo>.html`).
+
+Então, e se eu mudar para apontar, no lugar de `/blog/`, apontar para
+`./blog/`? Ou mesmo apenas `blog/`? Faço o teste e... tudo renderiza normal!
+Ufa!
+
+Não achei nenhuma deformidade no HTML gerado, nem no CSS gerado que foi o que
+pegou da última vez. Com isso em mãos, posso voltar a subir as coisas via
+Alpine.
+
+Vamos retornar o alpine para o estado atual de build.
+
+# Revisitando o CI
+
+Eu estava pensando em como aproveitar e deixar o `script` único. Fui olhar a
+documentação do [GitLab-CI YAML](https://docs.gitlab.com/ee/ci/yaml/), mais
+especificamente fui logo em
+[`before_script`](https://docs.gitlab.com/ee/ci/yaml/#before_script) para ver
+se achava um link para um `script` global. E eis que acho isso:
+
+> Using `before_script` at the top level [...] is deprecated. 
+
+Em tradução livre:
+
+> Usar `before_script` diretamente da raiz do arquivo é deprecado.
+
+Hmmmm, e qual a sugestão? Usar
+[`default`](https://docs.gitlab.com/ee/ci/yaml/#default). Ok, vamos usar
+`default` então. O que temos de comum? Basicamente:
+
+- `before_script`
+- `image`
+- `artifacts`
+
+Variáveis tem definição em top-level, então não preciso me preocupar. Ficou
+assim o `default`:
+
+```yaml
+default:
+  image: ruby:3.2-alpine
+  before_script:
+    - echo -e "\e[0Ksection_start:`date +%s`:install-deps\r\e[0KInstalando dependêncidas gerais"
+    - apk add gcc g++ make
+    - gem install bundler
+    - echo -e "\e[0Ksection_end:`date +%s`:install-deps\r\e[0K"
+    - gem --version
+    - echo -e "\e[0Ksection_start:`date +%s`:install-bundle-deps\r\e[0KInstalando dependêncidas via bundle"
+    - bundle install
+    - echo -e "\e[0Ksection_end:`date +%s`:install-bundle-deps\r\e[0K"
+  artifacts:
+    when: always
+    paths:
+    - public
+    - Gemfile.lock
+```
+
+Show! Próximo passo? Remover o `only:ref` e `except:ref`, são mais duas coisas
+marcadas para remoção futura. Para isso temos `rule`. Como funciona? Bem, de
+modo bem semelhante na real. Mas `rule` permite eu ter um controle, por
+exemplo, de fazer um evento de abertura de PR. Legal, né?
+
+Vamos lá. O build manual já está bem definido com o `when: manual`. Agora, para
+quando desejamos rodar ao empurrar algo no `master`? Primeiro, vamos controlar
+que estamos lidando com o evento de `$CI_PIPELINE_SOURCE == "push"`. Segundo,
+para quando o alvo for o branch `master`: `$CI_COMMIT_BRANCH == "master"`.
+Juntando isso:
+
+```yaml
+pages:
+  # ...
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master"
+```
+
+De modo semelhante para quando for `$CI_COMMIT_BRANCH != "master"`.
+
+Eu sei que tem um jeito que permitia fazer uma espécie de "herança" de
+um "job" (ou hidden-job/template) por outro... tem uma documentação toda sobre
+isso. [Veja aqui](https://docs.gitlab.com/ee/ci/yaml/yaml_optimization.html).
+Inicialmente eu aprendi a fazer as coisas através de "YAML merge". Mas segundo
+a documentação o melhor seria eu fazer com `extends`. A ideia é a mesma, mas
+sem magias.
+
+Bem, vamos especificar aqui então um template chamado `.run-jekyll`. É
+importante esse `.` na frente, porque com isso o objeto YAML não é interpretado
+como um job object.
+
+```yaml
+.run-jekyll:
+  script:
+    - echo -e "\e[0Ksection_start:`date +%s`:jekyll-build\r\e[0KIniciando o Jekyll"
+    - bundle exec jekyll build -d public
+    - echo -e "\e[0Ksection_end:`date +%s`:jekyll-build\r\e[0K"
+```
+
+Com isso, o job principal fica assim:
+
+```yaml
+pages:
+  extends: .run-jekyll
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master"
+```
