@@ -20,7 +20,7 @@ layout: default
   <script defer src="{{ "/js/citation.js" | prepend: site.baseurl }}">
   </script>
 
-  <button id="citationCopier" style="display: none;" class="icon" onclick="citation2clipboard('{{ page.title }}', '{{ page.url | slugify }}')">{% include uxwing-copy-icon.svg %}</button>
+  <button id="citationCopier" style="display: none;" class="icon" onclick="citation2clipboard('{{ page.title | escape }}', '{{ page.url | slugify }}')">{% include uxwing-copy-icon.svg %}</button>
 
   <div class="post-content" itemprop="articleBody">
     {{ content }}
