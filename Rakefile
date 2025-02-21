@@ -71,7 +71,7 @@ rule(/^_drafts\/.*\.md$/) do |t|
     assetsDir = "/assets/#{radix}/"
 
     template =  "layout: post
-title: \"#{title}\"
+title: \"#{title.gsub "\"", "\\\""}\"
 author: \"#{author}\"
 tags: #{tags}
 base-assets: \"#{assetsDir}\"
