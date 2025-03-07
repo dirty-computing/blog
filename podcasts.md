@@ -6,70 +6,105 @@ title: Podcasts
 interesting: true
 ---
 
-# Todo mundo odeia Clean Code (Rock'n'Code)
 
-Rock'n'Code com [@edgarberlinck](https://twitter.com/edgarberlinck), ep #30:
+Podcasts dos quais participei, episódios agrupados por podcast:
 
-- [Spotify](https://open.spotify.com/show/52yZtjKJj3LFBIzh3eYAcT)
-- [Anchor FM](https://podcasters.spotify.com/pod/show/curtinhasdoed/episodes/30---Todo-mundo-odeia-Clean-Code-feat-JeffQuesado-e-samsantosb-e26v03e)
+{% assign podcast_people = site.data.podcasts.people %}
 
-Host:
-- [Edgar Berlinck](https://twitter.com/edgarberlinck)
+<div markdown="1" class="randomize">
+{% for show in site.data.podcasts.podcasts %}
 
-Convidados:
-- Jefferson Quesado
-- [Samuel Santos](https://twitter.com/samsantosb)
+<div markdown="1" class="podcast">
+## {{ show.show }}
 
-Canal:
-- [Instagram](https://www.instagram.com/rockncodepod/)
-- [Anchor FM](https://podcasters.spotify.com/pod/show/rockncode)
-- [YouTube](https://youtube.com/@RocknCodePod)
+{{ show.description }}
 
-# Embrace Legacy! (Carlos Nogueira, Engineering Sessions)
+Host: {{ podcast_people[show.host] }}
 
-Engineering Sessions, S03E05:
+Canais para acompanhar o podcast:
 
-- [YouTube](https://youtu.be/zOzLwJOe96w?feature=shared)
+{% for channel in show.channels -%}
+- {{ channel }}
+{% endfor %}
 
-Host:
-- [Carlos Nogueira](https://twitter.com/carlosenog)
+<details markdown="1">
+<summary>
+Episódios ({{ show.episodes | size }})
+</summary>
 
-Convidados:
-- Jefferson Quesado
-- [Lenadron Proença](https://twitter.com/leandronsp)
-- [Rafael Ponte](https://twitter.com/rponte)
+{% for episode in show.episodes %}
+### {{ episode.title }}
 
-Canal:
-- [YouTube](https://www.youtube.com/@carlosenog)
+{{ episode.description }}
 
-# Agile 2024 (Carlos Nogueira, Engineering Sessions)
+Com a participação de {% for guest in episode.guests %}
+{%- unless forloop.first -%}{% if forloop.last %} e {% else -%}, {% endif -%}{% endunless -%}
+{{ podcast_people[guest] }}{% endfor %}
 
-Engineering Sessions, summer edition (pt 1):
+Onde assistir esse episódio?
 
-- [YouTube](https://youtu.be/rq_iSKWR3SI?feature=shared)
+{% for link in episode.links %}
+- {{ link }}
+{%- endfor %}
 
-Host:
-- [Carlos Nogueira](https://twitter.com/carlosenog)
+{% endfor %}
+</details>
+</div>
+{% endfor %}
+</div>
 
-Convidados:
-- Jefferson Quesado
-- [Rodolvo De Nadai](https://twitter.com/rdenadai)
-- [Victor Osório](https://twitter.com/vepo)
+<script>
+// https://www.freecodecamp.org/news/how-to-shuffle-an-array-of-items-using-javascript-or-typescript/
+function shuffle(list) {
+    const array = [...list]
+    for (let i = array.length - 1; i > 0; i--) { 
+        const j = Math.floor(Math.random() * (i + 1)); 
+        [array[i], array[j]] = [array[j], array[i]]; 
+    } 
+    return array;
+}
 
-Canal:
-- [YouTube](https://www.youtube.com/@carlosenog)
+function randomize(htmlRoot) {
+    const children = Array.from(htmlRoot.children)
+    const shuffled = shuffle(children)
 
-# Javismo Cultural, message oriented middleware (Carlos Nogueira, Engineering Sessions)
+    // based on https://www.geeksforgeeks.org/remove-all-the-child-elements-of-a-dom-node-in-javascript/
+    for (const child of children) {
+        htmlRoot.removeChild(child)
+    }
+    // doc https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild
+    for (const child of shuffled) {
+        htmlRoot.appendChild(child)
+    }
+}
 
-Engineering sessions, S04E05:
+function openParents(element) {
+    // chegou no fim, para
+    if (!element.parentElement) {
+        return
+    }
+    openParents(element.parentElement)
+    if (element.parentElement.localName.toLocaleLowerCase() == "details") {
+        element.parentElement.open = true
+    }
+}
 
-- [YouTube](https://youtu.be/IXMF-8o7eDw?si=I-s0jfn_SMiunn5c)
+function startRandomization(shouldScroll) {
+    const whatToRandomize = document.getElementsByClassName("randomize");
+    for (const elementToRandomize of whatToRandomize) {
+        randomize(elementToRandomize)
+    }
 
-Host:
-- Carlos Nogueira
+    if (shouldScroll && whatToRandomize.length > 0 && !!window.location.hash) {
+        const id = window.location.hash.substring(1)
+        const element = document.getElementById(id)
+        if (!!element) {
+            openParents(element)
+            // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView
+            element.scrollIntoView(true);
+        }
+    }
+}
 
-Convidados:
-- Hugo Prudente
-- Jefferson Quesado
-- Victor Osório
-- Zan Franceshi
+startRandomization(true)
+</script>

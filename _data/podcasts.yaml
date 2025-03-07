@@ -1,0 +1,81 @@
+podcasts:
+- show: "Rock’n’Code"
+  host: edgarberlinck
+  description: "O Podcast de tecnologia que não te ensina absolutamente nada!"
+  episodes:
+    - title: "Todo mundo odeia Clean Code"
+      description: "Rock’n’Code com [@edgarberlinck](https://twitter.com/edgarberlinck), ep #30"
+      links:
+        - "[Spotify](https://open.spotify.com/show/52yZtjKJj3LFBIzh3eYAcT)"
+        - "[Anchor FM](https://podcasters.spotify.com/pod/show/curtinhasdoed/episodes/30---Todo-mundo-odeia-Clean-Code-feat-JeffQuesado-e-samsantosb-e26v03e)"
+      guests:
+        - jeffque
+        - samsantosb
+  channels:
+    - "[Anchor FM](https://creators.spotify.com/pod/show/rockncode)"
+    - "[YouTube](https://www.youtube.com/@RocknCodePod)"
+- show: "Engineering Sessions"
+  host: carlosenog
+  description: "Conversa de engenheiro a engenheiro sobre o ofício."
+  episodes:
+    - title: "Embrace Legacy!"
+      description: "Engineering Sessions, S03E05"
+      links:
+        - "[YouTube](https://youtu.be/zOzLwJOe96w?feature=shared)"
+      guests:
+        - jeffque
+        - leandronsp
+        - rponte
+    - title: "Agile 2024 part 1"
+      description: "Engineering Sessions, summer edition (pt 1)"
+      links:
+        - "[YouTube](https://youtu.be/rq_iSKWR3SI?feature=shared)"
+      guests:
+        - jeffque
+        - rdenadai
+        - vepo
+    - title: "Javismo Cultural, Message Oriented Middleware"
+      description: "Engineering Sessions, S04E05"
+      links:
+        - "[YouTube](https://youtu.be/IXMF-8o7eDw?si=aZmWTspCOBgx009i)"
+      guests:
+        - jeffque
+        - hugomarques
+        - vepo
+        - zanfranceschi
+    - title: "Functional languages"
+      description: "Engineering Sessions, S04E14"
+      links:
+        - "[YouTube](https://youtu.be/W0udJQ1YdxI?si=RYUh_hNtjjKyJBcN)"
+      guests:
+        - jeffque
+        - lobaorn
+  channels:
+    - "[YouTube](https://www.youtube.com/@carlosenog)"
+- show: "The Leandronsp Show"
+  description: "Código & Batatas"
+  host: leandronsp
+  channels:
+    - "[YouTube](https://www.youtube.com/@leandronsp)"
+    - "[Twitch](https://www.twitch.tv/leandronsp)"
+  episodes:
+    - title: "Computaria com Coelho"
+      description: "Nesta live temos a participação especial do Jeff Quesado, o Coelho da Bolha, onde iremos falar de diversos assuntos aleatórios de computação, reagir a artigos, sair na mão etc"
+      links:
+        - "[YouTube](https://www.youtube.com/live/s8o_Nj-1a9Y?si=QHZM-NGoXM3alJVD)"
+        - "[Twitch](https://www.twitch.tv/videos/2329106987)"
+      guests:
+        - jeffque
+
+people:
+  carlosenog: "[Carlos Nogueira](https://carlosenog.dev/)"
+  edgarberlinck: "[Edgar Berlinck](https://medium.com/@edgarberlinck)"
+  hugomarques: "[Hugo Marques](https://hugomarques.dev)"
+  jeffque: "Jefferson Quesado"
+  leandronsp: "[Leandro Proença](https://leandronsp.com)"
+  lobaorn: "[Daniel Lobão Figueiredo](https://bsky.app/profile/lobaorn.bsky.social)"
+  rdenadai: "[Rodolfo De Nadai](https://rdenadai.com.br/)"
+  rponte: "[Rafael Ponte](https://www.linkedin.com/in/rponte/)"
+  samsantosb: "[Samuel Santos](https://twitter.com/samsantosb)"
+  vepo: "[Victor Osório](https://vepo.dev/)"
+  zanfranceschi: "[Zanfranceschi](https://dev.to/zanfranceschi)"
