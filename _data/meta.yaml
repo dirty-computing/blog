@@ -1,0 +1,13 @@
+variables:
+  - name: computaria-cite
+    description: "Copiar referência fácil"
+    env: '*'
+    posts:
+      - title: "Post facilmente citável"
+        slug: "2024-05-22-citable"
+links:
+  - link: "[Acompanhar pipeline](/blog/about/?status=true)"
+    posts:
+      - title: "Deixando a pipeline visível para acompanhar deploy do blog"
+        slug: "2024-05-19-pipeline-visible"
+  - link: "[Gerencial](/blog/managerial)"
