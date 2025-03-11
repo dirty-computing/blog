@@ -10,3 +10,7 @@
   alias: [ design-patterns ]
 - tag: maven
   alias: [ mvn ]
+- tag: inversion-of-control
+  alias: [ ioc ]
+- tag: programação-funcional
+  alias: [ fp, functional-programming ]
