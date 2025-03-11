@@ -7,7 +7,9 @@ variables:
         slug: "2024-05-22-citable"
 links:
   - link: "[Acompanhar pipeline](/blog/about/?status=true)"
+    env: "*"
     posts:
       - title: "Deixando a pipeline visível para acompanhar deploy do blog"
         slug: "2024-05-19-pipeline-visible"
   - link: "[Gerencial](/blog/managerial)"
+    env: "*"

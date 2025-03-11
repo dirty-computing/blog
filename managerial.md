@@ -26,7 +26,7 @@ Ambiente Jekyll que gerou essa página? `{{jekyll.environment}}`
 
 <table class='lalala'>
     <tr>
-        <th>Variável</th><th>Descrição</th><th>Valor</th><th>Toggle</th><th>Posts</th>
+        <th>Variável/ambiente</th><th>Descrição</th><th>Valor</th><th>Toggle</th><th>Posts</th>
     </tr>
     <tbody>
         {% for var in site.data.meta.variables -%}
@@ -51,10 +51,13 @@ Ambiente Jekyll que gerou essa página? `{{jekyll.environment}}`
 Links para meta informação (post citando):
 
 {% for meta_link in site.data.meta.links %}
+{% if meta_link.env == '*' or meta_link.env == jekyll.environment %}
 - {{ meta_link.link }}
+  - Ambiente: {{  meta_link.env }}
 {%- for bg_post in meta_link.posts %}
   - [{{ bg_post.title }}]({% post_urlwa {{ bg_post.slug }} %})
 {%- endfor %}
+{% endif %}
 {% endfor %}
 
 <script>
