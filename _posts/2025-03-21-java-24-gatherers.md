@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Java 24 chegou! Vamos reescreer streams com gatherers!"
+title: "Java 24 chegou! Vamos reescrever streams com gatherers!"
 author: "Jefferson Quesado"
 tags: java programação-funcional stream
 base-assets: "/assets/java-24-gatherers/"
@@ -120,6 +120,16 @@ e peguei todos os métodos de instância que retornavam outras streams. Mesmo
 métodos com implementações default vão aqui, apesar de ter implementação
 default _por que não_, né?
 
+Para ilustrar as operações intermediárias, vou colocar contra esse conjunto de
+elementos, por os parâmetros adequados e mostrar a saída esperada:
+
+```java
+final var l = Stream.of("A", "A", "B", "A", "CC", "A", "DD", "EEE")
+    .gather(...)
+    .toList();
+// Gives [...]
+```
+
 E agora, com vocês, as operações intermediárias de streams do java, mas agora
 implementadas com gatherer!
 
@@ -172,7 +182,7 @@ Por exemplo:
 O nome dessa classe não importa, então colocar `State` acaba sendo um ótimo
 ponto de partida.
 
-Por fim, o terceito tipo genérico, que eu representei como `ToDownstream`, ele
+Por fim, o terceiro tipo genérico, que eu representei como `ToDownstream`, ele
 representa o tipo que será passado para o downstream, que será consumido
 posteriormente.
 
@@ -236,6 +246,15 @@ Mas eu poderia fazer com `Gatherer.of` contanto que eu tomasse alguns cuidados:
 É possível adaptar a implementação do `disctincBy` para satisfazer o
 `distinct`, visto que o combiner dele já lida com "favorecer o lado esquerdo".
 
+Executando:
+
+```java
+final var l = Stream.of("A", "A", "B", "A", "CC", "A", "DD", "EEE")
+    .gather(distinct())
+    .toList();
+// Gives ["A", "B", "CC", "DD", "EEE"]
+```
+
 ## dropWhile
 
 Aqui eu preciso manter estado, apenas pra saber se preciso continuar dropando.
@@ -297,6 +316,15 @@ essencialmente sequencial. Eu vou consumir o input inteiro.
 Na implementação secundária eu tentei guardar no estado a próxima ação, assim
 a função `whatToDo` mantém o que precisa ser feito.
 
+Executando:
+
+```java
+final var l = Stream.of("A", "A", "B", "A", "CC", "A", "DD", "EEE")
+    .gather(dropWhile(s -> s.length() == 1))
+    .toList();
+// Gives ["CC", "A", "DD", "EEE"]
+```
+
 ## filter
 
 No filtro eu não preciso manter estado. A ordem de chegada não afeta o próximo
@@ -314,6 +342,15 @@ elemento, então posso paralelizar livremente. Vou consumir até o fim.
         })
     );
 }
+```
+
+Executando:
+
+```java
+final var l = Stream.of("A", "A", "B", "A", "CC", "A", "DD", "EEE")
+    .gather(filter(s -> s.length() == 1))
+    .toList();
+// Gives ["A", "A", "B", "A", "A"]
 ```
 
 ## flatMap
@@ -345,6 +382,15 @@ eu não vou consumir elementos do tipo `Stream<R>`, apenas elementos do tipo
 `R`. Eu me enganei bastante por conta do tipo do `mapper`, que é
 `A -> Stream<R>`.
 
+Executando:
+
+```java
+final var l = Stream.of("A", "A", "B", "A", "CC", "A", "DD", "EEE")
+    .gather(flatMap(e -> e.chars().mapToObj(c -> ((char) c) + "")))
+    .toList();
+// Gives ["A", "A", "B", "A", "C", "C", "A", "D", "D", "E", "E", "E"]
+```
+
 ## limit
 
 Aqui eu quero realizar um curto circuito! Ao chegar em determinado valor,
@@ -375,6 +421,15 @@ achei mais semântico comparar com `state.qnt >= maxSize` do que
 }
 ```
 
+Executando:
+
+```java
+final var l = Stream.of("A", "A", "B", "A", "CC", "A", "DD", "EEE")
+    .gather(limit(3))
+    .toList();
+// Gives ["A", "A", "B"]
+```
+
 ## map
 
 Aqui nota que finalmente temos um mapeamento trivial que altera o retorno! Não
@@ -388,6 +443,15 @@ consumir tudo até o fim:
         Gatherer.Integrator.ofGreedy((state, element, ds) -> ds.push(mapper.apply(element)))
     );
 }
+```
+
+Executando:
+
+```java
+final var l = Stream.of("A", "A", "B", "A", "CC", "A", "DD", "EEE")
+    .gather(map(String::length))
+    .toList();
+// Gives [1, 1, 1, 1, 2, 1, 2, 3]
 ```
 
 ## mapMulti
@@ -412,6 +476,19 @@ Uma coisa que pegou é que `? super Consumer<R>` não é `Consumer<R>`, então
 super tipos de `Consumer<R>`, logo não tem nenhuma garantia de que precisa
 implementar `accept`, e é por isso que eu faço o cast `(Consumer<T>) ds::push`.
 
+Executando:
+
+```java
+final var l = Stream.of("A", "A", "B", "A", "CC", "A", "DD", "EEE")
+    .gather(mapMulti((s, c) -> {
+        for (int i = 0; i < s.length(); i++) {
+            c.accept(s.charAt(i));
+        }
+    }))
+    .toList();
+// Gives ["A", "A", "B", "A", "C", "C", "A", "D", "D", "E", "E", "E"]
+```
+
 ## peek
 
 Pego um elemento, olho ele, passo pra frente. Stateless, sem preocupação com
@@ -427,6 +504,24 @@ ordem de chegada, sem preocupação com curto circuito.
         })
     );
 }
+```
+
+Executando:
+
+```java
+final var l = Stream.of("A", "A", "B", "A", "CC", "A", "DD", "EEE")
+    .gather(peek(System.out::println))
+    .toList();
+// Gives ["A", "A", "B", "A", "CC", "A", "DD", "EEE"]
+// Output:
+// A
+// A
+// B
+// A
+// CC
+// A
+// DD
+// EEE
 ```
 
 ## skip
@@ -455,6 +550,15 @@ do caminho.
         })
     );
 }
+```
+
+Executando:
+
+```java
+final var l = Stream.of("A", "A", "B", "A", "CC", "A", "DD", "EEE")
+    .gather(skip(3))
+    .toList();
+// Gives ["A", "CC", "A", "DD", "EEE"]
 ```
 
 ## sorted
@@ -518,6 +622,26 @@ garantir que `A extends Comparable<A>`, então forcei a barra com
     return sorted((Comparator<A>) Comparator.naturalOrder());
 }
 ```
+
+Executando:
+
+```java
+final var l = Stream.of("A", "A", "B", "A", "CC", "A", "DD", "EEE")
+    .gather(sorted())
+    .toList();
+// Gives ["A", "A", "A", "A", "B", "CC", "DD", "EEE"]
+```
+
+Outra execução:
+
+```java
+final var l = Stream.of("A", "A", "B", "A", "CC", "A", "DD", "EEE")
+    .gather(map(String::length))
+    .gather(sorted())
+    .toList();
+// Gives [1, 1, 1, 1, 1, 2, 2, 3]
+```
+
 
 ## takeWhile
 
@@ -592,4 +716,13 @@ E, finalmente, a implementação baseada na complicação do `dropWhile2`.
         Gatherer.Integrator.of((state, element, ds) -> state.whatToDo.test(element, ds))
     );
 }
+```
+
+Executando:
+
+```java
+final var l = Stream.of("A", "A", "B", "A", "CC", "A", "DD", "EEE")
+    .gather(takeWhile(s -> s.length() == 1))
+    .toList();
+// Gives ["A", "A", "B", "A"]
 ```
