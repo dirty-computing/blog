@@ -5,7 +5,6 @@ author: "Giovanni Rozza"
 tags: java optional fp
 base-assets: "/assets/java-optional/"
 pixmecoffe: rgiovann
-draft: "true"
 ---
 
 <style>
