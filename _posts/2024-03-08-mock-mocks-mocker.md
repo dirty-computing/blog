@@ -64,8 +64,8 @@ chamada ocorreu ia ser tão bom, né?
 E advinha? É possível fazer isso. É possível meter a mão no meio do
 bytecode java no meio do teste e redirecionar chamadas de métodos estáticos
 para bater em outro ponto do código que não o natural dele. E sabe
-o que é o pior? Eu te ensino, tá no meu
-[jardim de anotações](https://github.com/jeffque/digital-garden/blob/main/mockito-junit5-static.md).
+o que é o pior? Eu te ensino, coloquei uma seção sobre isso no post
+[Anotações sobre JUnit/Mockito e testes automatizados em Java]({% post_url 2025-04-24-junit-mockito-notas-pessoais %})
 
 Em resumo: você precisa fazer um _lifting_ com algumas dependências,
 no caso do JUnit o _lifting_ em si é feito rodando a "extensão mockito",
