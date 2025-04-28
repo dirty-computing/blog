@@ -22,6 +22,12 @@ layout: default
 
   <button id="citationCopier" style="display: none;" class="icon" onclick="citation2clipboard('{{ page.title | escape }}', '{{ page.url | slugify }}')">{% include uxwing-copy-icon.svg %}</button>
 
+  {% if page.sponsored_by %}
+  <blockquote>
+    <p>Com o gentil patrocínio de {{ page.sponsored_by | join: ", " }}</p>
+  </blockquote>
+  {% endif %}
+
   <div class="post-content" itemprop="articleBody">
     {{ content }}
   </div>

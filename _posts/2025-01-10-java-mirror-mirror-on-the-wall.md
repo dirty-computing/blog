@@ -5,6 +5,7 @@ author: "Jefferson Quesado"
 tags: java python reflection meta-programming ipc typescript totalcross
 base-assets: "/assets/java-mirror-mirror-on-the-wall/"
 pixmecoffe: jeffquesado
+sponsored_by: ["David Fornazier", "Rodolfo de Nadai"]
 twitter: jeffquesado
 ---
 
