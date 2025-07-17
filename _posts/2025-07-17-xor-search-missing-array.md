@@ -56,27 +56,7 @@ E por fim, XOR é associativo. Isso quer dizer que `(a ^ b) ^ c` tem o mesmo
 valor do que `a ^ (b ^ c)`. Isso nos dá 8 possibilidades de valores para as 3
 variáveis:
 
-<style>
-    table.lalala {
-        border: 1px solid gray;
-        width: 90%
-    }
-    table.lalala tr {
-        /* width: 90% */
-    }
-    table.lalala th {
-        border: 1px solid gray;
-        font-weight: bold;
-    }
-    table.lalala td {
-        border: 1px solid gray;
-    }
-    table.lalala.numeric td {
-        text-align: right;
-    }
-</style>
-
-<table class='lalala numeric'>
+<table class='marked-table numeric'>
     <tr>
         <th>a</th>
         <th>b</th>
@@ -308,7 +288,7 @@ um XOR a mais com o novo `n`, que vai dar `n + 1`.
 
 Portanto, de acordo com `n % 4`:
 
-<table class='lalala numeric'>
+<table class='marked-table numeric'>
     <tr>
         <th>n % 4</th>
         <th>valor do XOR [0..n]</th>

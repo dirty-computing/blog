@@ -7,23 +7,6 @@ base-assets: "/assets/java-optional/"
 pixmecoffe: rgiovann
 ---
 
-<style>
-    table.lalala {
-        border: 1px solid gray;
-        width: 90%
-    }
-    table.lalala tr {
-        /* width: 90% */
-    }
-    table.lalala th {
-        border: 1px solid gray;
-        font-weight: bold;
-    }
-    table.lalala td {
-        border: 1px solid gray;
-    }
-</style>
-
 O `Optional`, introduzido no Java 8, é uma ferramenta poderosa para lidar com
 valores que podem ou não estar presentes, ajudando a evitar o temido
 `NullPointerException`. Dois de seus métodos mais usados, `map()` e
@@ -38,7 +21,7 @@ eles lidam com o resultado dessa função.
 
 Diferença central: **O tipo da função que você passa**
 
-<table class='lalala'>
+<table class='marked-table'>
  <tr>
   <th>Método</th><th>Espera uma função que retorna...</th><th>Exemplo de função</th><th>Retorna</th>
  </tr>

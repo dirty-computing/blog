@@ -5,26 +5,9 @@ permalink: /managerial/
 show: true
 ---
 
-<style>
-    table.lalala {
-        border: 1px solid gray;
-        width: 90%
-    }
-    table.lalala tr {
-        /* width: 90% */
-    }
-    table.lalala th {
-        border: 1px solid gray;
-        font-weight: bold;
-    }
-    table.lalala td {
-        border: 1px solid gray;
-    }
-</style>
-
 Ambiente Jekyll que gerou essa página? `{{jekyll.environment}}`
 
-<table class='lalala'>
+<table class='marked-table'>
     <tr>
         <th>Variável/ambiente</th><th>Descrição</th><th>Valor</th><th>Toggle</th><th>Posts</th>
     </tr>

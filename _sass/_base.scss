@@ -194,3 +194,22 @@ pre {
         }
     }
 }
+
+table.marked-table {
+    border: 1px solid gray;
+    width: 90%;
+
+    th {
+        border: 1px solid gray;
+        font-weight: bold;
+    }
+    td {
+        border: 1px solid gray;
+    }
+}
+
+.marked-table.numeric {
+    td {
+        text-align: right;
+    }
+}
