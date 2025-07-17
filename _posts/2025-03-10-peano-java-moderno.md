@@ -798,7 +798,7 @@ public sealed interface Maybe<R> {
     <T> Maybe<T> map(Function<R, T> mapper);
     Maybe<R> filter(Predicate<R> filter);
 
-    Maybe<R> or(Supplier<Optional<R>> supplier);
+    Maybe<R> or(Supplier<Maybe<R>> supplier);
     Stream<R> stream();
 }
 ```
@@ -872,7 +872,7 @@ Pronto. Agora, o mesmo para `Just`. Começar com `or`, que é no-op (retornando
 record Just<R>(R r) implements Maybe<R> {
 
     @Override
-    public Stream<T> stream() {
+    public Stream<R> stream() {
         return Stream.of(r);
     }
 

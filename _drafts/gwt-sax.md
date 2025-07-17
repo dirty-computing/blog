@@ -330,7 +330,7 @@ HasBool executouFailure1 = new HasBool(false);
 HasBool executouFailure2 = new HasBool(false);
 new AsyncCallbackBuilder<Integer>()
   .onFailure(__ -> executouFailure1.value = true)
-  .onFailure(__ -> executouFailure2.value = true))
+  .onFailure(__ -> executouFailure2.value = true)
   .setAsyncCall(cb -> {
     futuro.whenComplete(asyncCallBack2biConsumer(cb));
     return null;
