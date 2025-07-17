@@ -188,7 +188,7 @@ Como sabemos que é uma operação comutativa e associativa, podemos agrupar os
 elementos com os pares na vertical:
 
 ```
-(1^1) ^ (2^2) ^ (3^3) ^... ^ ((n-2) ^ (n-2)) ^ ( (n-1) ) ^ (n^n)
+(1^1) ^ (2^2) ^ (3^3) ^ ... ^ ((n-2) ^ (n-2)) ^ ( (n-1) ) ^ (n^n)
 ```
 
 Notou que todo mundo ficou com par, exceto o `n-1`? Sabe o que acontece com XOR
@@ -196,7 +196,7 @@ de dois elementos iguais? Exatamente, eles se anulam, ficando assim:
 
 
 ```
-(0) ^ (0) ^ (0) ^... ^ (0) ^ ( (n-1) ) ^ (0)
+(0) ^ (0) ^ (0) ^ ... ^ (0) ^ ( (n-1) ) ^ (0)
 ```
 
 E o 0 é elemento neutro, portanto ficou apenas o `n-1` no final. Isso da
