@@ -19,6 +19,8 @@ layout: default
 
   <script defer src="{{ "/js/citation.js" | prepend: site.baseurl }}">
   </script>
+  <script defer src="{{ "/js/meta.js" | prepend: site.baseurl }}">
+  </script>
 
   <button id="citationCopier" style="display: none;" class="icon" onclick="citation2clipboard('{{ page.title | escape }}', '{{ page.url | slugify }}')">{% include uxwing-copy-icon.svg %}</button>
 
@@ -33,3 +35,49 @@ layout: default
   </div>
 
 </article>
+
+<style>
+  .nav-next::after {
+    content: "→";
+  }
+  .nav-prev::before {
+    content: "←";
+  }
+  .nav-next {
+    flex-basis: 50%;
+    justify-content: end;
+    text-align: end;
+    display: flex;
+    gap: .2em;
+  }
+  .nav-prev {
+    flex-basis: 50%;
+    justify-content: start;
+    text-align: start;
+    display: flex;
+    gap: .2em;
+  }
+  .nav-link:visited {
+    color: #111;
+  }
+  .nav-link:link {
+    color: #565656;
+  }
+  .jeff-nav {
+    display: flex;
+    flex-basis: 100%;
+    gap: 2em;
+  }
+
+  .beta-hidden[data-beta="hidden"] {
+    display: none
+  }
+</style>
+<nav class="jeff-nav beta-hidden beta" data-beta="hidden">
+    {% if page.previous %}
+      <div class="nav-prev"><a class="nav-link beta-link" href="{{ page.previous.url | prepend: site.baseurl }}">{{ page.previous.title }}</a></div>
+    {% endif %}
+    {% if page.next %}
+      <div class="nav-next"><a class="nav-link beta-link" href="{{ page.next.url | prepend: site.baseurl }}">{{ page.next.title }}</a></div>
+    {% endif %}
+</nav>
