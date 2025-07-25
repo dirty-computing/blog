@@ -37,36 +37,49 @@ layout: default
 </article>
 
 <style>
+  .jeff-nav {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 8px 16px;
+  }
+
+  .nav-next,
+  .nav-prev {
+    display: flex;
+    flex-grow: 1;
+    padding: 8px 16px;
+    gap: 8px;
+    border-radius: 4px;
+    &:hover {
+      background-image: linear-gradient(
+        var(--grad-direction, to right),
+        #eef,
+        transparent
+      );
+    }
+  }
+
   .nav-next::after {
     content: "→";
   }
-  .nav-prev::before {
-    content: "←";
+
+  .nav-next .nav-link {
+    margin-left: auto;
   }
-  .nav-next {
-    flex-basis: 50%;
-    justify-content: end;
-    text-align: end;
-    display: flex;
-    gap: .2em;
-  }
+
   .nav-prev {
-    flex-basis: 50%;
-    justify-content: start;
-    text-align: start;
-    display: flex;
-    gap: .2em;
+    --grad-direction: to left;
+    &::before {
+      content: "←";
+    }
   }
-  .nav-link:visited {
-    color: #111;
-  }
-  .nav-link:link {
-    color: #565656;
-  }
-  .jeff-nav {
-    display: flex;
-    flex-basis: 100%;
-    gap: 2em;
+
+  .nav-link {
+    text-decoration: none;
+    color: currentColor;
   }
 
   .beta-hidden[data-beta="hidden"] {

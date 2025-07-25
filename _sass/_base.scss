@@ -28,6 +28,11 @@ body {
     font-kerning: normal;
 }
 
+.scroll {
+    /* Se você quiser o back to top suave*/
+    scroll-behavior: smooth;
+}
+
 .clean-background {
     background-color: c.$background-color;
 }
@@ -211,5 +216,41 @@ table.marked-table {
 .marked-table.numeric {
     td {
         text-align: right;
+    }
+}
+
+.back-to-top {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    transform: translate(-48px, -64px);
+    color: currentColor;
+    text-decoration: none;
+    background-color: #eef;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transform-style: preserve-3d;
+    &:hover {
+      box-shadow: 0px 0px 0px 2px purple;
+      &::after {
+        --rotation-val: -16deg;
+        --translate-y-val: -32px;
+      }
+    }
+    &::after {
+      --bg-size: 32px;
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      background-image: url("../assets/coelho.png");
+      background-repeat: no-repeat;
+      background-size: cover;
+      height: var(--bg-size);
+      width: var(--bg-size);
+
+      transform: rotate(var(--rotation-val, 0))
+        translateY(var(--translate-y-val, 0)) translateZ(-1px);
+      transition: transform 200ms ease-in-out, box-shadow 200ms ease-in-out;
     }
 }
