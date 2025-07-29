@@ -1,0 +1,6 @@
+{% assign post=include.post %}
+{% unless post.draft == "true" %}
+    <div class="nav-next"><a class="nav-link beta-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></div>
+{% elsif post.next %}
+    {% include component/next-link.html post=post.next %}
+{% endunless %}

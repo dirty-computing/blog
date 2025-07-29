@@ -15,3 +15,8 @@ links:
     env: "*"
   - link: "[Planejamento (issues gitlab)](https://gitlab.com/computaria/blog/-/issues)"
     env: "*"
+  - link: "[Blog beta-testing](/blog/?beta=true)"
+    env: "*"
+    posts:
+      - title: "Funcionalidade beta no Computaria"
+        slug: "2025-07-28-beta"

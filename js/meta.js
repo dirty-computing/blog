@@ -17,7 +17,8 @@ function showBeta() {
 function changeBetaLink() {
     const betaElements = document.getElementsByClassName("beta-link")
     for (const betaElement of betaElements) {
-        if (betaElement.hasAttribute("href")) {
+        if (betaElement.hasAttribute("href") && betaElement.getAttribute("data-beta-applied") != "beta-applied") {
+            betaElement.setAttribute("data-beta-applied", "beta-applied")
             betaElement.href += window.location.search
         }
     }
