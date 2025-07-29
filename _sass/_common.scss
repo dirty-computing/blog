@@ -14,21 +14,20 @@ $text-color:          #111;
 $background-color:    #fdfdfd;
 $brand-color:         #2a7ae2;
 
+$grey-color-dark-2:   #565656;
 $grey-color:          #828282;
-$grey-color-light-raw: color.adjust($grey-color, $lightness: 40%);
-$grey-color-dark-raw:  color.adjust($grey-color, $lightness: -25%);
 
-$grey-color-dark: color.change($grey-color-dark-raw,
-    $red: math.round(color.channel($grey-color-dark-raw, "red")),
-    $green: math.round(color.channel($grey-color-dark-raw, "green")),
-    $blue: math.round(color.channel($grey-color-dark-raw, "blue"))
-);
+@function adjust-lightness-and-round($color, $lightness-delta) {
+    $color-adjust-raw: color.adjust($color, $lightness: $lightness-delta);
+    @return color.change($color-adjust-raw,
+        $red: math.round(color.channel($color-adjust-raw, "red")),
+        $green: math.round(color.channel($color-adjust-raw, "green")),
+        $blue: math.round(color.channel($color-adjust-raw, "blue"))
+    );
+}
 
-$grey-color-light: color.change($grey-color-light-raw,
-    $red: math.round(color.channel($grey-color-light-raw, "red")),
-    $green: math.round(color.channel($grey-color-light-raw, "green")),
-    $blue: math.round(color.channel($grey-color-light-raw, "blue"))
-);
+$grey-color-dark: adjust-lightness-and-round($grey-color, $lightness-delta: -25%);
+$grey-color-light: adjust-lightness-and-round($grey-color, $lightness-delta: 40%);
 
 // Width of the content area
 $content-width:    800px;
