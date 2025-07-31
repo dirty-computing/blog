@@ -623,10 +623,10 @@ pintar de rosa o backgound:
 <script>
     function toggleHighlightCarrosselFalho() {
         const spanCarrosselFalho = document.getElementById("carrossel-falho")
-        if (spanCarrosselFalho.hasAttribute("data-highlight")) {
-            spanCarrosselFalho.removeAttribute("data-highlight")
+        if (!!spanCarrosselFalho.dataset.highlight) {
+            delete spanCarrosselFalho.dataset.highlight
         } else {
-            spanCarrosselFalho.setAttribute("data-highlight", "true")
+            spanCarrosselFalho.dataset.highlight = "true"
         }
     }
 </script>
@@ -695,21 +695,21 @@ disso eu pego o elemento pelo ID específico e posso adicionar/remover o atribut
 dele:
 
 ```js
-function toggleHilightCarrosselFalho() {
+function toggleHighlightCarrosselFalho() {
     const spanCarrosselFalho = document.getElementById("carrossel-falho")
-    if (spanCarrosselFalho.hasAttribute("data-highlight")) {
-        spanCarrosselFalho.removeAttribute("data-highlight")
+    if (!!spanCarrosselFalho.dataset.highlight) {
+        delete spanCarrosselFalho.dataset.highlight
     } else {
-        spanCarrosselFalho.setAttribute("data-highlight", "true")
+        spanCarrosselFalho.dataset.highlight = "true"
     }
 }
 ```
 
-E dentro do botão eu chamo a função `toggleHilightCarrosselFalho()` ao
+E dentro do botão eu chamo a função `toggleHighlightCarrosselFalho()` ao
 ser clicado:
 
 ```html
-<button onclick="toggleHilightCarrosselFalho()">Toggle destaque</button>
+<button onclick="toggleHighlightCarrosselFalho()">Toggle destaque</button>
 ```
 
 Mas isso não deixa pintado todo o comprimento da imagem, e sim
