@@ -4,13 +4,13 @@ variables:
     env: '*'
     posts:
       - title: "Post facilmente citável"
-        slug: "2024-05-22-citable"
+        slug: "2024/2024-05-22-citable"
 links:
   - link: "[Acompanhar pipeline](/blog/about/?status=true)"
     env: "*"
     posts:
       - title: "Deixando a pipeline visível para acompanhar deploy do blog"
-        slug: "2024-05-19-pipeline-visible"
+        slug: "2024/2024-05-19-pipeline-visible"
   - link: "[Gerencial](/blog/managerial)"
     env: "*"
   - link: "[Planejamento (issues gitlab)](https://gitlab.com/computaria/blog/-/issues)"
@@ -19,4 +19,4 @@ links:
     env: "*"
     posts:
       - title: "Funcionalidade beta no Computaria"
-        slug: "2025-07-29-beta"
+        slug: "2025/2025-07-29-beta"

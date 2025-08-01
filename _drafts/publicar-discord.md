@@ -7,7 +7,7 @@ tags: gitlab gitlab-ci meta discord jekyll ruby
 
 Vamos publicar, obter o feed e publicar em um canal do Discord?
 
-Bem, eu acabei de publicar um post ([Desafio do Zan]({% post_url 2022-09-09-soma-valores-sem-loops %})),
+Bem, eu acabei de publicar um post ([Desafio do Zan]({% post_url 2022/2022-09-09-soma-valores-sem-loops %})),
 e eu queria automatizar subir isso num server do Discord. Como fazer, para onde ir?
 
 Bem, um dos passos é simplesmente avisar no Discord algo. Para fazer isso, uma das alternativas
@@ -28,7 +28,7 @@ como "hoje", sendo "hoje" o dia do commit.
 Mas para fazer tudo isso preciso definir alguma tecnologia para tal. Como o Jekyll é em Ruby, vou usar
 Ruby também para fazer essas atividades.
 
-Para ajudar nesta atividade, criei o [`scream-out`]({% post_url 2022-09-13-criando-gem %}). Então toda discussão
+Para ajudar nesta atividade, criei o [`scream-out`]({% post_url 2022/2022-09-13-criando-gem %}). Então toda discussão
 programática será ao redor dessa gem.
 
 # Parsear o `feed.xml`

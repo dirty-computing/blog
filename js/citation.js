@@ -1,6 +1,7 @@
 async function citation2clipboard(title, slug) {
     try {
-        await navigator.clipboard.writeText(`[${title}]({% post_url ${slug} %})`)
+        const year = slug.slice(0, 4)
+        await navigator.clipboard.writeText(`[${title}]({% post_url ${year}/${slug} %})`)
         console.log("citação copiada")
     } catch (e) {
         console.log("erro ocorreu")

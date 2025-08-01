@@ -199,7 +199,7 @@ Em geometria analítica, ao descrever uma curva, temos uma função
 que só é possível ter valores nela para os pontos da curva.
 
 Por exemplo, temos uma notação para a [curva do
-barbante]({% post_url 2022-11-17-comprimento-arco %}). Mas
+barbante]({% post_url 2022/2022-11-17-comprimento-arco %}). Mas
 para esse caso específico aqui não precisamos de uma curva
 parametrizda (apesar de ser possível e fácil), apenas
 um conjunto de ponto que satisfaçam uma condição.

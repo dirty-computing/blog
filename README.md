@@ -19,7 +19,7 @@ a [documentação do Jekyll](https://jekyllrb.com/docs/home/), ela é uma ótima
 Cada artigo tem sua própria seção de `assets`. Isso me ajudou a organizar os artigos e
 evitar que o asset de um se misture com o asset do outro. Isso se aplica tanto a
 rascunhos quanto a posts publicados propriamente ditos. Considerando que um artigo
-é da forma `/_posts/{date-part}-{slug}.md` e um rascunho `/_drafts/{slug}.md`,
+é da forma `/_posts/{year}/{date-part}-{slug}.md` e um rascunho `/_drafts/{slug}.md`,
 os assets desse artigo ficam em `/assets/{slug}/`.
 
 Além dos assets, tem o [blog companion](https://gitlab.com/computaria/blog-companion) também.
@@ -58,8 +58,11 @@ pelo processo de criação:
 
 ![Criando um post com rake](/assets/little-improves/rake-blah.md.png)
 
-Para citar posts, use `{% post_url 2021-09-17-desenhos-python-turtle %}` com
-o nome do arquivo do post.
+Para citar posts, use `{% post_url 2021/2021-09-17-desenhos-python-turtle %}` com
+o ano seguido do nome do arquivo do post.
+
+> O ano foi adicionado para melhor gerenciar os posts dentro de `/_posts/` dentro
+> de repositório.
 
 Assets ficam em uma pasta separada dentro dos assets, então coloque o que
 precisa dos assets na pasta adequada. Por exemplo, os assets da página

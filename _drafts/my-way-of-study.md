@@ -122,7 +122,7 @@ fornecida (de preferência armazenando o tempo). Então, comparar a saída obtid
 automatizar isso?
 
 Bem, eu posso automatizar a detecção da diferença usando `diff`. No post sobre [identifcando enums Java com
-bash]({% post_url 2022-03-20-bash-java-enum-parser %}) falei um pouco sobre isso. Preciso alimentar um arquivo com a
+bash]({% post_url 2022/2022-03-20-bash-java-enum-parser %}) falei um pouco sobre isso. Preciso alimentar um arquivo com a
 saída obtida do programa. Chamemos essa saída de `circulos.out` e o resultado esperado de `circulos.res`.
 
 Então, como gerar essas coisas? Vamos precisar de um `circulos.res` que é informado pelo humano uma única vez.

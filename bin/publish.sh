@@ -43,7 +43,9 @@ get-today() {
 git add "$DRAFT"
 SLUG="${DRAFT#_drafts/}"
 
-POST="_posts/`get-today`-${SLUG}"
+TODAY=`get-today`
+
+POST="_posts/${TODAY%%-*}/$TODAY-${SLUG}"
 
 git mv -v "$DRAFT" "$POST"
 
