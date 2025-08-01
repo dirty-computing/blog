@@ -1,3 +1,24 @@
+const toggleSwitch = document.querySelector("[role='switch']")
+
+toggleSwitch.addEventListener("click", ({ target }) => {
+    const currentClass = document.body.className
+    const isToggled = target.checked
+    const toggleLabel = isToggled ? "Tema claro" : "Tema escuro"
+    const toggleClass = isToggled ? "theme-light" : "theme-dark"
+
+    const togleWrapper = target.closest("label")
+    togleWrapper.ariaLabel = toggleLabel
+    document.body.classList.replace(currentClass, toggleClass)
+})
+
+toggleSwitch.addEventListener("focus", (event) => { 
+    event.currentTarget.parentNode.classList.add('switch--focus')
+})
+
+toggleSwitch.addEventListener("blur", (event) => {
+    event.currentTarget.parentNode.classList.remove('switch--focus')
+})
+
 function enableBeta() {
     const queryParams = new URLSearchParams(window.location.search.substring(1))
     if (queryParams.get("beta") === "true") {
