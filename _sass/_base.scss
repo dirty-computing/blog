@@ -187,23 +187,6 @@ pre {
   }
 }
 
-.wrapper {
-  max-width: -webkit-calc(#{c.$content-width} - (#{c.$spacing-unit} * 2));
-  max-width: calc(#{c.$content-width} - (#{c.$spacing-unit} * 2));
-  margin-right: auto;
-  margin-left: auto;
-  padding-right: c.$spacing-unit;
-  padding-left: c.$spacing-unit;
-  @include c.clearfix;
-
-  @include c.media-query(c.$on-laptop) {
-    max-width: -webkit-calc(#{c.$content-width} - (#{c.$spacing-unit}));
-    max-width: calc(#{c.$content-width} - (#{c.$spacing-unit}));
-    padding-right: calc(c.$spacing-unit / 2);
-    padding-left: calc(c.$spacing-unit / 2);
-  }
-}
-
 /**
  * Icons
  */
