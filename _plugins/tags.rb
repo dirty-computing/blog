@@ -95,7 +95,12 @@ module Computaria
         end
     end
 
-
+    module PostPathChanged
+        def post_path_changed(input)
+            year = input[0..3]
+            return "#{year}/#{input}"
+        end
+    end
 
           class PostComparer
             MATCHER = %r!^(.+/)*(\d+-\d+-\d+)-(.*)$!.freeze
@@ -276,6 +281,7 @@ module Computaria
     end
 end
 
+Liquid::Template.register_filter(Computaria::PostPathChanged)
 Liquid::Template.register_filter(Computaria::TagNormalizer)
 Liquid::Template.register_tag("post_urlwa", Computaria::PostUrlWA)
 Liquid::Template.register_tag("verbatim_etc", Computaria::VerbatimEtc)
