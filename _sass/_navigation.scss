@@ -6,14 +6,16 @@
   bottom: 0;
   right: 0;
   transform: translate(-48px, -64px);
-  color: currentColor;
+  color: var(--color-text);
   text-decoration: none;
-  background-color: #eef;
+  background-color: var(--color-code);
   padding: 8px 16px;
   border-radius: 8px;
   transform-style: preserve-3d;
+  box-shadow: 0px 0px 0px 2px transparent,
+    0px 0px 0px 4px var(--color-background);
   &:hover {
-    box-shadow: 0px 0px 0px 2px purple;
+    box-shadow: 0px 0px 0px 2px var(--color-button-border);
     &::after {
       --rotation-val: -16deg;
       --translate-y-val: -32px;
@@ -50,41 +52,80 @@
 .nav-prev {
   display: flex;
   flex-grow: 1;
-  padding: 8px 16px;
+  padding: 42px 16px;
   gap: 8px;
   border-radius: 4px;
+  position: relative;
+
   &:hover {
-    background-image: linear-gradient(
-      var(--grad-direction, to right),
-      #eef,
-      transparent
-    );
+    background-image: url("../assets/coelho-pattern.png");
+
+    background-repeat: repeat;
+    animation: infinite-scroll 4s linear infinite;
   }
 }
 
-.nav-next::after {
+.nav-next .nav-link::after {
   content: "→";
 }
 
-.nav-next .nav-link {
-  margin-left: auto;
+.nav-next {
+  &::before {
+    content: "";
+    inset: 0;
+    position: absolute;
+    background-image: linear-gradient(
+      to right,
+      var(--color-dynamic-bg),
+      transparent
+    );
+  }
+
+  .nav-link {
+    margin-left: auto;
+  }
 }
 
 .nav-prev {
   --grad-direction: to left;
   &::before {
+    content: "";
+    inset: 0;
+    position: absolute;
+    background-image: linear-gradient(
+      to left,
+      var(--color-dynamic-bg),
+      transparent
+    );
+  }
+
+  & .nav-link::before {
     content: "←";
   }
 }
 
-.nav-link:visited {
-  color: c.$grey-color-dark-2;
-}
-
-.nav-link:link {
-  color: c.$grey-color-dark;
+.nav-link {
+  display: flex;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+  &:link {
+    color: var(--color-visited);
+  }
+  &:visited {
+    color: var(--color-button-border);
+  }
 }
 
 .beta-hidden[data-beta="hidden"] {
   display: none;
+}
+
+@keyframes infinite-scroll {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -1000px 0;
+  }
 }

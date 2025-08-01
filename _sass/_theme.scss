@@ -1,0 +1,140 @@
+@use "common" as c;
+
+:root {
+  --color-text-light: #{c.$text-color};
+  --color-background-light: #{c.$background-color};
+  --color-brand-light: #{c.$brand-color};
+  --color-visited-light: #{c.$grey-color-dark};
+  --color-code-light: #{c.$ascent-color};
+  --color-code-border-light: #e8e8e8;
+  --color-button-border-light: #800080;
+  --color-dynamic-bg-light: #{c.$ascent-color};
+
+  --color-text-dark: #{c.$background-color};
+  --color-background-dark: #{c.$text-color};
+  --color-brand-dark: #{c.$ascent-color};
+  --color-visited-dark: #{c.$ascent-color};
+  --color-code-dark: #{c.$color-code-dark};
+  --color-code-border-dark: var(--color-blue-dark);
+  --color-button-border-dark: #d9beff;
+  --color-dynamic-bg-dark: #{c.$color-code-dark};
+
+  @extend .theme-light;
+  @extend #theme-light-highlight;
+
+  @media (prefer-color-scheme: dark) {
+    --color-text: var(--color-text-dark);
+    --color-background: var(--color-background-dark);
+    --color-brand: var(--color-brand-dark);
+    --color-visited: var(--color-visited-dark);
+    --color-code: var(--color-code-dark);
+    --color-code-border: var(--color-code-border-dark);
+    --color-button-border: var(--color-button-border-dark);
+    --color-dynamic-bg: var(--color-dynamic-bg-dark);
+
+    // Highlight colors
+    --color-background: #282a36;
+    --color-black: #f8f8f2;
+    --color-grey-comment: #6272a4;
+    --color-grey-light: #6272a4;
+    --color-grey-dark: #f8f8f2;
+    --color-grey-medium: #f8f8f2;
+    --color-grey-pale: #6272a4;
+    --color-grey-super-pale: #6272a4;
+    --color-dark-red: #ff5555;
+    --color-red: #ff5555;
+    --color-error-red: #ffb86c;
+    --color-error-bg: #44475a;
+    --color-deleted-bg: #552222;
+    --color-deleted-specific-bg: #663333;
+    --color-inserted-bg: #224422;
+    --color-inserted-specific-bg: #335533;
+    --color-blue-dark: #d9beff;
+    --color-blue-bright: #8be9fd;
+    --color-blue-navy: #d9beff;
+    --color-cyan: #50fa7b;
+    --color-teal: #8be9fd;
+    --color-ruby: #ff79c6;
+    --color-purple: #d9beff;
+    --color-magenta: #ff79c6;
+    --color-green-regex: #50fa7b;
+  }
+}
+
+.theme-light {
+  --color-text: var(--color-text-light);
+  --color-background: var(--color-background-light);
+  --color-brand: var(--color-brand-light);
+  --color-visited: var(--color-visited-light);
+  --color-code: var(--color-code-light);
+  --color-code-border: var(--color-code-border-light);
+  --color-button-border: var(--color-button-border-light);
+  --color-dynamic-bg: var(--color-dynamic-bg-light);
+}
+
+.theme-dark {
+  --color-text: var(--color-text-dark);
+  --color-background: var(--color-background-dark);
+  --color-brand: var(--color-brand-dark);
+  --color-visited: var(--color-visited-dark);
+  --color-code: var(--color-code-dark);
+  --color-code-border: var(--color-code-border-dark);
+  --color-button-border: var(--color-button-border-dark);
+  --color-dynamic-bg: var(--color-dynamic-bg-dark);
+}
+
+#theme-light-highlight {
+  --color-white: #fff;
+  --color-black: #000;
+  --color-grey-comment: #998;
+  --color-grey-light: #999;
+  --color-grey-dark: #555;
+  --color-grey-medium: #888;
+  --color-grey-pale: #bbb;
+  --color-grey-super-pale: #aaa;
+  --color-dark-red: #a00;
+  --color-red: #900;
+  --color-error-red: #a61717;
+  --color-error-bg: #e3d2d2;
+  --color-deleted-bg: #fdd;
+  --color-deleted-specific-bg: #faa;
+  --color-inserted-bg: #dfd;
+  --color-inserted-specific-bg: #afa;
+  --color-blue-dark: #458;
+  --color-blue-bright: #0086b3;
+  --color-blue-navy: #000080;
+  --color-cyan: #099;
+  --color-teal: #008080;
+  --color-ruby: #d14;
+  --color-purple: #800080;
+  --color-magenta: #990073;
+  --color-green-regex: #009926;
+}
+
+#theme-dark-highlight {
+  --color-background: #282a36;
+  --color-black: #f8f8f2;
+  --color-grey-comment: #a9b6dd;
+  --color-grey-light: #a9b6dd;
+  --color-grey-dark: #f8f8f2;
+  --color-grey-medium: #f8f8f2;
+  --color-grey-pale: #a9b6dd;
+  --color-grey-super-pale: #a9b6dd;
+  --color-dark-red: #ff8383;
+  --color-red: #ff8383;
+  --color-error-red: #ffb86c;
+  --color-error-bg: #44475a;
+  --color-deleted-bg: #552222;
+  --color-deleted-specific-bg: #663333;
+  --color-inserted-bg: #224422;
+  --color-inserted-specific-bg: #335533;
+  --color-blue-dark: #d9beff;
+  --color-blue-bright: #8be9fd;
+  --color-blue-navy: #d9beff;
+  --color-cyan: #50fa7b;
+  --color-teal: #8be9fd;
+  --color-ruby: #ff79c6;
+  --color-purple: #d9beff;
+  --color-magenta: #ff79c6;
+  --color-green-regex: #50fa7b;
+}

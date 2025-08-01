@@ -30,7 +30,7 @@
 
   &,
   &:visited {
-    color: c.$grey-color-dark;
+    color: var(--color-visited);
   }
 }
 
@@ -50,11 +50,11 @@
     height: 0;
   }
   &__input:checked + &__slider {
-    background-color: c.$brand-color;
+    background-color: var(--color-brand);
   }
 
   &__input:focus + &__slider {
-    box-shadow: 0 0 1px c.$brand-color;
+    box-shadow: 0 0 1px var(--color-brand);
   }
 
   &__input:checked + &__slider::before {
@@ -75,24 +75,23 @@
       width: var(--toggle-handle-size);
       left: 4px;
       bottom: 4.5px;
-      background-color: c.$background-color;
+      background-color: var(--color-background);
       transition: 400ms;
       border-radius: 50%;
     }
   }
 
   &--focus {
-    box-shadow: 0px 0px 0px 2px c.$background-color,
-      0px 0px 0px 4px c.$brand-color;
+    box-shadow: 0px 0px 0px 2px var(--color-background),
+      0px 0px 0px 4px var(--color-brand);
   }
 
   &::before {
     content: attr(aria-label);
     position: absolute;
-    width: max-content;
     top: 0;
     left: 0;
-    transform: translate(-15%, calc((100% + 2px) * -1));
+    transform: translate(calc((100% + 6px) * -1), -15%);
     font-size: 0.8rem;
   }
 }
@@ -106,7 +105,7 @@
   }
 
   .page-link {
-    color: c.$text-color;
+    color: var(--color-text);
     line-height: c.$base-line-height;
 
     // Gaps between nav items, but not on the last one
@@ -123,7 +122,7 @@
     position: absolute;
     top: 9px;
     right: calc(c.$spacing-unit / 2);
-    background-color: c.$background-color;
+    background-color: var(--color-background);
     border: 1px solid c.$grey-color-light;
     border-radius: 5px;
     text-align: right;

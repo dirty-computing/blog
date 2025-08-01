@@ -30,8 +30,8 @@ figure {
 body {
   font: c.$base-font-weight #{c.$base-font-size}/#{c.$base-line-height}
     c.$base-font-family;
-  color: c.$text-color;
-  background-color: c.$background-color;
+  color: var(--color-text);
+  background-color: var(--color-background);
   -webkit-text-size-adjust: 100%;
   -webkit-font-feature-settings: "kern" 1;
   -moz-font-feature-settings: "kern" 1;
@@ -46,7 +46,7 @@ body {
 }
 
 .clean-background {
-  background-color: c.$background-color;
+  background-color: var(--color-background);
 }
 
 /**
@@ -117,8 +117,8 @@ h6 {
 /**
  * Links
  */
-a {
-  color: c.$brand-color;
+:where(a) {
+  color: var(--color-brand);
   text-decoration: none;
 
   &:visited {
@@ -126,7 +126,7 @@ a {
   }
 
   &:hover {
-    color: c.$text-color;
+    color: var(--color-text);
     text-decoration: underline;
   }
 }
@@ -136,7 +136,7 @@ a {
  */
 blockquote {
   color: c.$grey-color;
-  border-left: 4px solid c.$grey-color-light;
+  border-left: 4px solid var(--color-code-border);
   padding-left: calc(c.$spacing-unit / 2);
   font-size: 18px;
   letter-spacing: -1px;
@@ -153,9 +153,9 @@ blockquote {
 pre,
 code {
   font-size: 15px;
-  border: 1px solid c.$grey-color-light;
+  border: 1px solid var(--color-code-border);
   border-radius: 3px;
-  background-color: #eef;
+  background-color: var(--color-code);
 }
 
 code {
