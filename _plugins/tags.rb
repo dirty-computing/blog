@@ -150,6 +150,36 @@ module Computaria
             end
           end
       
+          class VerbatimEtc < Liquid::Block
+            def initialize(tag_name, markup, tokens)
+              super
+
+              @lang = markup.strip
+            end
+
+            # https://talk.jekyllrb.com/t/markdown-parsing-order-in-custom-liquid-tags/4397/3
+            def render(context)
+              code = super.to_s.strip
+
+              site = context.registers[:site]
+              converter = site.find_converter_instance(::Jekyll::Converters::Markdown)
+
+
+
+              rendered = Liquid::Template.parse(converter.convert("""
+{% raw %}
+\`\`\`#{@lang}
+#{code}
+\`\`\`
+{% endraw %}
+
+#{code}
+              """)).render(context)
+
+              rendered
+            end
+          end
+
           class PostUrlWA < Liquid::Tag
             include Jekyll::Filters::URLFilters
       
@@ -248,3 +278,4 @@ end
 
 Liquid::Template.register_filter(Computaria::TagNormalizer)
 Liquid::Template.register_tag("post_urlwa", Computaria::PostUrlWA)
+Liquid::Template.register_tag("verbatim_etc", Computaria::VerbatimEtc)
