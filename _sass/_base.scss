@@ -1,220 +1,240 @@
-@use 'sass:color';
+@use "sass:color";
 @use "common" as c;
 
 /**
  * Reset some basic elements
  */
-body, h1, h2, h3, h4, h5, h6,
-p, blockquote, pre, hr,
-dl, dd, ol, ul, figure {
-    margin: 0;
-    padding: 0;
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+hr,
+dl,
+dd,
+ol,
+ul,
+figure {
+  margin: 0;
+  padding: 0;
 }
-
-
 
 /**
  * Basic styling
  */
 body {
-    font: c.$base-font-weight #{c.$base-font-size}/#{c.$base-line-height} c.$base-font-family;
-    color: c.$text-color;
-    background-color: c.$background-color;
-    -webkit-text-size-adjust: 100%;
-    -webkit-font-feature-settings: "kern" 1;
-    -moz-font-feature-settings: "kern" 1;
-    -o-font-feature-settings: "kern" 1;
-    font-feature-settings: "kern" 1;
-    font-kerning: normal;
+  font: c.$base-font-weight #{c.$base-font-size}/#{c.$base-line-height}
+    c.$base-font-family;
+  color: c.$text-color;
+  background-color: c.$background-color;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-feature-settings: "kern" 1;
+  -moz-font-feature-settings: "kern" 1;
+  -o-font-feature-settings: "kern" 1;
+  font-feature-settings: "kern" 1;
+  font-kerning: normal;
 }
 
 .scroll {
-    /* Se você quiser o back to top suave*/
-    scroll-behavior: smooth;
+  /* Se você quiser o back to top suave*/
+  scroll-behavior: smooth;
 }
 
 .clean-background {
-    background-color: c.$background-color;
+  background-color: c.$background-color;
 }
 
 /**
  * Set `margin-bottom` to maintain vertical rhythm
  */
-h1, h2, h3, h4, h5, h6,
-p, blockquote, pre,
-ul, ol, dl, figure {
-    @include c.vertical-rhythm;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+ul,
+ol,
+dl,
+figure {
+  @include c.vertical-rhythm;
 }
-
-
 
 /**
  * Images
  */
 img {
-    max-width: 100%;
-    vertical-align: middle;
+  max-width: 100%;
+  vertical-align: middle;
 }
-
-
 
 /**
  * Figures
  */
 figure > img {
-    display: block;
+  display: block;
 }
 
 figcaption {
-    font-size: c.$small-font-size;
+  font-size: c.$small-font-size;
 }
-
-
 
 /**
  * Lists
  */
-ul, ol {
-    margin-left: c.$spacing-unit;
+ul,
+ol {
+  margin-left: c.$spacing-unit;
 }
 
 li {
-    > ul,
-    > ol {
-         margin-bottom: 0;
-    }
+  > ul,
+  > ol {
+    margin-bottom: 0;
+  }
 }
-
-
 
 /**
  * Headings
  */
-h1, h2, h3, h4, h5, h6 {
-    font-weight: c.$base-font-weight;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: c.$base-font-weight;
 }
-
-
 
 /**
  * Links
  */
 a {
-    color: c.$brand-color;
-    text-decoration: none;
+  color: c.$brand-color;
+  text-decoration: none;
 
-    &:visited {
-        color: c.adjust-lightness-and-round(c.$brand-color, $lightness-delta: -15%);
-    }
+  &:visited {
+    color: c.adjust-lightness-and-round(c.$brand-color, $lightness-delta: -15%);
+  }
 
-    &:hover {
-        color: c.$text-color;
-        text-decoration: underline;
-    }
+  &:hover {
+    color: c.$text-color;
+    text-decoration: underline;
+  }
 }
-
-
 
 /**
  * Blockquotes
  */
 blockquote {
-    color: c.$grey-color;
-    border-left: 4px solid c.$grey-color-light;
-    padding-left: calc(c.$spacing-unit / 2);
-    font-size: 18px;
-    letter-spacing: -1px;
-    font-style: italic;
+  color: c.$grey-color;
+  border-left: 4px solid c.$grey-color-light;
+  padding-left: calc(c.$spacing-unit / 2);
+  font-size: 18px;
+  letter-spacing: -1px;
+  font-style: italic;
 
-    > :last-child {
-        margin-bottom: 0;
-    }
+  > :last-child {
+    margin-bottom: 0;
+  }
 }
-
-
 
 /**
  * Code formatting
  */
 pre,
 code {
-    font-size: 15px;
-    border: 1px solid c.$grey-color-light;
-    border-radius: 3px;
-    background-color: #eef;
+  font-size: 15px;
+  border: 1px solid c.$grey-color-light;
+  border-radius: 3px;
+  background-color: #eef;
 }
 
 code {
-    padding: 1px 5px;
+  padding: 1px 5px;
 }
 
 pre {
-    padding: 8px 12px;
-    overflow-x: auto;
+  padding: 8px 12px;
+  overflow-x: auto;
 
-    > code {
-        border: 0;
-        padding-right: 0;
-        padding-left: 0;
-    }
+  > code {
+    border: 0;
+    padding-right: 0;
+    padding-left: 0;
+  }
 }
-
-
 
 /**
  * Wrapper
  */
-.wrapper {
-    max-width: -webkit-calc(#{c.$content-width} - (#{c.$spacing-unit} * 2));
-    max-width:         calc(#{c.$content-width} - (#{c.$spacing-unit} * 2));
-    margin-right: auto;
-    margin-left: auto;
-    padding-right: c.$spacing-unit;
-    padding-left: c.$spacing-unit;
-    @include c.clearfix;
 
-    @include c.media-query(c.$on-laptop) {
-        max-width: -webkit-calc(#{c.$content-width} - (#{c.$spacing-unit}));
-        max-width:         calc(#{c.$content-width} - (#{c.$spacing-unit}));
-        padding-right: calc(c.$spacing-unit / 2);
-        padding-left: calc(c.$spacing-unit / 2);
-    }
+.grid-wrapper {
+  --content-width: #{c.$content-width};
+  display: grid;
+  grid-template-columns: 1fr min(var(--content-width), 100%) 1fr;
+  padding-inline: 16px;
+  & > * {
+    grid-column: 2;
+  }
 }
 
+.wrapper {
+  max-width: -webkit-calc(#{c.$content-width} - (#{c.$spacing-unit} * 2));
+  max-width: calc(#{c.$content-width} - (#{c.$spacing-unit} * 2));
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: c.$spacing-unit;
+  padding-left: c.$spacing-unit;
+  @include c.clearfix;
 
+  @include c.media-query(c.$on-laptop) {
+    max-width: -webkit-calc(#{c.$content-width} - (#{c.$spacing-unit}));
+    max-width: calc(#{c.$content-width} - (#{c.$spacing-unit}));
+    padding-right: calc(c.$spacing-unit / 2);
+    padding-left: calc(c.$spacing-unit / 2);
+  }
+}
 
 /**
  * Icons
  */
 .icon {
+  > svg {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
 
-    > svg {
-        display: inline-block;
-        width: 16px;
-        height: 16px;
-        vertical-align: middle;
-
-        path {
-            fill: c.$grey-color;
-        }
+    path {
+      fill: c.$grey-color;
     }
+  }
 }
 
 table.marked-table {
-    border: 1px solid gray;
-    width: 90%;
+  border: 1px solid gray;
+  width: 90%;
 
-    th {
-        border: 1px solid gray;
-        font-weight: bold;
-    }
-    td {
-        border: 1px solid gray;
-    }
+  th {
+    border: 1px solid gray;
+    font-weight: bold;
+  }
+  td {
+    border: 1px solid gray;
+  }
 }
 
 .marked-table.numeric {
-    td {
-        text-align: right;
-    }
+  td {
+    text-align: right;
+  }
 }

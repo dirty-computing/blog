@@ -1,14 +1,21 @@
-<header class="site-header">
-  <div class="wrapper">
+<header class="site-header grid-wrapper">
+  <div class="site-header__content">
     <a class="site-title beta-link" href="{{ site.baseurl }}/"
       >{{ site.title }}</a
     >
+    <label for="theme" class="switch" aria-label="Tema claro">
+      <input
+        class="switch__input"
+        type="checkbox"
+        id="theme"
+        name="theme"
+        role="switch"
+        checked
+      />
+      <span class="switch__slider"></span>
+    </label>
 
     <nav class="site-nav">
-      <label for="theme" class="switch">
-        <input class="switch__input" type="checkbox" id="theme" name="theme" />
-        <span class="switch__slider"></span>
-      </label>
       <a href="#" class="menu-icon">
         <svg viewBox="0 0 18 15">
           <path
