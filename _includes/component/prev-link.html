@@ -1,6 +1,9 @@
 {% assign post=include.post %}
 {% unless post.draft == "true" %}
-    <div class="nav-prev"><a class="nav-link beta-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></div>
+    <div class="nav-prev">
+        <a class="nav-link beta-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+        <span class="bunny-stampede"></span>
+    </div>
 {% elsif post.previous %}
     {% include component/prev-link.html post=post.previous %}
 {% endunless %}

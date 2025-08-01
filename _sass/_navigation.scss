@@ -57,12 +57,25 @@
   border-radius: 4px;
   position: relative;
 
-  &:hover {
+  &:hover .bunny-stampede {
     background-image: url("../assets/coelho-pattern.png");
 
     background-repeat: repeat;
     animation: infinite-scroll 4s linear infinite;
   }
+}
+
+.bunny-stampede {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: -1;
+}
+
+.nav-next .bunny-stampede {
+  transform: scale(-1, 1);
 }
 
 .nav-next .nav-link::after {
