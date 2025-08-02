@@ -28,8 +28,7 @@ figure {
  * Basic styling
  */
 body {
-  font: c.$base-font-weight #{c.$base-font-size}/#{c.$base-line-height}
-    c.$base-font-family;
+  font: c.$base-font-weight #{c.$base-font-size}/#{c.$base-line-height} c.$base-font-family;
   color: var(--color-text);
   background-color: var(--color-background);
   -webkit-text-size-adjust: 100%;
