@@ -91,7 +91,9 @@
     position: absolute;
     top: 0;
     left: 0;
-    transform: translate(calc((100% + 6px) * -1), -15%);
+    transform: translate(calc((100% + 0px) * -1), -15%);
+    opacity: 0;
+    animation: switch-label-appear-left 300ms ease-in forwards 300ms;
     font-size: 0.8rem;
   }
 }
@@ -334,5 +336,16 @@
     @include c.media-query(c.$on-laptop) {
       font-size: 18px;
     }
+  }
+}
+
+@keyframes switch-label-appear-left {
+  from {
+    transform: translate(calc((100% + 0px) * -1), -15%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(calc((100% + 6px) * -1), -15%);
+    opacity: 1;
   }
 }
