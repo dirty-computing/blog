@@ -20,8 +20,7 @@ function setThemeLabel(themeName) {
     toggleWrapper.ariaLabel = toggleLabel
 }
 
-toggleSwitch.addEventListener("click", ({ target }) => {
-    const isToggled = target.checked
+function changeTheme(isToggled) {
     const toggleClass = isToggled ? "theme-light" : "theme-dark"
 
     const currentClass = document.documentElement.className
@@ -37,7 +36,12 @@ toggleSwitch.addEventListener("click", ({ target }) => {
     }
 
     toggleSwitch.checked = toggleClass === "theme-light"
+    return toggleClass
+}
 
+toggleSwitch.addEventListener("click", ({ target }) => {
+    const isToggled = target.checked
+    const toggleClass = changeTheme(isToggled)
     setThemeLocalstorage(toggleClass)
 })
 
@@ -49,11 +53,22 @@ toggleSwitch.addEventListener("blur", (event) => {
     event.currentTarget.parentNode.classList.remove("switch--focus")
 })
 
+function applyChangeTheme(theme) {
+    const isToggled = theme === "theme-light"
+
+    changeTheme(isToggled)
+}
+
 window.addEventListener("DOMContentLoaded", () => {
-    const theme = getThemeLocalstorage()
-    setThemeLabel(theme)
-    toggleSwitch.checked = theme === "theme-light"
+    applyChangeTheme(getThemeLocalstorage())
 })
+
+// para detecção multi-aba: mudança em uma aba implica mudança na local
+window.addEventListener("storage", event => {
+    if (event.key == "theme" || !event.key) {
+        applyChangeTheme(event.newValue);
+    }
+});
 
 function enableBeta() {
     const queryParams = new URLSearchParams(window.location.search.substring(1))
