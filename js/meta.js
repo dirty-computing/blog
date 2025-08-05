@@ -81,7 +81,7 @@ function enableBeta() {
 function showBeta() {
     const betaElements = document.getElementsByClassName("beta")
     for (const betaElement of betaElements) {
-        betaElement.setAttribute("data-beta", "true")
+        betaElement.dataset.beta = true
     }
 }
 
@@ -90,9 +90,9 @@ function changeBetaLink() {
     for (const betaElement of betaElements) {
         if (
             betaElement.hasAttribute("href") &&
-            betaElement.getAttribute("data-beta-applied") != "beta-applied"
+            betaElement.dataset.betaApplied != "beta-applied"
         ) {
-            betaElement.setAttribute("data-beta-applied", "beta-applied")
+            betaElement.dataset.betaApplied = "beta-applied"
             betaElement.href += window.location.search
         }
     }
