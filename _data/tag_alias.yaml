@@ -4,6 +4,8 @@
   alias: [ ts ]
 - tag: markdown
   alias: [ md ]
+- tag: tail-call
+  alias: [ tco ]
 - tag: bash
   alias: [ shell, shell-script ]
 - tag: design-pattern
