@@ -349,7 +349,7 @@ int mult(int a, int b) {
 Agora a função não faz nenhuma computação a mais no retorno, é apenas uma
 chamada de função de cauda. Ela pode ser otimizada com TCO!
 
-# Nem tudon são flores
+# Nem tudo são flores
 
 Não foi porque eu transformei o código em algo que PODE sofrer otimização de
 cauda que ele VAI sofrer otimização de cauda. Para isso, você precisa passar a
