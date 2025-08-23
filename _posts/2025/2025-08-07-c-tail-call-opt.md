@@ -8,7 +8,7 @@ pixmecoffe: jeffquesado
 twitter: jeffquesado
 ---
 
-Vi um post na APDA (Associaçãp de Programadores Depressivos Anônimos,
+Vi um post na APDA (Associação de Programadores Depressivos Anônimos,
 comunidade do Facebook) sobre um rapaz que estava escrevendo uma função de
 multiplicação em C sem usar primitivos de multiplicação. A resposta dele foi
 algo assim:
