@@ -877,7 +877,7 @@ public long withStream(Input i) {
 E o resultado que eu colhi foi:
 
 {:class="marked-table"}
-| Benchmark                 (size)  | Mode   | Cnt|  Score    |   Error   | Units |
+| Benchmark              |  (size)  | Mode   | Cnt|  Score    |   Error   | Units |
 | :-------------------:  | -------: | :---:  | -: | --------: | --------: | :---  |
 | Summation.noopForeach  |   100000 | thrpt  | 15 | 24917.405 | ±  75.933 | ops/s |
 | Summation.noopForeach  | 50000000 | thrpt  | 15 |    38.930 | ±   0.397 | ops/s |
