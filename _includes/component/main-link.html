@@ -1,7 +1,7 @@
 {% assign post=include.post %}
 <li>
     <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}{% if post.sponsored_by %}, gentil patrocínio de
-    {{ post.sponsored_by | join: ", "}}{% endif %}</span>
+    {{ post.sponsored_by | join: ", "}}{% endif %}{% if  post.author != site.author %} por {{post.author}} {% endif %}</span>
 
     <h2>
     <a class="post-link beta-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>

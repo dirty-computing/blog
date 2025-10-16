@@ -8,6 +8,7 @@
 # Site settings
 title: Computaria - assuntos computacionais por Jefferson Quesado
 email: jeff.quesado@gmail.com
+author: Jefferson Quesado
 description: > # this means to ignore newlines until "baseurl:"
   Devaneios e dicas de programação e outros demais assuntos, relacionados
   à programação, computação ou engenharia de software.
