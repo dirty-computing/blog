@@ -2,7 +2,7 @@
 layout: post
 title: "Alpine morreu! Vida longa ao Alpine!"
 author: "Jefferson Quesado"
-tags: gitab-ci meta linux ruby
+tags: gitlab-ci meta linux ruby
 base-assets: "/assets/long-live-alpine/"
 pixmecoffe: jeffquesado
 twitter: jeffquesado

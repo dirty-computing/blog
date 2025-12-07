@@ -20,7 +20,7 @@ Eu investiguei coisas desse tipo em alguns posts anteriores:
 
 Então, vamos falar sobre o famigerado Y-combinator? Uma função especial que
 permite que a gente escreva funções recursivas sem precisar de capacidade
-resursiva na linguagem!
+recursiva na linguagem!
 
 {% katexmm %}
 

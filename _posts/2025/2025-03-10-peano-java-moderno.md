@@ -36,7 +36,7 @@ partir do ponto o seno que faria o ângulo entre o eixo x indo pra direta e a
 reta que passa pela origem e por esse ponto específico.
 
 Pulando a questão das identidades trigonométricas, eu tenho que o valor da
-tangente de um ângulo em um retângulo retângulo é "cateto oposto/cateto
+tangente de um ângulo em um triângulo retângulo é "cateto oposto/cateto
 adjacente". Em relação a esse ângulo específico que procuro, o "cateto oposto"
 dele é numericamente igual ao valor `c.y` da coordenada `c`, e o "cateto
 adjacente" é numericamente igual ao valor `c.x`. Então basta fazer a divisão
