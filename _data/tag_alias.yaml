@@ -18,3 +18,5 @@
   alias: [ fp, functional-programming ]
 - tag: sass
   alias: [ scss ]
+- tag: engenharia-de-software
+  alias: [ engenharia-software, software-engineering ]
