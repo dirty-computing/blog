@@ -252,11 +252,11 @@ class VerbatimEtc < Liquid::Block
 
 
         rendered = Liquid::Template.parse(converter.convert("""
-{% raw %}
+{{ "%7B%25 raw %25%7D" | url_decode }}
 \`\`\`
 #{code}
 \`\`\`
-{% endraw %}
+{{ "%7B%25 endraw %25%7D" | url_decode }}
 
 #{code}
         """)).render(context)
@@ -290,11 +290,11 @@ class VerbatimEtc < Liquid::Block
 
 
         rendered = Liquid::Template.parse(converter.convert("""
-{% raw %}
+{{ "%7B%25 raw %25%7D" | url_decode }}
 \`\`\`#{@lang}
 #{code}
 \`\`\`
-{% endraw %}
+{{ "%7B%25 endraw %25%7D" | url_decode }}
 
 #{code}
         """)).render(context)
