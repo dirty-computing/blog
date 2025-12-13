@@ -50,6 +50,14 @@ podcasts:
       guests:
         - jeffque
         - lobaorn
+    - title: "Velocity vs Agility"
+      description: "Engineering Sessions, S06E09"
+      links:
+        - "[YouTube](https://youtu.be/QWRsLrbFch0?si=JGAT7BspE2wcpJpc)"
+      guests:
+        - jeffque
+        - giggio
+        - victorhg
   channels:
     - "[YouTube](https://www.youtube.com/@carlosenog)"
 - show: "The Leandronsp Show"
@@ -70,6 +78,7 @@ podcasts:
 people:
   carlosenog: "[Carlos Nogueira](https://carlosenog.dev/)"
   edgarberlinck: "[Edgar Berlinck](https://medium.com/@edgarberlinck)"
+  giggio: "[Giovanni Bassi](https://giggio.net/)"
   hugomarques: "[Hugo Marques](https://hugomarques.dev)"
   jeffque: "Jefferson Quesado"
   leandronsp: "[Leandro Proença](https://leandronsp.com)"
@@ -78,4 +87,5 @@ people:
   rponte: "[Rafael Ponte](https://www.linkedin.com/in/rponte/)"
   samsantosb: "[Samuel Santos](https://twitter.com/samsantosb)"
   vepo: "[Victor Osório](https://vepo.dev/)"
+  victorhg: "[Victor Hugo Germano](https://www.victorhg.com/)"
   zanfranceschi: "[Zanfranceschi](https://dev.to/zanfranceschi)"
