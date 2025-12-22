@@ -43,7 +43,7 @@ abastecendo o mecanismo conforme a energia vai sendo necessária.
 
 Outro exemplo de autômato de corda é esse aqui:
 
-![Um autômato de um arqueiro japonês atirando uma flecha](https://i.sstatic.net/GWeFO.gif)
+![Um autômato de um arqueiro japonês atirando uma flecha]({{ page.base-assets | append: "arco-flecha.gif" | relative_url }})
 
 Um autômato que ficou conhecido no cinema foi
 [A invenção de Hugo Cabret](https://en.wikipedia.org/wiki/Hugo_Cabret), que
@@ -133,7 +133,7 @@ possui uma pilha de onde você pode ler e escrever elementos nela (mas apenas na
 você deve escrever novamente esse elemento na pilha. Você também pode não ler a
 pilha. Assim como pode escrever na pilha sem consumir nada. Veja abaixo:
 
-![exemplo de autômato de pilha](https://i.sstatic.net/o21Dd.png)
+![exemplo de autômato de pilha]({{ page.base-assets | append: "pda.png" | relative_url }})
 
 Olhe para a primeira transação: `-,-/S`. Isso indica 3 coisas:
 
@@ -316,4 +316,4 @@ naquele lugar (pode ser o mesmo símbolo que foi lido), mudar de estado e
 escolher se a cabeça de leitura vai para a esquerda ou para a direita.
 
 
- [dfa]: https://i.sstatic.net/Wgyh1.png
+ [dfa]: {{ page.base-assets | append: "afd.png" | relative_url }}
