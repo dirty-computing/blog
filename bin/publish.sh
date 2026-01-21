@@ -43,7 +43,7 @@ get-today() {
 git add "$DRAFT"
 SLUG="${DRAFT#_drafts/}"
 
-TODAY=2027-01-01 #`get-today`
+TODAY=`get-today`
 
 POST="_posts/${TODAY%%-*}/$TODAY-${SLUG}"
 
