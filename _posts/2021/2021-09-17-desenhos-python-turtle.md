@@ -7,8 +7,10 @@ tags: python tartaruga
 ---
 
 Senti a necessidade de fazer alguns desenhos para fazer a explicação sobre
-interseções de círculos (a publicar). Para isso, me lembrei que na [resposta
-original que dei no StackOverflow](https://pt.stackoverflow.com/a/260073/64969)
+interseções de círculos
+([Determinando interseção de circunferências]({% post_url 2026/2026-01-20-intersecao-circulos %})).
+Para isso, me lembrei que na
+[resposta original que dei no StackOverflow](https://pt.stackoverflow.com/a/260073/64969)
 fiz os desenhos usando o módulo `Turtle` do Python. Porém, não consegui resgatar os
 códigos originais.
 
