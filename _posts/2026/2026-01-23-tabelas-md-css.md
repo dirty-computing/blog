@@ -521,3 +521,68 @@ O [Gerancial]({% link managerial.md %}) não foi adaptado para usar a tabela de
 markdown, a geração de tabelas dele mesmo já era complicada o suficiente e
 nesse caso tentar forçar markdown só iria dificultar as coisas, já que as
 células são previstas para serem multi-linhas.
+
+# Voltando pra tabelinha do começo
+
+Bem, vamos voltar para a tabelinha que começou tudo:
+
+{% verbatim_etc %}
+|   A   |   B   |  output  |
+| :---: | :---: |  :---:   |
+|   0   |   0   |    0     |
+|   1   |   0   |    1     |
+|   0   |   1   |    1     |
+|   1   |   1   |    1     |
+{% endverbatim_etc %}
+
+Xoxa, capenga, manca, anêmica, frágil e inconsistente... vamos adicionar a
+classe para ela ser uma tabela marcada?
+
+{% verbatim_etc md %}
+{:class="marked-table"}
+|   A   |   B   |  output  |
+| :---: | :---: |  :---:   |
+|   0   |   0   |    0     |
+|   1   |   0   |    1     |
+|   0   |   1   |    1     |
+|   1   |   1   |    1     |
+{% endverbatim_etc %}
+
+E se não estiver satisfeito, podemos ocupar boa parte horizontal também:
+
+{% verbatim_etc md %}
+{:class="marked-table w90"}
+|   A   |   B   |  output  |
+| :---: | :---: |  :---:   |
+|   0   |   0   |    0     |
+|   1   |   0   |    1     |
+|   0   |   1   |    1     |
+|   1   |   1   |    1     |
+{% endverbatim_etc %}
+
+Hmmm, como essa tabela foi desenhada originalmente para falar sobre operadores
+de lógica booleana com carangueijos (yep, acredite), podemos colocar os números
+à direita:
+
+{% verbatim_etc md %}
+{:class="marked-table w90"}
+|   A   |   B   |  output  |
+| ----: | ----: |  ----:   |
+|   0   |   0   |    0     |
+|   1   |   0   |    1     |
+|   0   |   1   |    1     |
+|   1   |   1   |    1     |
+{% endverbatim_etc %}
+
+E se estiver insatisfeito com isso por que o header saiu do centro? Só pedir
+para alinhar o header!
+
+{% verbatim_etc md %}
+{:class="marked-table w90 centered-head"}
+|   A   |   B   |  output  |
+| ----: | ----: |  ----:   |
+|   0   |   0   |    0     |
+|   1   |   0   |    1     |
+|   0   |   1   |    1     |
+|   1   |   1   |    1     |
+{% endverbatim_etc %}
