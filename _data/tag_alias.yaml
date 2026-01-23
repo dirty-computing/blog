@@ -20,3 +20,5 @@
   alias: [ scss ]
 - tag: engenharia-de-software
   alias: [ engenharia-software, software-engineering ]
+- tag: autômato
+  alias: [ autômatos ]
