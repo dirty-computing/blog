@@ -585,7 +585,7 @@ possível usar essas tags então melhor ainda!
 E dá? Na real, dá sim. "Ah, mas e se você fizer isso não vai renderizar
 markdown blablablá..."
 
-Lembra o que ue citei acima quando estava fazendo as renderizações parciais
+Lembra o que eu citei acima quando estava fazendo as renderizações parciais
 para pegar os exemplos para este post? Vou copiar abaixo com destaque no
 detalhe importante:
 
