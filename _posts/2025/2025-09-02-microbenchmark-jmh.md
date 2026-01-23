@@ -765,7 +765,7 @@ estava dominando os resultados perante `ArrayList` para o maior valor (1 milhão
 de elementos). Para se ter uma ideia:
 
 
-{:class="marked-table"}
+{:class="marked-table w90"}
 |   Benchmark   |   (size)   |  ops/s  |
 | :---: | ----: |  ----:   |
 |   StreamList.oldForArrayList_List  |	 1000000   |    61.227      |
@@ -808,7 +808,7 @@ atualizações apenas, sem necessitar normalmente de alocações extras.
 Então com isso veio a ideia de tentar justamente os 5 milhões. E com 5 milhões,
 como foi o resultado?
 
-{:class="marked-table"}
+{:class="marked-table w90"}
 |   Benchmark   |   (size)   |  ops/s  |
 | :---: | ----: |  ----:   |
 |   StreamList.oldForArrayList_List  |	 5000000   |    10.964      |
@@ -876,7 +876,7 @@ public long withStream(Input i) {
 
 E o resultado que eu colhi foi:
 
-{:class="marked-table"}
+{:class="marked-table w90"}
 | Benchmark              |  (size)  | Mode   | Cnt|  Score    |   Error   | Units |
 | :-------------------:  | -------: | :---:  | -: | --------: | --------: | :---  |
 | Summation.noopForeach  |   100000 | thrpt  | 15 | 24917.405 | ±  75.933 | ops/s |

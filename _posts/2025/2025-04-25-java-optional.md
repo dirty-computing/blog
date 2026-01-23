@@ -21,27 +21,11 @@ eles lidam com o resultado dessa função.
 
 Diferença central: **O tipo da função que você passa**
 
-<table class='marked-table'>
- <tr>
-  <th>Método</th><th>Espera uma função que retorna...</th><th>Exemplo de função</th><th>Retorna</th>
- </tr>
-<tbody>
- <tr>
-  <td markdown="1">`map()`
-  </td>
-  <td>Um valor simples (T -&gt; U)</td>
-  <td>String::length → String -&gt; Integer</td>
-  <td>Optional&lt;U&gt;</td>
- </tr>
- <tr>
-  <td markdown="1">`flatMap()`
-  </td>
-  <td>Um novo Optional (T -&gt; Optional) </td>
-  <td>x -&gt; Optional.of(x.length()) </td>
-  <td>Optional&lt;U&gt;</td>
- </tr>
-</tbody>
-</table>
+{:class="marked-table w90"}
+| Método   | Espera uma função que retorna... | Exemplo de função | Retorna |
+| ---      | ----------------                 | -----             | -----   |
+| `map()`  | Um valor simples (T -> U)        | String::length → String -> Integer | Optional\<U\> |
+|  `flatMap()` |  Um novo Optional (T -> Optional) | x -> Optional.of(x.length()) | Optional\<U\> |
 
 - `map()`: Usa uma função que transforma o valor contido no `Optional` em um
   valor comum (não-`Optional`). O `map()` embrulha o resultado automaticamente

@@ -56,82 +56,17 @@ E por fim, XOR é associativo. Isso quer dizer que `(a ^ b) ^ c` tem o mesmo
 valor do que `a ^ (b ^ c)`. Isso nos dá 8 possibilidades de valores para as 3
 variáveis:
 
-<table class='marked-table numeric'>
-    <tr>
-        <th>a</th>
-        <th>b</th>
-        <th>c</th>
-        <th>a^b^c</th>
-        <th>a^b</th>
-        <th>b^c</th>
-    </tr>
-    <tbody>
-        <tr>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-        </tr>
-        <tr><!-- a -->
-            <td>1</td>
-            <td>0</td>
-            <td>0</td>
-            <td>1</td>
-            <td>1</td>
-            <td>0</td>
-        </tr>
-        <tr><!-- b -->
-            <td>0</td>
-            <td>1</td>
-            <td>0</td>
-            <td>1</td>
-            <td>0</td>
-            <td>1</td>
-        </tr>
-        <tr><!-- a,b -->
-            <td>1</td>
-            <td>1</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>1</td>
-        </tr>
-        <tr><!-- c -->
-            <td>0</td>
-            <td>0</td>
-            <td>1</td>
-            <td>1</td>
-            <td>0</td>
-            <td>1</td>
-        </tr>
-        <tr><!-- a,c -->
-            <td>1</td>
-            <td>0</td>
-            <td>1</td>
-            <td>0</td>
-            <td>1</td>
-            <td>1</td>
-        </tr>
-        <tr><!-- b,c -->
-            <td>0</td>
-            <td>1</td>
-            <td>1</td>
-            <td>0</td>
-            <td>1</td>
-            <td>0</td>
-        </tr>
-        <tr><!-- a,b,c -->
-            <td>1</td>
-            <td>1</td>
-            <td>1</td>
-            <td>1</td>
-            <td>0</td>
-            <td>0</td>
-        </tr>
-    </tbody>
-</table>
+{:class="marked-table w90 centered-head"}
+| a     | b     | c     | a^b^c | a^b   | b^c   |
+| ----: | ----: | ----: | ----: | ----: | ----: |
+| 0     | 0     | 0     | 0     | 0     | 0     |
+| 1     | 0     | 0     | 1     | 1     | 0     |
+| 0     | 1     | 0     | 1     | 1     | 1     |
+| 1     | 1     | 0     | 0     | 0     | 1     |
+| 0     | 0     | 1     | 1     | 0     | 1     |
+| 1     | 0     | 1     | 0     | 1     | 1     |
+| 0     | 1     | 1     | 0     | 1     | 0     |
+| 1     | 1     | 1     | 1     | 0     | 0     |
 
 O que nós podemos ver que a ordem em si em que são aplicadas as operações não
 importa.
@@ -288,30 +223,13 @@ um XOR a mais com o novo `n`, que vai dar `n + 1`.
 
 Portanto, de acordo com `n % 4`:
 
-<table class='marked-table numeric'>
-    <tr>
-        <th>n % 4</th>
-        <th>valor do XOR [0..n]</th>
-    </tr>
-    <tbody>
-        <tr>
-            <td>0</td>
-            <td>n</td>
-        </tr>
-        <tr>
-            <td>1</td>
-            <td>1</td>
-        </tr>
-        <tr>
-            <td>2</td>
-            <td>n + 1</td>
-        </tr>
-        <tr>
-            <td>3</td>
-            <td>0</td>
-        </tr>
-    </tbody>
-</table>
+{:class="marked-table centered-head"}
+| n % 4 | valor do XOR [0..n] |
+| ----: |               ----: |
+|     0 |                   n |
+|     1 |                   1 |
+|     2 |               n + 1 |
+|     3 |                   0 |
 
 Logo, posso reescrever aquela função assim:
 

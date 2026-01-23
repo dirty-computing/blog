@@ -204,7 +204,10 @@ pre {
 
 table.marked-table {
   border: 1px solid gray;
-  width: 90%;
+
+  &.centered-head th {
+    text-align: center !important;
+  }
 
   th {
     border: 1px solid gray;
@@ -215,8 +218,6 @@ table.marked-table {
   }
 }
 
-.marked-table.numeric {
-  td {
-    text-align: right;
-  }
+.w90 {
+  width: 90%;
 }
