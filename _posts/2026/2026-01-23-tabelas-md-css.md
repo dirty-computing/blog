@@ -562,7 +562,7 @@ E se não estiver satisfeito, podemos ocupar boa parte horizontal também:
 
 Hmmm, como essa tabela foi desenhada originalmente para falar sobre operadores
 de
-[lógica booleana com carangueijos]( post_url 2026/2026-01-29-completude-funcional %})
+[lógica booleana com carangueijos]({% post_url 2026/2026-01-29-completude-funcional %})
 (yep, acredite), podemos colocar os números à direita:
 
 {% verbatim_etc md %}
