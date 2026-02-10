@@ -4,7 +4,7 @@ variables:
   BUNDLE_FROZEN: true
 
 default:
-  image: ruby:3.2-alpine
+  image: registry.gitlab.com/computaria/blog-full-throttle-docker:2026.02.10
   before_script:
     - echo -e "\e[0Ksection_start:`date +%s`:install-deps\r\e[0KInstalando dependêncidas gerais"
     - apk add gcc g++ make
