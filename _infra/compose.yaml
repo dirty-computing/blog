@@ -1,0 +1,7 @@
+services:
+  dind:
+    image: "docker:29-dind"
+    container_name: pipeline_dind
+    privileged: true
+    volumes:
+      - ./runner:/runner
