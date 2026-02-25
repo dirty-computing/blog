@@ -1161,7 +1161,7 @@ site.tags.each do |tag, posts|
 end
 ```
 
-O oprtador `+=` com arrays fará com que eu tenho agora um array que seja a
+O operador `+=` com arrays fará com que eu tenho agora um array que seja a
 concatenação do array anterior com o novo. Mas, eu posso ser melhor do que
 isso, não posso? Claro! Se é a primeira vez, e já que o `posts_local` não é
 reutilizado adiante, eu posso colocar ele diretamente no mapa. E para os outros
