@@ -115,8 +115,8 @@ Para representar um autômato, normalmente fazem um desenho através de um grafo
 contendo as seguintes informações:
 
 1. os estados (vértices)
-2. as transações (arestas)
-3. o que é necessário para a transação ocorrer (rótulo das arestas)
+2. as transições (arestas)
+3. o que é necessário para a transição ocorrer (rótulo das arestas)
 
 Dependendo do autômato, a informação para colocar no rótulo pode variar. Por 
 xemplo, em autômatos finitos (entrada em fita finita, cabeça apenas de leitura,
@@ -135,21 +135,21 @@ pilha. Assim como pode escrever na pilha sem consumir nada. Veja abaixo:
 
 ![exemplo de autômato de pilha]({{ page.base-assets | append: "pda.png" | relative_url }})
 
-Olhe para a primeira transação: `-,-/S`. Isso indica 3 coisas:
+Olhe para a primeira transição: `-,-/S`. Isso indica 3 coisas:
 
 1. o traço `-` antes da vírgula indica que ele simplesmente ignorou a entrada,
-   então essa transação ocorre sem leituras
+   então essa transição ocorre sem leituras
 1. `-/S` indica que nada é lido da pilha através do `-` antes da barra; e
 1. o símbolo `S` é inserido em seu topo
 
-Olhe para a segunda transação, `-,S/-`:
+Olhe para a segunda transição, `-,S/-`:
 
 1. novamente, ignora a entrada com o traço
 1. é necessário ter `S` no topo da pilha, símbolo esse que, por ter sido lido,
    será sacado fora
 1. o traço após a barra em `S/-` indica que não é inserido nada na pilha
 
-Só mais uma transação, `a,S/SBB`:
+Só mais uma transição, `a,S/SBB`:
 
 1. é necessário ler `a` da entrada
 1. é necessário ter `S` no topo da pilha
@@ -157,7 +157,7 @@ Só mais uma transação, `a,S/SBB`:
    então `B`, e então terá mais um `B`.
 
 Em Máquinas de Turing de uma fita, como a cabeça se move livremente, você
-precisa indicar em cada transação:
+precisa indicar em cada transição:
 
 1. o símbolo lido (ou algo para indicar que tanto faz)
 1. o símbolo escrito (ou algo para indicar que não vai escrever)
@@ -224,18 +224,18 @@ Eles são caracterizados por:
 - não há fita de trabalho
 - sabendo o estado atual e o caracter disponível na cabeça de leitura, eu
   **sempre** conheço o estado seguinte, e eu sei que só pode haver um
-- só posso mudar de estado com leitura (sem transações lambda/vazias)
+- só posso mudar de estado com leitura (sem transições lambda/vazias)
 
 AFDs podem gerar saída sim. Se a escrita na fita de saída for determinada única
 e exclusivamente pelo estado de destino, então temos uma
 [máquina de Moore](https://en.wikipedia.org/wiki/Moore_machine). Caso a
-transação disparada seja a responsável por produzir o símbolo na fita de saída,
+transição disparada seja a responsável por produzir o símbolo na fita de saída,
 então temos uma
 [máquina de Mealy](https://en.wikipedia.org/wiki/Mealy_machine).
 
-## Máquina de estado finito não determinística sem transações lambda
+## Máquina de estado finito não determinística sem transições lambda
 
-Também conhecido como autômato finito não determinístico sem transações lambda,
+Também conhecido como autômato finito não determinístico sem transições lambda,
 AFN sem lambda.
 
 A diferença deste autômato para o AFD é um relaxamento nas restrições do AFD.
@@ -255,20 +255,20 @@ Ou seja:
 - ambos os autômatos possuem o mesmo poder computacional
 - é possível obter um AFD a partir de um AFN
 
-## Máquina de estados finito não determinística com transações lambda
+## Máquina de estados finito não determinística com transições lambda
 
 Também conhecido como autômato finito não determinístico, AFN.
 
 Esse autômato permite a existência de mudança de estado sem consumo de símbolos
 da fita de leitura. A essa mudança de estado sem consumir leitura damos o nome
-de "transação lambda".
+de "transição lambda".
 
 AFNs podem ser reduzidos para AFDs, sempre. Ambos possuem o mesmo poder
 computacional.
 
 ## Autômatos de pilha
 
-Semelhante à máquina de estados finito não determinístico com transações
+Semelhante à máquina de estados finito não determinístico com transições
 lambda, mas além da fita da entrada ele trabalha com uma fita chamada de
 "pilha". Essa fita de trabalho tem três operações:
 
@@ -276,7 +276,7 @@ lambda, mas além da fita da entrada ele trabalha com uma fita chamada de
 - apaga o token, movendo a cabeça de leitura para à esquerda
 - insere um novo token, movendo a cabeça de leitura para a direita
 
-Transações precisam especificar o que estão lendo da pilha e o que estão
+Transições precisam especificar o que estão lendo da pilha e o que estão
 escrevendo nela. Como listado acima, não há opção de acessar outra parte da
 memória, apenas um único símbolo, que é o último inserido.
 
@@ -289,7 +289,7 @@ operações em cada uma dessas pilhas continuam as mesmas. Porém, como é poss�
 simular uma fila com duas pilhas, o poder computacional deste autômato é o
 mesmo do poder computacional de um autômato de fila.
 
-As transações nesse tipo de autômato precisam informar para cada pilha (e que
+As transições nesse tipo de autômato precisam informar para cada pilha (e que
 precisam ser pilhas diferenciáveis) está sendo lido de token/escrito de token.
 
 ## Autômato de fila

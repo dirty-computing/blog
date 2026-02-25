@@ -909,7 +909,7 @@ envolvendo o `<span>` com um `href` para `#pixmeacoffe`, para focar no
 No caso do `<button>` focar no `<iframe>` foi um pouco mais complicado.
 Só faz sentido focar no `<iframe>` se eu estiver colocando o `<iframe>`
 para ser visível, e só faz sentido focar depois de mandar ser visível.
-Não fiz a transação mais suave possível, mas consegui fazer.
+Não fiz a transição mais suave possível, mas consegui fazer.
 
 No caso, para simular o "ir para o elemento específico" precisa
 manipular o `window.location` (ou `window.location.href`, são [APIs

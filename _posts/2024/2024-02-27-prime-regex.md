@@ -177,20 +177,20 @@ representando um processo de Markov válido para geração de palavras, mas ele
 irá gerar o complemento perante $\Sigma^*$. Isso significa que linguagens
 regulares são fechadas sob o complemento.
 
-Outra coisa interessante é que ao permitir transações $\epsilon$, podemos
-ligar todos os vértices finais através de transações $\epsilon$ com o vértice
+Outra coisa interessante é que ao permitir transições $\epsilon$, podemos
+ligar todos os vértices finais através de transições $\epsilon$ com o vértice
 inicial. Isso permite demonstrar que se uma linguagem $A$ era uma linguagem
 regular, então $A^{*}$ também será. Então linguagens regulares são
 fechadas perante a estrela de Kleene.
 
-Concatenação de palavras é semelhante, mas no lugar de fazer a transação $\epsilon$
+Concatenação de palavras é semelhante, mas no lugar de fazer a transição $\epsilon$
 voltar para o vértice inicial do grafo atual, se pluga no vértice inicial
 da outra linguagem regular. Isso significa que linguagens regulares são fechadas
 perante a concatenação.
 
 E sobre união de linguagens regulares? Bem, pegue os grafos $A, B$ que tem vérticies
-iniciais $S_A, S_B$, permita transações $\epsilon$, e crie um novo estado inicial $S$.
-$S$ então tem uma transação $\epsilon$ para $S_A$ e outra para $S_B$. Com isso,
+iniciais $S_A, S_B$, permita transições $\epsilon$, e crie um novo estado inicial $S$.
+$S$ então tem uma transição $\epsilon$ para $S_A$ e outra para $S_B$. Com isso,
 demonstramos que linguagens regular são fechadas perante a união.
 
 Com essas características poderemos demonstrar que é impossível um processo de Markov,
