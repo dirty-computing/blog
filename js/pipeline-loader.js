@@ -14,9 +14,15 @@ if (queryParams.get("status") === "true") {
     pipelineIFrame.style["border-width"] = "0px"
     pipelineIFrame.height = "20px"
     pipelineIFrame.width = "116px"
-    
+    pipelineIFrame.style["pointer-events"] = "none";
+
+    const pipelineLink = document.createElement("a")
+    pipelineLink.href = "{{site.repository.base}}/-/pipelines"
+    pipelineLink.target = "_blank"
+    pipelineLink.appendChild(pipelineIFrame)
+
     pipeline.style.display = "block";
-    pipeline.appendChild(pipelineIFrame)
+    pipeline.appendChild(pipelineLink)
 
     let intervalId;
 
