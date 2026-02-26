@@ -24,10 +24,11 @@ palavra sendo reconhecida). Vide
 [CSL](https://en.wikipedia.org/wiki/Context-sensitive_language).
 
 Assim sendo, como demonstrar que um autômato finito (determinístico ou não) é
-menos poderoso do que uma máquina de Turing de fita constante?
+menos poderoso do que uma máquina de Turing cuja fita não possa crescer?
 
-Note que aqui não é um autômato finito versus um LBA, mas sim uma máquina de
-Turing com uma fita de tamanho fixo! Constante! Igual ao tamanho da entrada!
+Note que aqui não é um autômato finito versus um LBA em geral, mas sim uma
+máquina de Turing com uma fita de tamanho fixado pela entrada! A versão mais
+restrita de um LBA!
 
 Já foi explorado aqui no blog o conceito de autômato finito, nas postagens
 [Expressões regulares podem detectar números primos?]({% post_url 2024/2024-02-27-prime-regex %})
