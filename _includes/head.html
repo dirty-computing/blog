@@ -17,9 +17,12 @@
   {% if page.title %}
     <meta property="og:type" content="article" >
 
-    {% for tag in page.tags %}
-      <meta property="article:tag" content="{{tag}}" >
-    {% endfor %}
+    {% if page.tags %}
+      {% assign tags = page.tags | normalize_tags | uniq %}
+      {% for tag in tags %}
+        <meta property="article:tag" content="{{tag}}" >
+      {% endfor %}
+    {% endif %}
   {% else %}
     <meta property="og:type" content="website" >
   {% endif %}
