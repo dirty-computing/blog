@@ -84,6 +84,18 @@ geração de código.
 Para códigos de teste, vou me dar a possibilidade de chamar `List.of`, isso
 facilita demais o trabalho sem perder a generalidade.
 
+Em resumo, minhas limitações são:
+
+- Java 7 (menos anotações de runtime)
+- sem métodos `default` de interface
+- sem métodos estáticos de interface
+- interfaces funcionais do Java 8 (`Supplier`, `Consumer`, `Function` etc)
+- lambdas liberado
+
+Para testes não preciso de nenhuma restrição (afinal, a restrição só pra
+produção), mas vou tentar manter o máximo possível de compatibilidade com as
+restrições acima.
+
 # Estratégia de desenvolvimento
 
 Dadas essas limitações, o primeiro alvo deve ser alcançar o `forEach`. O
@@ -145,7 +157,7 @@ public class Stream<T> {
 }
 ```
 
-E, por fim, as factories! Como `.of(1, 2, 3)` e `iterate(seed, operator)`!
+E, por fim, as factories! Como `.of(1, 2, 3)` e `.iterate(seed, operator)`!
 
 ```java
 public class Stream<T> {
@@ -901,7 +913,7 @@ public Stream<T> distinct() {
 }
 ```
 
-Para o teste? Bem, vamos usar o `flatMap` anterior, junto com o `distintct`:
+Para o teste? Bem, vamos usar o `flatMap` anterior, junto com o `distinct`:
 
 ```java
 final Stream<Integer> s = new Stream<>(List.of(1, 2, 3, 4, 5, 6));
@@ -1640,37 +1652,405 @@ public <R> R collect(Supplier<R> supplier, BiConsumer<R, T> acc, BiConsumer<R, R
 ```
 
 Então, com esse _caveat_ em mãos, vamos implementar o `collect` em que se passa
-o `Collecetor`?
+o `Collector`? No momento, irei abstrair o funcionamento do `Collector` (ie,
+simularei com o do Java).
 
+Para começar, o `Collector` é um genérico do Java que tem 3 tipos:
 
+- `T`: o elemento que chega e é processado
+- `R`: o elemento de retorno
+- `A`: o elemento de acumulação, que em muitos casos vem com `?` porque não
+  importa pro chamador
 
-> XXX COMPLETAR
+Então, a primeira coisa a se fazer é obter um elemento de acumulação. Em
+seguida, precisamos seguir acumulando os elementos. Finalmente, transformamos o
+resultado acumulado usando um `finisher`:
+
+```java
+public <A, R> R collect(Collector<T, A, R> collector) {
+    A a = collector.supplier().get();
+    final BiConsumer<A, T> acc = collector.accumulator();
+    for (final T el: it) {
+        acc.accept(a, el);
+    }
+    return collector.finisher().apply(a);
+}
+```
+
+Pegando aqui o coletor `summingInt`:
+
+```java
+final Stream<Integer> s = new Stream<>(List.of(1, 2, 3, 4, 5, 6));
+final int l = s.collect(Collectors.summingInt(i -> i));
+System.out.println(l);
+// 21
+```
+
+De modo geral, é isso. Agora só precisaremos da implementação dos coletores na
+seção adequada.
 
 ## empty
 
-> XXX COMPLETAR
+Retorna um iterador vazio: que não tem `hasNext`, e coloca como `Stream`:
+
+```java
+public static <T> Stream<T> empty() {
+    return new Stream<>(() -> new Iterator<>() {
+
+        @Override
+        public boolean hasNext() {
+            return false;
+        }
+
+        @Override
+        public T next() {
+            return null;
+        }
+    });
+}
+```
 
 ## of
 
-> XXX COMPLETAR
+Aqui vem em dois sabores: o `of` unitário e o com varargs. O unitário é fazer
+um iterator de apenas um único elemento. Já o com varargs, bem, pega até
+esgotar o array mesmo:
+
+```java
+public static <T> Stream<T> of(T value) {
+    return new Stream<>(() -> new Iterator<>() {
+        boolean available = true;
+
+        @Override
+        public boolean hasNext() {
+            return available;
+        }
+
+        @Override
+        public T next() {
+            available = false;
+            return value;
+        }
+    });
+}
+```
+
+O teste mais simples seria contar a quantidade de elementos, precisa ser
+necessariamente 1:
+
+```java
+final Stream<String> s = Stream.of("valor");
+final long l = s.count();
+System.out.println(l);
+// 1
+```
+
+Para a opção com varargs, é só manter o índice da posição de leitura:
+
+```java
+@SafeVarargs
+public static <T> Stream<T> of(T ...values) {
+    return new Stream<>(() -> new Iterator<>() {
+        int idx = 0;
+
+        @Override
+        public boolean hasNext() {
+            return idx < values.length;
+        }
+
+        @Override
+        public T next() {
+            final T el = values[idx];
+            idx++;
+            return el;
+        }
+    });
+}
+```
+
+> Ah, sim, precisei anotar como `@SafeVarargs` porque tem cenários que usar
+> varargs com genéricos causa problemas.
+
+Para demonstração, vamos usar o `Collectors.summingInt`:
+
+```java
+final Stream<Integer> s = Stream.of(1, 2, 3, 4, 5, 6);
+final int l = s.collect(Collectors.summingInt(i -> i));
+System.out.println(l);
+// 21
+```
 
 ## concat
 
-> XXX COMPLETAR
+Existem algumas alternativas para isso. Uma delas é pegar um
+`Stream<Stream<T>>` e fazer um `flatMap`:
+
+```java
+public static <T> Stream<T> concat(Stream<T> a, Stream<T> b) {
+    return Stream.of(a, b).flatMap(s -> s);
+}
+```
+
+Para testar, que tal usar o `summingInt` da mesma `Stream.of` duas vezes? Isso
+significa que o resultado esperado seria 42:
+
+```java
+final Stream<Integer> s = Stream.concat(Stream.of(1, 2, 3, 4, 5, 6), Stream.of(1, 2, 3, 4, 5, 6));
+final int l = s.collect(Collectors.summingInt(i -> i));
+System.out.println(l);
+// 42
+```
+
+Uma implementação mais direta disso seria um caso específico da implementação
+usada em `flatMap`: eu pego o iterador da primeira stream, levo até o fim.
+Quando chegar no fim, troco para o iterador da segunda stream e vou até o fim,
+aí acaba.
+
+Aqui, diferente do `flatMap`, vou precisar me preocupar novamente com streams
+esgotadas ao começar. Vou adicionar variantes do teste:
+
+- 2 streams cheias (igual o teste anterior)
+- primeira stream vazia
+- segunda stream vazia
+- ambas streams vazias
+
+```java
+final Supplier<Stream<Integer>> stream1to6 = () -> Stream.of(1, 2, 3, 4, 5, 6);
+final Stream<Integer> cheios = Stream.concat(stream1to6.get(), stream1to6.get());
+final Stream<Integer> primeiroVazio = Stream.concat(Stream.empty(), stream1to6.get());
+final Stream<Integer> segundoVazio = Stream.concat(stream1to6.get(), Stream.empty());
+final Stream<Integer> vazios = Stream.concat(Stream.empty(), Stream.empty());
+
+final int soma_cheios = cheios.collect(Collectors.summingInt(i -> i));
+System.out.println(soma_cheios);
+// 42
+
+final int soma_primeiroVazio = primeiroVazio.collect(Collectors.summingInt(i -> i));
+System.out.println(soma_primeiroVazio);
+// 21
+
+final int soma_segundoVazio = segundoVazio.collect(Collectors.summingInt(i -> i));
+System.out.println(soma_segundoVazio);
+// 21
+
+final int soma_vazios = vazios.collect(Collectors.summingInt(i -> i));
+System.out.println(soma_vazios);
+// 0
+```
+
+Para eu começar usando o primeiro iterador, ele precisa ter um elemento pelo
+menos. A cada `next` eu verifico se estou usando o primeiro iterador e, se eu
+estiver usando ele, se ele está vazio; se for esse o caso, então eu marco que
+não uso mais o primeiro iterador.
+
+```java
+public static <T> Stream<T> concat(Stream<T> a, Stream<T> b) {
+    return new Stream<>(() -> new Iterator<T>() {
+        private final Iterator<T> first = a.it.iterator();
+        private final Iterator<T> second = b.it.iterator();
+
+        private boolean useFirst = first.hasNext();
+
+        private Iterator<T> getUsedIterator() {
+            return useFirst? first: second;
+        }
+        
+        @Override
+        public boolean hasNext() {
+            return getUsedIterator().hasNext();
+        }
+
+        @Override
+        public T next() {
+            final T v = getUsedIterator().next();
+            
+            if (useFirst && !first.hasNext()) {
+                useFirst = false;
+            }
+            
+            return v;
+        }
+    });
+}
+```
 
 ## iterate
 
-> XXX COMPLETAR
+Surgiu no Java 9 a versão do
+`iterate(T seed, Predicate<T> hasNext, UnaryOperator<T> next)`, mas vou puxar
+ele para cá como caso geral do
+`iterate(T seed, UnaryOperator<T> next)`, que existe no Java 8. A ideia do
+sabor com `hasNext` é identificar quando precisa parar a geração de elementos.
+Ou seja: a versão geral precisa ser limitada de alguma maneira (normalmente com
+`limit`, ou nas APIs posteriores com `takeWhile`).
+
+Assumindo a existência do sabor com `hasNext`, o `iterate` de dois elementos
+pode simplesmente passar um predicado tautologicamente verdade:
+
+```java
+public static <T> Stream<T> iterate(T seed, UnaryOperator<T> next) {
+    return iterate(seed, () -> true, next);
+}
+```
+
+O funcionamento com 3 sabores é o seguinte: ele pega o elemento corrente, se
+passar no crivo do `hasNext`, retorna ele e atualiza o elemento corrente:
+
+```java
+public static <T> Stream<T> iterate(T seed, Predicate<T> hasNext, UnaryOperator<T> next) {
+    return new Stream<>(() -> new Iterator<>() {
+        T curr = seed;
+
+        @Override
+        public boolean hasNext() {
+            return hasNext.test(curr);
+        }
+
+        @Override
+        public T next() {
+            final T r = curr;
+            curr = next.apply(r);
+            return r;
+        }
+    });
+}
+```
+
+Para testar, vamos gerar a soma de todos os elementos de 0 até um `n`
+especificado? Vamos testar para com `n = 6` (esperado 21) e com `n = 10`
+(esperado 55):
+
+```java
+final Stream<Integer> s = Stream.iterate(0, i -> i <= n, i -> i+1);
+final int l = s.collect(Collectors.summingInt(i -> i));
+System.out.println(l);
+```
 
 ## generate
 
-> XXX COMPLETAR
+Bem, esse cara gera uma lista infinita. Basicamente, sempre posso criar um novo
+objeto chamando `get`:
+
+```java
+public static <T> Stream<T> generate(Supplier<T> s) {
+    return new Stream<>(() -> new Iterator<>() {
+        @Override
+        public boolean hasNext() {
+            return true;
+        }
+
+        @Override
+        public T next() {
+            return s.get();
+        }
+    });
+}
+```
+
+Para testar, vou fazer a soma dos primeiros 6 elementos, gerando como entrada
+para 6 e com 10:
+
+```java
+final Stream<Integer> s = Stream.generate(() -> n).limit(6);
+final int l = s.collect(Collectors.summingInt(i -> i));
+System.out.println(l);
+```
+
+E isso retornou os valores esperados de 36 e 60.
 
 ## builder
 
-> XXX COMPLETAR
+O método `builder` retorna um `Stream.Builder` (interface). Não preciso me ater
+a manter isso mas... por que não, né?
 
-# optional
+Mantendo a mesma estrutura do `Stream.Builder`, preciso definir ele como uma
+interface derivada de `Consumer`. A documentação diz que é mutável (até porque
+o método do `Consumer` retorna `void`, né?, aí não dá pra fazer sem
+_side-effects_). Então, vamos lá:
+
+
+```java
+public interface Builder<T> extends Consumer<T> {
+    Builder<T> add(T t);
+    Stream<T> build();
+}
+```
+
+Bom começo. Estou evitando usar os `default` devido a questão do retrolambda,
+então deixei o `add` como método aberto mesmo. Agora, vamos ver uma
+implementação pra isso?
+
+```java
+private static class ArrayBuilder<T> implements Builder<T> {
+
+    private final ArrayList<T> l = new ArrayList<>();
+
+    @Override
+    public Builder<T> add(T t) {
+        accept(t);
+        return this;
+    }
+
+    @Override
+    public void accept(T t) {
+        l.add(t);
+    }
+
+
+    @Override
+    public Stream<T> build() {
+        return new Stream<>(l);
+    }
+}
+```
+
+Aparentemente é isso, né? Agora, a doc diz que se tiver mudado o estado para
+"built", precisa dar ruim caso sofra alguma outra alteração ou tente buildar de
+novo. Então, vamos botar esses safeguards?
+
+```java
+private static class ArrayBuilder<T> implements Builder<T> {
+
+    private final ArrayList<T> l = new ArrayList<>();
+    private boolean built = false;
+
+    @Override
+    public Builder<T> add(T t) {
+        accept(t);
+        return this;
+    }
+
+    @Override
+    public void accept(T t) {
+        checkIfBuilt();
+        l.add(t);
+    }
+
+
+    @Override
+    public Stream<T> build() {
+        checkIfBuilt();
+        built = true;
+        return new Stream<>(l);
+    }
+    
+    private void checkIfBuilt() {
+        if (built) {
+            throw new IllegalStateException("já foi buildado");
+        }
+    }
+}
+```
+
+E o `builder`?
+
+```java
+public static <T> Builder<T> builder() {
+    return new ArrayBuilder<>();
+}
+```
+
+# Implementação acessória: optional
 
 Antes da parte mais interessante (os `Collectors`), vamos normalizar aqui a
 questão do `Optional`? Eles foram usados no `findAny`, `findFirst`, `min` e
@@ -1681,12 +2061,615 @@ Existem algumas estratégias para isso. Uma delas é usar subclasses,
 `Optional.None` e `Optional.Just`. Outra é enfiar `if`s em todo método. Vamos
 explorar ambos?
 
-> XXX COMPLETAR
+## Optional observando o próprio estado
 
-# Os coletores
+Aqui, vamos fazer o `Optional` olhando para ele mesmo. Sem subclasses.
+
+O construtor é privado:
+
+```java
+private Optional() {
+    // aqui cria o optional vazio
+    this.v = null;
+}
+
+private Optional(T value) {
+    this.v = value;
+}
+```
+
+Para não precisar ficar criando vazia a toda momento, vou pendurar um objeto
+vazio e reutilizar ele:
+
+```java
+private static final Optional<Object> EMPTY = new Optional<>();
+
+public static <T> Optional<T> empty() {
+    return (Optional<T>) EMPTY;
+}
+
+public static <T> Optional<T> of(T v) {
+    if (v == null) {
+        throw new NullPointerException("aqui só aceita valor, sem nulos");
+    }
+    return new Optional<>(v);
+}
+
+public static <T> Optional<T> ofNullable(T v) {
+    if (v == null) {
+        return (Optional<T>) EMPTY;
+    }
+    return new Optional<>(v);
+}
+```
+
+A implementação de `equals` e `hashCode` é direta ao assunto:
+
+```java
+@Override
+public int hashCode() {
+    return v == null? 0: v.hashCode();
+}
+
+@Override
+public boolean equals(Object o) {
+    if (!(o instanceof Optional)) { // isso já testa o nulo
+        return false;
+    }
+    Optional<T> other = (Optional<T>) o;
+    return areEquals(this.v, other.v);
+}
+
+// basicamente uma versão de Objects.equals, porém que eu não tenho acesso nesse runtime
+private static boolean areEquals(Object a, Object b) {
+    if (a == null) {
+        return b == null;
+    }
+    return a.equals(b);
+}
+```
+
+O `toString` não precisa seguir nenhuma convenção explícita, mas precisam ser
+suficientemente distintos para não misturar:
+
+```java
+@Override
+public String toString() {
+    return v == null? "Empty[]": "Valued[" + v + "]";
+}
+```
+
+O `map` retorna a aplicação da função no objeto. Como pode retornar nulo,
+retorna com `ofNullable`. O `flatMap` eu não preciso cuidar do que é gerado, só
+retornar diretamente:
+
+```java
+public <R> Optional<R> map(Function<T, R> mapper) {
+    return v == null? (Optional<R>) this: Optional.ofNullable(mapper.apply(v));
+}
+
+public <R> Optional<R> flatMap(Function<T, Optional<R>> mapper) {
+    return v == null? this: mapper.apply(v);
+}
+```
+
+O filtro é interessante: se não passar no filtro, retorna `EMPTY`. E se tá nulo
+já assumimos que não pasosu no filtro:
+
+```java
+public Optional<T> filter(Predicate<T> f) {
+    return v == null || !f.test(v)? (Optional<T>) EMPTY : this;
+}
+```
+
+O `isPresent` é direto ao assunto (semelhante ao `isEmpty` do Java 11):
+
+```java
+public boolean isPresent() {
+    return v != null;
+}
+
+public boolean isEmpty() {
+    return v == null;
+}
+```
+
+Agora é só o consumidor de valores, como `ifPresent`, `orElse`, essas coisas:
+
+```java
+public void ifPresent(Consumer<T> r) {
+    if (v != null) {
+        r.accept(v);
+    }
+}
+
+public T orElse(T t) {
+    return v == null? t: v;
+}
+
+public T orElseGet(Supplier<T> s) {
+    return v == null? s.get(): v;
+}
+
+public <E extends Exception> T orElseThrow(Supplier<E> s) throws E {
+    if (v != null) {
+        return v;
+    }
+    throw s.get();
+}
+```
+
+## Com subclasses
+
+Aqui resolvemos tudo no polimorfismo. Temos as subclasses escondidas `Just` e
+`None`. `Just` possui apenas um único campo (vou chamar de `v` para aproveitar
+a implementação anterior) e `None` não tem campo algum, portanto podemos salvar
+ele do mesmo modo que usamos o `EMPTY` anterior (agora morando em
+`None.EMPTY`).
+
+Sem muito segredo, boa parte do código foi simplesmente "resolver o branch" que
+se estava da implementação anterior, com exceção do `filter` para quando se
+tinha elemento:
+
+```java
+public abstract class Optional<T> {
+
+    public static <T> Optional<T> empty() {
+        return (Optional<T>) None.EMPTY;
+    }
+
+    public static <T> Optional<T> of(T v) {
+        if (v == null) {
+            throw new NullPointerException("aqui só aceita valor, sem nulos");
+        }
+        return new Just<>(v);
+    }
+
+    public static <T> Optional<T> ofNullable(T v) {
+        if (v == null) {
+            return (Optional<T>) None.EMPTY;
+        }
+        return new Just<>(v);
+    }
+
+    @Override
+    public abstract int hashCode();
+    @Override
+    public abstract boolean equals(Object o);
+    @Override
+    public abstract String toString();
+
+    public abstract <R> Optional<R> map(Function<T, R> mapper);
+    public abstract <R> Optional<R> flatMap(Function<T, Optional<R>> mapper);
+    public abstract Optional<T> filter(Predicate<T> f);
+    public abstract boolean isPresent();
+    public abstract boolean isEmpty();
+    public abstract void ifPresent(Consumer<T> r);
+    public abstract T orElse(T t);
+    public abstract T orElseGet(Supplier<T> s);
+    public abstract <E extends Exception> T orElseThrow(Supplier<E> s) throws E;
+    
+    
+    private static class Just<T> extends Optional<T> {
+
+        private final T v;
+        private Just(T v) {
+            if (v == null) {
+                throw new NullPointerException("aqui só aceita valor, sem nulos");
+            }
+            this.v = v;
+        }
+
+
+        @Override
+        public int hashCode() {
+            return v.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof Just)) { // isso já testa o nulo
+                return false;
+            }
+            Just<T> other = (Just<T>) o;
+            return this.v.equals(other.v);
+        }
+
+        @Override
+        public String toString() {
+            return "Valued[" + v + "]";
+        }
+
+        @Override
+        public <R> Optional<R> map(Function<T, R> mapper) {
+            return Optional.ofNullable(mapper.apply(v));
+        }
+
+        @Override
+        public <R> Optional<R> flatMap(Function<T, Optional<R>> mapper) {
+            return mapper.apply(v);
+        }
+
+        @Override
+        public Optional<T> filter(Predicate<T> f) {
+            return f.test(v)? this: (Optional<T>) None.EMPTY;
+        }
+
+        @Override
+        public boolean isPresent() {
+            return true;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        @Override
+        public void ifPresent(Consumer<T> r) {
+            r.accept(v);
+        }
+
+        @Override
+        public T orElse(T t) {
+            return v;
+        }
+
+        @Override
+        public T orElseGet(Supplier<T> s) {
+            return v;
+        }
+
+        @Override
+        public <E extends Exception> T orElseThrow(Supplier<E> s) throws E {
+            return v;
+        }
+    }
+    
+    private static class None<T> extends Optional<T> {
+
+        private static final None<Object> EMPTY = new None<>();
+
+        @Override
+        public int hashCode() {
+            return 0;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof None;
+        }
+
+        @Override
+        public String toString() {
+            return "Empty[]";
+        }
+
+        @Override
+        public <R> Optional<R> map(Function<T, R> mapper) {
+            return (Optional<R>) this;
+        }
+
+        @Override
+        public <R> Optional<R> flatMap(Function<T, Optional<R>> mapper) {
+            return (Optional<R>) this;
+        }
+
+        @Override
+        public Optional<T> filter(Predicate<T> f) {
+            return this;
+        }
+
+        @Override
+        public boolean isPresent() {
+            return false;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
+
+        @Override
+        public void ifPresent(Consumer<T> r) {
+        }
+
+        @Override
+        public T orElse(T t) {
+            return t;
+        }
+
+        @Override
+        public T orElseGet(Supplier<T> s) {
+            return s.get();
+        }
+
+        @Override
+        public <E extends Exception> T orElseThrow(Supplier<E> s) throws E {
+            throw s.get();
+        }
+    }
+}
+```
+
+Muito bem, funcionalmente parece correto. Agora precisamos ter uma garantia que
+nos era dado pelo `Optional`: o consumidor dessa lib não pode nem instanciar
+diretamente nem tampouco fazer subclasse. Ou seja, mesmo que eu implementasse
+todos os métodos, isso aqui na classe `Main` (onde moram os testes) deveria dar
+erro de compilação:
+
+```java
+private static class X<T> extends Optional<T> {
+    X() {
+    }
+
+    // ...
+}
+```
+
+Mas, como eu consigo isso? Bem, meu primeiro experimento foi colocar construtor
+privado vazio em `Optional`:
+
+```java
+public abstract class Optional<T> {
+
+    private Optional() {
+    }
+
+    // ...
+}
+```
+
+E, bem, isso manteve a compilação funcionando adequadamente dentro da mesma
+unidade de compilação! Ufa... E, sim, para fora da unidade de compilação passou
+a dar problema, com a mensagem de erro:
+
+> There is no no-arg constructor available in 'Optional'
+
+### Variações de subclasses?
+
+Será que eu posso fazer essas implementações com a subclasse não sendo uma
+_nested class_? Isto é, algo assim:
+
+```java
+public abstract class Optional<T> {
+    private Optional() {
+    }
+
+    // ...
+}
+
+class None extends Optional<T> {
+    // ?
+}
+```
+
+E a resposta é não. Dá o mesmíssimo erro. Colocar duas classes no _root level_
+é mais ou menos equivalente a ter separado em dois arquivos. Só que apenas uma
+das classes pode ser pública (pela JLS apenas a que tem o mesmo nome do arquivo
+que pode ser pública,
+[JLS §7.6](https://docs.oracle.com/javase/specs/jls/se8/html/jls-7.html#jls-7.6)).
+
+Para permitir esse tipo de implementação, eu precisaria deixar o nível de
+acesso do construtor de `Optional` para `package private`. Ou seja: qualquer um
+poderia ter uma classe no pacote `com.jeffque` (ou o nome de pacote escolhido)
+e fazer uma subclasse. O que fere a intenção de proibir todo mundo de conseguir
+fazer subclasse (lembrando que não tenho `sealed` aqui devido às restrições).
+
+E com classe anônima? Bem, na real daria quase certo sim. Só teríamos problemas
+no `equals`. E como se resolveria isso? Bem, vamos tentar?
+
+Para simplificar, vou criar uma classe de experimento chamada de `Xp`. Tal qual
+o `Optional`, ela vai ser genérica e abstrata com o construtor privado. Para
+implementar o `equals`, vou assumir algo relativamente ok e aceitável: que
+vamos ter um singleton do `EMPTY`. Com isso, só é igual se for igual via
+igualdade de referência:
+
+```java
+public abstract class Xp<T> {
+    
+    @Override
+    public abstract boolean equals(Object obj);
+    @Override
+    public abstract int hashCode();
+    @Override
+    public abstract String toString();
+
+    private Xp() {
+    }
+    
+    private static final Xp<Object> EMPTY = new Xp<>() {
+
+        @Override
+        public boolean equals(Object obj) {
+            return this == obj;
+        }
+
+        @Override
+        public int hashCode() {
+            return 0;
+        }
+
+        @Override
+        public String toString() {
+            return "Empty[]";
+        }
+    };
+    
+    public static <T> Xp<T> empty() {
+        return (Xp<T>) EMPTY;
+    }   
+}
+```
+
+Ok, para terminar as factories, vamos implementar o `of` e `ofNullable` (por
+hora o `of` como um placeholder):
+
+```java
+public static <T> Xp<T> ofNullable(T v) {
+    if (v == null) {
+        return empty();
+    }
+    return of(v);
+}
+
+public static <T> Xp<T> of(T v) {
+    if (v == null) {
+        throw new NullPointerException("aqui só aceita valor, sem nulos");
+    }
+    return new Xp<T>() {
+        @Override
+        public int hashCode() {
+            return v.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return false;
+        }
+
+        @Override
+        public String toString() {
+            return "Value[" + v + "]";
+        }
+    };
+}
+```
+
+Até aqui, tudo bem, preciso garantir o funcionamento do `equals`. Pegando via
+clausura eu sei que não vai ser possível obter o valor `v` de nenhum jeito,
+portanto vamos criar um campo pra ele:
+
+```java
+public static <T> Xp<T> of(T value) {
+    if (value == null) {
+        throw new NullPointerException("aqui só aceita valor, sem nulos");
+    }
+    return new Xp<T>() {
+
+        final T v = value;
+
+        @Override
+        public int hashCode() {
+            return v.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return false;
+        }
+
+        @Override
+        public String toString() {
+            return "Value[" + v + "]";
+        }
+    };
+}
+```
+
+Ok, assim eu tenho um campo `v`. Será que eu consigo fazer um _cast_ para a
+classe anônima? Bem, usando apenas a sintaxe java? Não. Mas eu posso pegar a
+classe daquele objeto específico e tentar, né? Eu não tenho nenhum tipo para
+segurar a variável, então eu preciso fazer inline o `class.cast()` e pegar o
+campo. Bora tentar?
+
+```java
+@Override
+public boolean equals(Object obj) {
+    if (obj == null) {
+        return false;
+    }
+    if (!this.getClass().isInstance(obj)) {
+        return false;
+    }
+    return this.getClass().cast(obj).v.equals(this.v);
+}
+```
+
+Primeiro, verifico que não é nulo. Então, verifico que é da instancia da minha
+classe anônima. E então eu faço o cast do objeto e pego seu campo para comparar
+com a minha variável local!
+
+Ok, além disso, temos outra opção? Podemos procurar pelo campo via reflection,
+que tal?
+
+```java
+@Override
+public boolean equals(Object obj) {
+    if (obj == null) {
+        return false;
+    }
+    if (!(obj instanceof Xp)) {
+        return false;
+    }
+    final Xp<?> other = (Xp<?>) obj;
+    try {
+        final Field field = other.getClass().getDeclaredField("v");
+        final Object otherV = field.get(other);
+        return otherV.equals(this.v);
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+        return false;
+    }
+}
+```
+
+Note que, caso eu faça algo como `Xp.of("str").equals(Xp.empty())` é necessário
+que eu pegue o `NoSuchFieldException`, pois a classe do `empty()` não tem de
+fato o campo `v`.
+
+Como questão de experimento, resolvi colocar um breakpoint para examinar os
+objetos em mão, e obtive coisas peculiares:
+
+1. o IntelliJ está acusando os objetos de terem o campo `v` e o campo `value`,
+   que foi pegue via clausura
+2. o _evaluate_ reclama quando eu peço `other.v`, mas mostra o resultado
+3. o _evaluate_ se recusa a trabalhar com `other.value`
+
+Aqui o acesso para `other.v`:
+
+![evaluate marcando de vermelho o campo "v", mostrando o valor no resultado e o objeto "aberto" mostrando os campos "v" e "value"]({{ page.base-assets | append: "other-v.png" | relative_url }})
+
+Aqui o acesso para `other.value`:
+
+![evaluate marcando de vermelho o campo "value", resultado acusando exceção "No such instance field: 'value'" e o objeto "aberto" mostrando os campos "v" e "value"]({{ page.base-assets | append: "other-value.png" | relative_url }})
+
+Hmmm, fiquei com um gostinho de que eu consigo me livrar do singleton. Será?
+Bora testar simplesmente verificar se o objeto é instância de
+`this.getClass()`?
+
+```java
+@Override
+public boolean equals(Object obj) {
+    return this.getClass().isInstance(obj);
+}
+```
+
+_Et voilà!_ Tudo certo! Alguns experimentos que eu fiz com essas variações:
+
+```java
+final Xp<String> one = Xp.of("one");
+final Xp<String> uno = Xp.of("one");
+final Xp<Integer> unonumber = Xp.of(1);
+final Xp<Integer> duonumber = Xp.of(2);
+final Xp<String> empty = Xp.empty();
+
+System.out.println("one x uno: " + one.equals(uno));
+System.out.println("one x unon: " + one.equals(unonumber));
+System.out.println("duon x unon: " + duonumber.equals(unonumber));
+System.out.println("uno x empty: " + uno.equals(empty));
+System.out.println("empty x empty: " + empty.equals(empty));
+System.out.println("empty x uno: " + empty.equals(uno));
+
+System.out.println("empty x null: " + empty.equals(null));
+```
+
+# Parte mais interessante: os coletores
 
 > XXX COMPLETAR
 
 # APIs além do Java 8
+
+Os gatherers serão deixados de lado, irei pegar as evoluções de `Stream` e de
+`Optional` até o Java 17.
 
 > XXX COMPLETAR
