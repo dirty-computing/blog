@@ -1889,7 +1889,7 @@ pode simplesmente passar um predicado tautologicamente verdade:
 
 ```java
 public static <T> Stream<T> iterate(T seed, UnaryOperator<T> next) {
-    return iterate(seed, () -> true, next);
+    return iterate(seed, t -> true, next);
 }
 ```
 
@@ -2174,13 +2174,21 @@ public boolean isEmpty() {
 }
 ```
 
-Agora é só o consumidor de valores, como `ifPresent`, `orElse`, essas coisas:
+Agora é só o consumidor de valores, como `ifPresent`, `orElse`, essas coisas (e
+o quase trivial `get`):
 
 ```java
 public void ifPresent(Consumer<T> r) {
     if (v != null) {
         r.accept(v);
     }
+}
+
+public T get() {
+    if (v == null) {
+        throw new NoSuchElementException("No value present");
+    }
+    return v;
 }
 
 public T orElse(T t) {
@@ -2245,6 +2253,7 @@ public abstract class Optional<T> {
     public abstract boolean isPresent();
     public abstract boolean isEmpty();
     public abstract void ifPresent(Consumer<T> r);
+    public abstract T get();
     public abstract T orElse(T t);
     public abstract T orElseGet(Supplier<T> s);
     public abstract <E extends Exception> T orElseThrow(Supplier<E> s) throws E;
@@ -2311,6 +2320,11 @@ public abstract class Optional<T> {
         }
 
         @Override
+        public T get() {
+            return v;
+        }
+
+        @Override
         public T orElse(T t) {
             return v;
         }
@@ -2372,6 +2386,11 @@ public abstract class Optional<T> {
 
         @Override
         public void ifPresent(Consumer<T> r) {
+        }
+
+        @Override
+        public T get() {
+            throw new NoSuchElementException("No value present");
         }
 
         @Override
@@ -2665,7 +2684,953 @@ System.out.println("empty x null: " + empty.equals(null));
 
 # Parte mais interessante: os coletores
 
-> XXX COMPLETAR
+Um coletor, de modo geral, ele se separa em 4 níveis:
+
+- um iniciador do acumulador
+- uma função de acumulação (pega um elemento T e mistura com o acumulador)
+- uma função de combinação (dados dois acumuladores, como combiná-los)
+- um finalizador (transforma o acumulador em resultado final)
+
+Muitas vezes (nem sempre) o acumulador é do mesmo tipo do resultado final,
+então nesses casos o finalizador é a função identidade. As duas factories que
+tem na JavaDoc indicam exatamente isso: uma retorna um
+[`Collector<T, A, R>`](https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collector.html#of-java.util.function.Supplier-java.util.function.BiConsumer-java.util.function.BinaryOperator-java.util.function.Function-java.util.stream.Collector.Characteristics...-)
+e a outra um
+[`Collector<T, R, R>`](https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collector.html#of-java.util.function.Supplier-java.util.function.BiConsumer-java.util.function.BinaryOperator-java.util.stream.Collector.Characteristics...-).
+
+Dito isso, e dado o compromisso de que não iremos usar métodos estáticos em
+interfaces, o `Collector` daqui vai ser só a interface com métodos abertos e as
+factories vão precisar residir em `Collectors`. E como não lidamos com as
+características das streams, também não vou implementar isso para os coletores:
+
+```java
+public interface Collector<T, A, R> {
+
+    Supplier<A> supplier();
+    BiConsumer<A, T> accumulator();
+    BinaryOperator<A> combiner();
+    Function<A, R> finisher();
+}
+```
+
+E as implementações das factories são resultados derivados diretamente disso,
+tanto o caso do coletor sem um finalizador próprio como o que implementa tudo:
+
+```java
+public final class Collectors {
+
+    public static <T, A, R> Collector<T, A, R> of(Supplier<A> supplier, BiConsumer<A,T> acc, BinaryOperator<A> combiner, Function<A, R> finisher) {
+        return new Collector<>() {
+            @Override
+            public Supplier<A> supplier() {
+                return supplier;
+            }
+
+            @Override
+            public BiConsumer<A, T> accumulator() {
+                return acc;
+            }
+
+            @Override
+            public BinaryOperator<A> combiner() {
+                return combiner;
+            }
+
+            @Override
+            public Function<A, R> finisher() {
+                return finisher;
+            }
+        };
+    }
+
+    public static <T, R> Collector<T, R, R> of(Supplier<R> supplier, BiConsumer<R,T> acc, BinaryOperator<R> combiner) {
+        return of(supplier, acc, combiner, i -> i);
+    }
+}
+```
+
+Para exemplificar o teste, vou transformar um coletor arbitrário do Java em um
+coletor próprio para a minha implementação:
+
+```java
+static <T, A, R> Collector<T, A, R> toMyCollector(java.util.stream.Collector<T, A, R> collector) {
+    return Collectors.of(
+        collector.supplier(),
+        collector.accumulator(),
+        collector.combiner(),
+        collector.finisher()
+    );
+}
+```
+
+E com isso eu consigo aproveitar os testes feitos sobre `Stream#concat`:
+
+```java
+final Supplier<Stream<Integer>> stream1to6 = () -> Stream.of(1, 2, 3, 4, 5, 6);
+final Stream<Integer> cheios = Stream.concat(stream1to6.get(), stream1to6.get());
+final Stream<Integer> primeiroVazio = Stream.concat(Stream.empty(), stream1to6.get());
+final Stream<Integer> segundoVazio = Stream.concat(stream1to6.get(), Stream.empty());
+final Stream<Integer> vazios = Stream.concat(Stream.empty(), Stream.empty());
+
+final int soma_cheios = cheios.collect(toMyCollector(java.util.stream.Collectors.summingInt(i -> i)));
+System.out.println(soma_cheios);
+// 42
+
+final int soma_primeiroVazio = primeiroVazio.collect(toMyCollector(java.util.stream.Collectors.summingInt(i -> i)));
+System.out.println(soma_primeiroVazio);
+// 21
+
+final int soma_segundoVazio = segundoVazio.collect(toMyCollector(java.util.stream.Collectors.summingInt(i -> i)));
+System.out.println(soma_segundoVazio);
+// 21
+
+final int soma_vazios = vazios.collect(toMyCollector(java.util.stream.Collectors.summingInt(i -> i)));
+System.out.println(soma_vazios);
+// 0
+```
+
+Ok, prova de conceito de que funciona tá ok. Hora de implementar os demais
+coletores em termos de `Collectors.of`!
+
+Uma observação importante é que, para efeito de quem vai consumir o coletor,
+saber quem é o acumulador do coletor é detalhe de implementação irrelevante,
+até porque ele é usado apenas internamente e não é exposto ao mundo externo,
+por isso que a maioria dos coletores são apresentados como
+`Collector<T, ?, R>`, onde o elemento de entrada `T` é importante e o elemento
+retornado `R` também é importante. O meio do caminho? Não.
+
+## toList, toSet, toCollection
+
+Aqui eu agrupei esses por um bom motivo:
+
+```java
+public static <T> Collector<T, ?, List<T>> toList() {
+    return toCollection(ArrayList::new);
+}
+
+public static <T> Collector<T, ?, Set<T>> toSet() {
+    return toCollection(HashSet::new);
+}
+```
+
+Como na documentação sobre o `toList` e `toSet` não é especificado nenhuma
+capacidade da coleção sendo retornada, estou tranquilo de que ela pode fazer
+qualquer coisa, até ser mutável. Do javadoc do `toSet`:
+
+> There are no guarantees on the type, mutability, serializability, or
+> thread-safety of the Set returned
+
+Para fazer isso, basicamente é adicionar elemento a coleção no acumulador e
+pegar o `toOperator` que foi usado pra transformar um `BiConsumer` em um
+`BinaryOperator`:
+
+```java
+public static <T, C extends Collection<T>> Collector<T, ?, C> toCollection(Supplier<C> supplier) {
+    return of(supplier, Collection::add, toOperator(Collection<T>::addAll));
+}
+```
+
+## joining
+
+Aqui só vamos juntar strings. São 3 sabores de `joining`:
+
+- um que só junta tudo
+- um que coloca um separador
+- o final que coloca um prefixo e um sufixo além do separador
+
+Podemos modelar como o que só junta é uma chamada para o separador, porém que
+usa o separador string vazia. E finalmente o que usa o separador chama o sabor
+completo porém passando string vazia para sufixo e prefixo:
+
+```java
+public static Collector<String, ?, String> joining() {
+    return joining("");
+}
+
+public static Collector<String, ?, String> joining(String delim) {
+    return joining(delim, "", "");
+}
+```
+
+Muito bem, agora vamos fazer a versão completa. Não vou me preocupar com
+otimizações, só API. Infelizmente o `accumulator` é um `BiConsumer`, não um
+`BiFunction`. Ou seja, vai ser de toda sorte necessário ter uma estrutura
+mutável (não posso simplesmente fazer operações de string). Então vamos
+usar como elemento de acumulação um container de string! Uma variável cuja
+única função é ter uma string, e que eu possa trocar essa string. Para
+facilitar essa troca, vou colocar os métodos `acc` que recebe uma string e
+altera o seu conteúdo, e o `combiner` que recebe outro elemento do mesmo tipo
+e combina.
+
+Tanto no `acc` quanto no `combiner` colocamos o delimitador, exceto se ainda
+não tiver sido inicializado. Se não tiver sido inicializado, só aceita a nova
+string no lugar sem colocar nada. Para fazer isso, vou chamar essa estrutura de
+`StringHolder`. Ele vai ter um construtor vazio e os métodos `acc` e `combine`,
+onde `acc` recebe uma nova string e `combine` recebe outro `StringHolder`:
+
+```java
+public static Collector<String, ?, String> joining(String delim, String preffix, String suffix) {
+    class StringHolder {
+        boolean initialized = false;
+        String v = "";
+        StringHolder() {
+        }
+
+        void acc(String s) {
+            if (!initialized) {
+                initialized = true;
+                this.v = s;
+                return;
+            }
+            this.v += delim + s;
+        }
+
+        StringHolder combine(StringHolder other) {
+            if (!initialized) {
+                if (!other.initialized) {
+                    return this;
+                } else {
+                    this.acc(other.v);
+                    return this;
+                }
+            } else if (other.initialized) {
+                this.acc(other.v);
+                return this;
+            }
+            return this;
+        }
+
+        String finish() {
+            return preffix + v + suffix;
+        }
+    }
+    return of(
+        StringHolder::new,
+        StringHolder::acc,
+        StringHolder::combine,
+        StringHolder::finish
+    );
+}
+```
+
+Para testes:
+
+```java
+System.out.println(
+    Stream.<String>empty().collect(Collectors.joining(", ", "[", "]"))
+);
+// []
+System.out.println(
+    Stream.of(1, 2, 3, 4).map(s -> "" + s).collect(Collectors.joining(", ", "[", "]"))
+);
+// [1, 2, 3, 4]
+```
+
+E imprimiu conforme esperado. Agora, a lógica do `combine` me parece exagerada.
+Hmmm, vamos examinar uma coisinha...
+
+Se ambos estão não inicializados, então preciso retornar um elemento não
+inicializado também, e aqui o `this` é um ótimo candidato (eles são
+indistinguíveis nesse estado). Agora, se o elemento que eu estiver recebendo
+esteja inicializado, então preciso causar os efeitos colaterais no elemento
+corrente, marcando ele como inicializado e "acumulando" o que vier do outro
+acumulador.
+
+Por fim, não tem o que fazer com o valor atual pois o outro elemento não foi
+inicializado, então posso retornar `this` sem maiores complicações:
+
+```java
+StringHolder combine(StringHolder other) {
+    if (!initialized && !other.initialized) {
+        return this;
+    } else if (other.initialized) {
+        this.acc(other.v);
+        return this;
+    }
+    return this;
+}
+```
+
+Mas lendo agora percebi que é mais simples ainda: eu preciso alterar o estado
+do `this` apenas se o outro já tiver sido inicializado. Caso contrário, retorno
+diretamente o que já temos:
+
+```java
+StringHolder combine(StringHolder other) {
+    if (other.initialized) {
+        this.acc(other.v);
+        return this;
+    }
+    return this;
+}
+```
+
+## mapping
+
+Aqui a intenção é mapear antes de passar para um outro coletor. Por exemplo,
+eu não posso passar diretamente uma stream de inteiros para o
+`Collectors.joining()`, mas eu posso mapear o inteiro em uma string e adaptar
+isso para o `Collectors.joining()`:
+
+```java
+Collectors.mapping(i -> "" + i, Collectors.joining(", "));
+```
+
+De certo modo, vamos decorar o `accumulator` do coletor passado como argumento,
+de modo que a entrada que se ele aceita `(A, U)`, vamos passar `(A, T)` e a
+função `T => U`. O resto não se altera.
+
+Então, vamos aplicar o padrão de projeto `decorator`?, tal qual temos no post
+[Funções como padrões de projeto: do GoF pro Computaria]({% post_url 2025/2025-05-24-functions-as-design-patterns %}#decorator)
+(especificamente o sabor "Estou ativamente escolhendo passar os argumentos para
+a função não decorada" descritos para `decorator`):
+
+```java
+public static <T, A, U, R> Collector<T, ?, R> mapping(Function<T, U> mapper, Collector<U, A, R> baseCollector) {
+    final BiConsumer<A, T> baseAcc = baseCollector.accumulator();
+    return of(
+        baseCollector.supplier(),
+        (a, t) -> baseAcc.accept(a, mapper.apply(t)),
+        baseCollector.combiner(),
+        baseCollector.finisher()
+    );
+}
+```
+
+Para testar, vou pegar o exemplo do `joining` só que, no lugar de mapear usando
+operações intermediárias de stream pra coletar depois, vou fazer tudo usando
+apenas `Collectors.mapping`:
+
+```java
+System.out.println(
+    Stream
+        .of(1, 2, 3, 4)
+        .collect(Collectors.mapping(s -> "" + s, Collectors.joining(", ", "[", "]")))
+);
+// [1, 2, 3, 4]
+```
+
+E o funcionamento foi adequadamente.
+
+
+## collectingAndThen
+
+De modo semelhante ao `mapping`, o `collectingAndThen` tem a pegada de ser uma
+alteração feito em outro coletor. Mas aqui a mudança ocorre no final: o
+`finisher` passa a ser transformado em outra coisa depois. Para exemplificar o
+desafio, vou pegar a coleção do exemplo do `mapping` e vou aplicar a função
+`String::length` para obter um inteiro:
+
+```java
+System.out.println(
+    Stream
+        .of(1, 2, 3, 4)
+        .collect(
+            Collectors.collectingAndThen(
+                Collectors.mapping(s -> "" + s, Collectors.joining(", ", "[", "]")),
+                String::length
+            )
+        )
+);
+// 12
+```
+
+Basicamente, vou montar um coletor tal qual meu coletor base, porém vou decorar
+a saída do `finisher` original do coletor:
+
+```java
+public static <T, A, R, RR> Collector<T, ?, RR> collectingAndThen(Collector<T, A, R> baseCollector, Function<R, RR> finisher) {
+    return of(
+        baseCollector.supplier(),
+        baseCollector.accumulator(),
+        baseCollector.combiner(),
+        a -> finisher.apply(baseCollector.finisher().apply(a))
+    );
+}
+```
+
+E o teste executa perfeitamente, sem maiores repercussões. Note que se eu
+tivesse acesso a métodos `default` das interfaces eu faria composição de função
+no lugar dessa linha gigantesca em que a ordem de leitura respeitasse a ordem
+de chamada de funções:
+
+```diff
+-a -> finisher.apply(baseCollector.finisher().apply(a))
++baseCollector.finisher().andThen(finisher)
+```
+
+## groupingBy
+
+> XXX
+
+## counting
+
+Esse é bem... tosco. Basicamente faz algo semelhante ao `Stream.count`, mas a
+nível de coletor.
+
+Basicamente começo com 0 elementos encontrados, o acumulador incrementa o que
+encontrei e o _combiner_ soma o que encontrei, e por fim eu retorno apenas o
+que encontrei descartando o `holder`:
+
+```java
+public static <T> Collector<T, ?, Long> counting() {
+    class Holder {
+        long c = 0;
+
+        long c() {
+            return c;
+        }
+
+        void inc() {
+            c++;
+        }
+
+        Holder add(long a) {
+            c += a;
+            return this;
+        }
+    }
+    return of(
+        Holder::new,
+        (h, v) -> h.inc(),
+        (h1, h2) -> h1.add(h2.c),
+        Holder::c
+    );
+}
+```
+
+Um caso de uso para ele? Bem, tem situações que eu não recebo nenhuma stream e
+mesmo assim eu preciso contar. Como, por exemplo, saber quantos elementos tem a
+mesma chave: posso usar o `groupingBy` seguido de `counting` como o coletor que
+vai lidar com "o que fazer com os elementos que tem a mesma chave de
+agrupamento".
+
+## maxBy/minBy
+
+Praticamente tão sem graça quanto o `counting` anterior. Tem o mesmo caso de
+uso e historinha motivadora: tem coisa de stream que é obviamente muito
+similar, porém tem situações que eu não terei stream.
+
+Para motivar, no lugar de contar quantos elementos tem após agrupar usando o
+`groupingBy`, vou querer o elemento máximo/mínimo desse agrupamento. Como
+diferença eu tenho que talvez o meu `Holder` não tenha sido ainda inicializado,
+situação em que retorna um `Optional.empty()`.
+
+```java
+public static <T> Collector<T, ?, Optional<T>> maxBy(Comparator<T> comparator) {
+    class Holder {
+        T max;
+        boolean initialized = false;
+
+        Optional<T> get() {
+            if (!initialized) {
+                return Optional.empty();
+            }
+            return Optional.of(max);
+        }
+
+        void acc(T t) {
+            if (!initialized) {
+                initialized = true;
+                max = t;
+                return;
+            }
+            if (comparator.compare(max, t) < 0) {
+                max = t;
+            }
+        }
+
+        Holder combine(Holder other) {
+            if (other.initialized) {
+                this.acc(other.max);
+            }
+            return this;
+        }
+    }
+    return of(
+        Holder::new,
+        Holder::acc,
+        Holder::combine,
+        Holder::get
+    );
+}
+```
+
+O `minBy` segue a mesma lógica, só trocando com o que estou verificando o
+retorno do `Comparator`:
+
+```java
+public static <T> Collector<T, ?, Optional<T>> minBy(Comparator<T> comparator) {
+    class Holder {
+        T min;
+        boolean initialized = false;
+
+        Optional<T> get() {
+            if (!initialized) {
+                return Optional.empty();
+            }
+            return Optional.of(min);
+        }
+
+        void acc(T t) {
+            if (!initialized) {
+                initialized = true;
+                min = t;
+                return;
+            }
+            if (comparator.compare(min, t) > 0) {
+                min = t;
+            }
+        }
+
+        Holder combine(Holder other) {
+            if (other.initialized) {
+                this.acc(other.min);
+            }
+            return this;
+        }
+    }
+    return of(
+        Holder::new,
+        Holder::acc,
+        Holder::combine,
+        Holder::get
+    );
+}
+```
+
+## partitioningBy
+
+Aqui o primeiro sabor do `partitioningBy` eu posso simplesmente dizer que é um
+`groupingBy` com o booleano da função de particionamento:
+
+```java
+public static <T> Collector<T, ?, Map<Boolean, List<T>>> partitioningBy(Predicate<T> predicate) {
+    return groupingBy(predicate::test);
+}
+```
+
+mas... eu poderia lidar melhor com isso, não poderia? Posso guardar em duas
+listas aqueles que atendem ao requisito de teste e os que não atendem, e só no
+final criar um `HashMap` (por exemplo) com `TRUE` e `FALSE` e inserir essas
+listas:
+
+```java
+public static <T> Collector<T, ?, Map<Boolean, List<T>>> partitioningBy(Predicate<T> predicate) {
+    class Holder {
+        final ArrayList<T> atende = new ArrayList<>();
+        final ArrayList<T> naoAtende = new ArrayList<>();
+
+        void acc(T t) {
+            final ArrayList<T> alvo = predicate.test(t)? atende: naoAtende;
+            alvo.add(t);
+        }
+
+        Holder combine(Holder other) {
+            atende.addAll(other.atende);
+            naoAtende.addAll(other.naoAtende);
+            return this;
+        }
+
+        Map<Boolean, List<T>> finish() {
+            final HashMap<Boolean, List<T>> r = new HashMap<>();
+            r.put(Boolean.TRUE, atende);
+            r.put(Boolean.FALSE, naoAtende);
+
+            return r;
+        }
+    }
+    return of(
+        Holder::new,
+        Holder::acc,
+        Holder::combine,
+        Holder::finish
+    );
+}
+```
+
+Até aqui tá legal. Mas falta o outro sabor do `partitioningBy`: o que recebe a
+função de partição e também o que fazer com os elementos que chegam lá. Nesse
+sentido, o mais fácil é delegar para o `groupingBy` passando o coletor para
+ele:
+
+```java
+public static <T, D, A> Collector<T, ?, Map<Boolean, D>> partitioningBy(Predicate<T> predicate, Collector<T, A, D> baseCollector) {
+    return groupingBy(predicate::test, baseCollector);
+}
+```
+
+Mas eu posso adaptar a solução de cima também, né? Só que no lugar de usar
+`ArrayList<T>` como elemento acumulador, passo a usar `A`. E no `finish`, eu
+aplico o `baseCollector.finisher()` nos `atende` e `naoAtende`:
+
+```java
+public static <T, D, A> Collector<T, ?, Map<Boolean, D>> partitioningBy(Predicate<T> predicate, Collector<T, A, D> baseCollector) {
+
+    class Holder {
+        A atende = baseCollector.supplier().get();
+        A naoAtende = baseCollector.supplier().get();
+
+        void acc(T t) {
+            final A alvo = predicate.test(t)? atende: naoAtende;
+            baseCollector.accumulator().accept(alvo, t);
+        }
+
+        Holder combine(Holder other) {
+            atende = baseCollector.combiner().apply(atende, other.atende);
+            naoAtende = baseCollector.combiner().apply(naoAtende, other.naoAtende);
+            return this;
+        }
+
+        Map<Boolean, D> finish() {
+            final HashMap<Boolean, D> r = new HashMap<>();
+            r.put(Boolean.TRUE, baseCollector.finisher().apply(atende));
+            r.put(Boolean.FALSE, baseCollector.finisher().apply(naoAtende));
+
+            return r;
+        }
+    }
+    return of(
+        Holder::new,
+        Holder::acc,
+        Holder::combine,
+        Holder::finish
+    );
+}
+```
+
+E sabe uma coisa que seria divertida? Escrever o primeiro sabor do
+`paritioningBy` como chamando o segundo sabor:
+
+```java
+public static <T> Collector<T, ?, Map<Boolean, List<T>>> partitioningBy(Predicate<T> predicate) {
+    return partitioningBy(predicate, Collectors.toList());
+}
+```
+
+Para testar, vou particionar os elementos como pares e ímpares. Para o caso do
+segundo sabor, no lugar de esperar por uma lista, vou simplesmente querer
+contar:
+
+```java
+System.out.println(
+    Stream.of(1, 2, 3, 4).collect(Collectors.partitioningBy(i -> i % 2 == 0))
+);
+// { false = [1, 3], true = [2, 4]}
+
+System.out.println(
+    Stream.of(1, 2, 3, 4).collect(Collectors.partitioningBy(i -> i % 2 == 0, Collectors.counting()))
+);
+// { false = 2, true = 2}
+```
+
+## reducing
+
+> XXX
+
+## summing
+
+Aqui temos 3 funções, que compartilham da mesma alma:
+
+- `summingInt`
+- `summingLong`
+- `summingDouble`
+
+O `summingDouble` pode ter um cuidado adicional para evitar perda de precisão
+por ponto flutuante? Pode ter. Vou abordar isso? Não. Vou simplesmente delegar
+para a exata mesma forma que vou resolver os demais `summing`: um receptáculo
+para carregar os elementos somados com o tipo que está sendo usado (porém sem
+_boxing_). Vou implementar apenas o `summingInt`, o resto é inferência trocando
+`int` por `long` ou `double` e `Integer` por `Long` ou `Double`. E também
+adequando o tipo da função que retorna primitivo: `ToIntFunction.applyAsInt` vs
+`ToLongFunction.applyAsLong` vs `ToDoubleFunction.applyAsDouble`.
+
+No sumário da documentação não cita, mas na descrição completa é citado que se
+a stream estiver vazia o retorno deve ser `0`:
+
+```java
+public static <T> Collector<T, ?, Integer> summingInt(ToIntFunction<T> mapper) {
+
+    class Holder {
+        int soma = 0;
+
+        void acc(T t) {
+            final int v = mapper.applyAsInt(t);
+            soma += v;
+        }
+
+        Holder combine(Holder other) {
+            soma += other.soma;
+            return this;
+        }
+
+        int finish() {
+            return soma;
+        }
+    }
+    return of(
+        Holder::new,
+        Holder::acc,
+        Holder::combine,
+        Holder::finish
+    );
+}
+```
+
+Para testar, aproveitei o código do `partitioningBy` e somei os pares/ímpares
+do meu conjunto:
+
+```java
+System.out.println(
+    Stream.of(1, 2, 3, 4)
+        .collect(
+            Collectors.partitioningBy(
+                i -> i % 2 == 0,
+                Collectors.summingInt(i -> i)
+            )
+        )
+);
+// {false=4, true=6}
+```
+
+## averaging
+
+Tal qual o `summing`, tem 3 funções que compartilham a mesma alma:
+
+- `averagingInt`
+- `averagingLong`
+- `averagingDouble`
+
+O código é a cópia do `summing` com 2 diferenças:
+
+- vou contar a quantidade de elementos (em um `long`)
+- para finalizar, vou dividir pela quantidade de elementos (exceto se vaio, aí
+  retorna 0 mesmo)
+
+Mesma linha de pensamento aqui que só vou apresentar o `averagingInt`, não vou
+me repetir mais do que o código abaixo ser uma verdadeira duplicação:
+
+```java
+public static <T> Collector<T, ?, Double> averagingInt(ToIntFunction<T> mapper) {
+
+    class Holder {
+        int soma = 0;
+        long contagem = 0;
+
+        void acc(T t) {
+            final int v = mapper.applyAsInt(t);
+            soma += v;
+            contagem++;
+        }
+
+        Holder combine(Holder other) {
+            soma += other.soma;
+            contagem += other.contagem;
+            return this;
+        }
+
+        double finish() {
+            if (contagem == 0) {
+                return 0;
+            }
+            return ((double)soma)/contagem;
+        }
+    }
+    return of(
+        Holder::new,
+        Holder::acc,
+        Holder::combine,
+        Holder::finish
+    );
+}
+```
+
+Mesmo teste adequando o coletor:
+
+```java
+System.out.println(
+    Stream.of(1, 2, 3, 4)
+        .collect(
+            Collectors.partitioningBy(
+                i -> i % 2 == 0,
+                Collectors.averagingInt(i -> i)
+            )
+        )
+);
+// {false=2.0, true=3.0}
+```
+
+## summarizing
+
+Tal qual `summing`, mesma alma em 3 cantos:
+
+- `summarizingInt`
+- `summarizingLong`
+- `summarizingDouble`
+
+Esses coletores retornam o `*SummaryStatistics` adequado ao tipo. Basicamente
+o tipo `*SummaryStatistics` vai guiar a aplicação das funções `summarizing`,
+então só vou delegar pra ela. Vou usar o `mapping` para fazer a decoração
+adequada e diminuir fricção de implementação:
+
+```java
+public static <T> Collector<T, ?, IntSummaryStatistics> summarizingInt(ToIntFunction<T> mapper) {
+    return Collectors.mapping(mapper, of(
+        IntSummaryStatistics::new,
+        IntSummaryStatistics::accept,
+        IntSummaryStatistics::combine
+    ));
+}
+```
+
+Vamos usar o `IntSummaryStatistics` do java inicialmente como rascunho e...
+Hmmm, não compilou? Ué... Ah! Claro! `combiner` aceita um `BinaryOperator` e
+aqui o `IntSummaryStatistics::combine` retorna `void`. Nada que um `toOperator`
+não resolva.
+
+Mas ainda não foi, ué... Ah! `mapper` não é do tipo `Function<T, Integer>`, mas
+posso passar pra ele a referência do método, que então o compilador vai
+transformar em `Function<T, Integer>`:
+
+```java
+public static <T> Collector<T, ?, IntSummaryStatistics> summarizingInt(ToIntFunction<T> mapper) {
+    return Collectors.mapping(mapper::applyAsInt, of(
+        IntSummaryStatistics::new,
+        IntSummaryStatistics::accept,
+        toOperator(IntSummaryStatistics::combine)
+    ));
+}
+```
+
+Ok, isso de lado, vamos agora implementar o `IntSummaryStatistics`! Aqui ele
+vai ter algo em comum com o `averagingInt`: vou precisar contar também quantos
+elementos foram aceitos. Mas tem algumas variações a mais:
+
+- precisa guardar o máximo e o mínimo
+- implementa `IntConsumer`
+- mínimo e máximo tem placeholders
+  (vide [documentação](https://docs.oracle.com/javase/8/docs/api/java/util/IntSummaryStatistics.html#IntSummaryStatistics--))
+
+Como estratégia, ao aceitar um novo valor, ao faço a soma dele e aumenta a
+contagem, e também aproveito para verificar o `max` e o `min`. Em relação à
+média, bem... eu posso manter ele sempre atualizado ou então marcar o registro
+como sujo. É, isso parece mais barato. E quando eu pedir a média eu a calculo,
+registro ela no campo e marco que está limpo.
+
+```java
+public class IntSummaryStatistics implements IntConsumer {
+
+    private int max = Integer.MIN_VALUE;
+    private int min = Integer.MAX_VALUE;
+    private long count = 0;
+    private long acc = 0;
+    private boolean dirty = false;
+    private double avg;
+
+    @Override
+    public void accept(int value) {
+        dirty = true;
+        acc += value;
+        count++;
+
+        if (value > max) {
+            this.max = value;
+        }
+        if (value < min) {
+            this.min = value;
+        }
+    }
+
+    public void combine(IntSummaryStatistics other) {
+        if (other.count == 0) {
+            // não tem nada o que fazer aqui
+            return;
+        }
+
+        this.dirty = true;
+        this.acc += other.acc;
+        this.count += other.count;
+
+        if (other.max > this.max) {
+            this.max = other.max;
+        }
+        if (other.min < this.min) {
+            this.min = other.min;
+        }
+    }
+
+    public double getAverage() {
+        if (count == 0) {
+            return 0.0;
+        }
+        if (dirty) {
+            avg = ((double) acc)/count;
+            dirty = false;
+        }
+        return avg;
+    }
+
+    public int getMax() {
+        return max;
+    }
+
+    public int getMin() {
+        return min;
+    }
+
+    public long getSum() {
+        return acc;
+    }
+
+    public long getCount() {
+        return count;
+    }
+}
+```
+
+Para teste? Que tal pegar o `summaryzingInt` para os números de 1 a 4?
+
+```java
+System.out.println(
+    Stream.of(1, 2, 3, 4)
+        .collect(
+            Collectors.summarizingInt(i -> i)
+        )
+);
+```
+
+E... `IntSummaryStatistics@234bef66`? Ah, sim. Ele não define um `toString`
+adequado. Vamos imprimir então a média, mínima, máximo, soma e contagem:
+
+```java
+final IntSummaryStatistics s = Stream.of(1, 2, 3, 4)
+        .collect(
+            Collectors.summarizingInt(i -> i)
+        );
+final HashMap<String, Object> valores = new HashMap<>();
+valores.put("avg", s.getAverage());
+valores.put("sum", s.getSum());
+valores.put("max", s.getMax());
+valores.put("min", s.getMin());
+valores.put("cnt", s.getCount());
+System.out.println(valores);
+```
+
+E o resultado veio conforme esperado (aqui eu dei um _prettify_):
+
+```none
+{
+    avg=2.5,
+    min=1,
+    max=4,
+    cnt=4,
+    sum=10
+}
+```
+
+## toMap
+
+> XXX
 
 # APIs além do Java 8
 
