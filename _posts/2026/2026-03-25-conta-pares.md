@@ -41,7 +41,7 @@ quantidade de pares no intervalo `(0, b]`, já temos a fórmula.
 Mas e para `(0, a)`? Agora o intervalo é aberto... Bem, como é aberto nos
 números inteiro, podemos trocar por um fechado no inteiro logo menor:
 `(0, a-1]`. Isso só vale porque estamos trabalhando com números inteiros, se
-fosse nos reais ou memso nos racionais isso já não valeria. Então, para achar
+fosse nos reais ou mesmo nos racionais isso já não valeria. Então, para achar
 os números entre `[a, b]`:
 
 ```c
