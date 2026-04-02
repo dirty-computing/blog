@@ -6,12 +6,12 @@ variables:
 default:
   image: registry.gitlab.com/computaria/blog-full-throttle-docker:2026.02.10
   before_script:
-    - echo -e "\e[0Ksection_start:`date +%s`:install-deps\r\e[0KInstalando dependêncidas gerais"
+    - echo -e "\e[0Ksection_start:`date +%s`:install-deps\r\e[0KInstalando dependências gerais"
     - apk add gcc g++ make
     - gem install bundler
     - echo -e "\e[0Ksection_end:`date +%s`:install-deps\r\e[0K"
     - gem --version
-    - echo -e "\e[0Ksection_start:`date +%s`:install-bundle-deps\r\e[0KInstalando dependêncidas via bundle"
+    - echo -e "\e[0Ksection_start:`date +%s`:install-bundle-deps\r\e[0KInstalando dependências via bundle"
     - bundle install
     - echo -e "\e[0Ksection_end:`date +%s`:install-bundle-deps\r\e[0K"
   artifacts:
