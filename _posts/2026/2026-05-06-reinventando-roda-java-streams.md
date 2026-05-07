@@ -96,6 +96,18 @@ Para testes não preciso de nenhuma restrição (afinal, a restrição só pra
 produção), mas vou tentar manter o máximo possível de compatibilidade com as
 restrições acima.
 
+# Fora de escopo
+
+Fazer a stream ser auto-closeable não está no escopo atual. Vamos fazer essa
+adaptação em outra publicação?
+
+Além disso, stream e optional focados em primitivos vão ser deixados de lado
+nesse momento, visto que a intenção maior é fornecer a DX adequada para o fluxo
+de trabalho. Então, fica aqui a promessa de fazer uma outra implementação com
+isso também.
+
+Também não vou dar muito foco nas variantes `unmodifiable` nem `concurrent`.
+
 # Estratégia de desenvolvimento
 
 Dadas essas limitações, o primeiro alvo deve ser alcançar o `forEach`. O
@@ -674,7 +686,7 @@ public <R> Stream<R> flatMap(Function<T, Stream<R>> mapper) {
 Próximo passo? Agora que eu tenho garantidamente o iterador do outro tipo, o
 que fazer com ele?
 
-Hmmm, mas e o caso do `else` se não tiver elementos no `innterIterator`? Bem,
+Hmmm, mas e o caso do `else` se não tiver elementos no `innerIterator`? Bem,
 aqui é de certo modo "fácil": crio um iterador vazio e deixo seguir como se
 fosse o caso anterior:
 
@@ -1560,7 +1572,7 @@ E, bem, o resultado esperado:
 [6,5,4,3,2,1]
 ```
 
-Para fazer o combinador, vamos precisar mecher fortemente nessa função de
+Para fazer o combinador, vamos precisar mexer fortemente nessa função de
 concatenação. Vamos esgotar os elementos, para obter a resposta e remontar?
 
 ```java
@@ -1605,13 +1617,13 @@ bastante um `Collector`:
 
 Argumentos de collect:
 - `Supplier<A> supplier`
-- `BiConsumer<T, A> acc`
-- `BiConsumer<T, T> combiner`
+- `BiConsumer<A, T> acc`
+- `BiConsumer<A, A> combiner`
 
 Partes do `Collector`:
 - `Supplier<A> supplier`
-- `BiConsumer<T, A> acc`
-- `BinaryOperator<T> combiner`
+- `BiConsumer<A, T> acc`
+- `BinaryOperator<A> combiner`
 
 Na descrição do terceiro argumento da função `collect`:
 
@@ -1631,7 +1643,7 @@ o primeiro elemento!
 ```
 
 Diferente da implementação padrão Java, o `of` vou colocar dentro do
-`Collectors` para continuar fazendo jus a não tem métodos estáticos/default em
+`Collectors` para continuar fazendo jus a não ter métodos estáticos/default em
 interfaces que eu estou aqui implementando, mantendo o `Collector` como uma
 interface. Então vou delegar aqui o funcionamento completo do `collect` com as
 3 funções para quando o `Collectors` estiver completo.
@@ -2154,7 +2166,7 @@ public <R> Optional<R> flatMap(Function<T, Optional<R>> mapper) {
 ```
 
 O filtro é interessante: se não passar no filtro, retorna `EMPTY`. E se tá nulo
-já assumimos que não pasosu no filtro:
+já assumimos que não passou no filtro:
 
 ```java
 public Optional<T> filter(Predicate<T> f) {
@@ -2178,9 +2190,9 @@ Agora é só o consumidor de valores, como `ifPresent`, `orElse`, essas coisas (
 o quase trivial `get`):
 
 ```java
-public void ifPresent(Consumer<T> r) {
+public void ifPresent(Consumer<T> c) {
     if (v != null) {
-        r.accept(v);
+        c.accept(v);
     }
 }
 
@@ -2252,7 +2264,7 @@ public abstract class Optional<T> {
     public abstract Optional<T> filter(Predicate<T> f);
     public abstract boolean isPresent();
     public abstract boolean isEmpty();
-    public abstract void ifPresent(Consumer<T> r);
+    public abstract void ifPresent(Consumer<T> c);
     public abstract T get();
     public abstract T orElse(T t);
     public abstract T orElseGet(Supplier<T> s);
@@ -2315,8 +2327,8 @@ public abstract class Optional<T> {
         }
 
         @Override
-        public void ifPresent(Consumer<T> r) {
-            r.accept(v);
+        public void ifPresent(Consumer<T> c) {
+            c.accept(v);
         }
 
         @Override
@@ -2385,7 +2397,7 @@ public abstract class Optional<T> {
         }
 
         @Override
-        public void ifPresent(Consumer<T> r) {
+        public void ifPresent(Consumer<T> c) {
         }
 
         @Override
@@ -3059,10 +3071,6 @@ de chamada de funções:
 +baseCollector.finisher().andThen(finisher)
 ```
 
-## groupingBy
-
-> XXX
-
 ## counting
 
 Esse é bem... tosco. Basicamente faz algo semelhante ao `Stream.count`, mas a
@@ -3104,6 +3112,180 @@ mesmo assim eu preciso contar. Como, por exemplo, saber quantos elementos tem a
 mesma chave: posso usar o `groupingBy` seguido de `counting` como o coletor que
 vai lidar com "o que fazer com os elementos que tem a mesma chave de
 agrupamento".
+
+## groupingBy
+
+Esse coletor tem 3 sabores:
+
+- o primeiro determina como separar os agrupamentos
+- o segundo determina como lidar com a acumulação
+- o terceiro permite criar o mapa que vai ser usado para juntar as coisas
+
+No primeiro sabor, eu posso simplesmente delegar para o segundo passando o
+coletor `toList`:
+
+
+```java
+public static <T, K> Collector<T, ?, Map<K, List<T>>> groupingBy(Function<T, K> classifier) {
+    return groupingBy(classifier, toList());
+}
+```
+
+Para o caso em que se fornece o coletor para lidar com a acumulação dentro de
+um mesmo agrupamento, posso simplesmente delegar adiante a criação de um
+`HashMap` e ser feliz:
+
+```java
+public static <T, K, A, D> Collector<T, ?, Map<K, D>> groupingBy(Function<T, K> classifier, Collector<T, A, D> downstream) {
+    return groupingBy(classifier, HashMap::new, downstream);
+}
+```
+
+E agora finalmente vamos à magia! O sabor completo!
+
+Ok, para agrupar, vamos usar um... `HashMap`... só que de `K -> A` (chave para
+o intermediário de acumulação do coletor downstream) no lugar de `K -> D`, que
+é o tipo retornado pelo `mapSupplier`:
+
+```java
+public static <T, K, A, D, M extends Map<K, D>> Collector<T, ?, M> groupingBy(Function<T, K> classifier,
+                                                                              Supplier<M> mapSupplier,
+                                                                              Collector<T, A, D> downstream) {
+    //...
+}
+```
+
+O `finish` vou pegar os valores guardados no `HashMap` intermediário e
+adicionar no `map` fornecido, finalizando os valores acumulados:
+
+```java
+M finish() {
+    final M ret = mapSupplier.get();
+    final Function<A, D> finishAcc = downstream.finisher();
+    
+    for (Map.Entry<K, A> entry: intermediary.entrySet()) {
+        ret.put(entry.getKey(), finishAcc.apply(entry.getValue()));
+    }
+    return ret;
+}
+```
+
+Ok, essa foi a parte mais fácil... e para combinar dois valores? Que tal iterar
+no mapa do outro elemento recebido e, se existir elemento no mapa do `this`,
+acumular e substituir esse elemento?
+
+```java
+Holder combine(Holder other) {
+    for (Map.Entry<K, A> entry: other.intermediary.entrySet()) {
+        final K key = entry.getKey();
+        final A v = entry.getValue();
+        if (this.intermediary.containsKey(key)) {
+            final A prevValue = this.intermediary.get(key);
+            final A newValue = downstream.combiner().apply(prevValue, v);
+            this.intermediary.put(key, newValue); // substituindo o valor atual
+        } else {
+            this.intermediary.put(key, v);
+        } 
+    }
+    return this;
+}
+```
+
+E para receber o elemento? Bem, podemos verificar se ele tem a chave. Tendo, eu
+acumulo com o novo elemento. Não tendo, insiro um novo acumulador fornecido
+pelo `downstream.supplier().get()` e acumulo com o novo elemento:
+
+```java
+void acc(T el) {
+    final K key = classifier.apply(el);
+    final A accUntil;
+    if (!intermediary.containsKey(key)) {
+        accUntil = downstream.supplier().get();
+        intermediary.put(key, accUntil);
+    } else {
+        accUntil = intermediary.get(key);
+        
+    }
+    downstream.accumulator().accept(accUntil, el);
+}
+```
+
+E fica assim a visão geral:
+
+```java
+public static <T, K, A, D, M extends Map<K, D>> Collector<T, ?, M> groupingBy(Function<T, K> classifier,
+                                                                              Supplier<M> mapSupplier,
+                                                                              Collector<T, A, D> downstream) {
+    class Holder {
+        final HashMap<K, A> intermediary = new HashMap<>();
+        
+        void acc(T el) {
+            final K key = classifier.apply(el);
+            final A accUntil;
+            if (!intermediary.containsKey(key)) {
+                accUntil = downstream.supplier().get();
+                intermediary.put(key, accUntil);
+            } else {
+                accUntil = intermediary.get(key);
+                
+            }
+            downstream.accumulator().accept(accUntil, el);
+        }
+        
+        Holder combine(Holder other) {
+            for (Map.Entry<K, A> entry: other.intermediary.entrySet()) {
+                final K key = entry.getKey();
+                final A v = entry.getValue();
+                if (this.intermediary.containsKey(key)) {
+                    final A prevValue = this.intermediary.get(key);
+                    final A newValue = downstream.combiner().apply(prevValue, v);
+                    this.intermediary.put(key, newValue);
+                } else {
+                    this.intermediary.put(key, v);
+                } 
+            }
+            return this;
+        }
+        
+        M finish() {
+            final M ret = mapSupplier.get();
+            final Function<A, D> finishAcc = downstream.finisher();
+            
+            for (Map.Entry<K, A> entry: intermediary.entrySet()) {
+                ret.put(entry.getKey(), finishAcc.apply(entry.getValue()));
+            }
+            return ret;
+        }
+    }
+    return Collectors.of(
+        Holder::new,
+        Holder::acc,
+        Holder::combine,
+        Holder::finish
+    );
+}
+```
+
+Para testar, vamos agrupar em par/ímpar?
+
+```java
+final Stream<Integer> s = Stream.iterate(0, i -> true, i -> i + 1).limit(6).flatMap(i -> Stream.of(i, i));
+final Map<Integer, List<Integer>> m = s.collect(Collectors.groupingBy(a -> a % 2));
+System.out.println(m);
+// 0: [0, 0, 2, 2]
+// 1: [1, 1, 3, 3, 5, 5]
+```
+
+O terceiro sabor nem me interessa tanto, mas também podemos acumular contando,
+né? O caso de uso até mencionado na seção anterior!
+
+```java
+final Stream<Integer> s = Stream.iterate(0, i -> true, i -> i + 1).limit(6).flatMap(i -> Stream.of(i, i));
+final Map<Integer, Integer> m = s.collect(Collectors.groupingBy(a -> a % 2, Collectors.counting()));
+System.out.println(m);
+// 0: 4
+// 1: 6
+```
 
 ## maxBy/minBy
 
@@ -3326,7 +3508,270 @@ System.out.println(
 
 ## reducing
 
-> XXX
+Aqui a redução vem em 3 sabores:
+
+- através da mistura de dois elementos, retornando "vazio" caso não tenha nada
+  para misturar
+- mesma coisa do anterior, porém com um elemento neutro/identidade
+- a identidade é de tipo diferente dos elementos e tem uma função que mapeia do
+  elemento recebido para o tipo da identidade (que é o tipo do retorno), e a
+  mistura ocorre no tipo da mistura
+
+Vamos começar com o modelo que recebe a identidade e a função de alteração?
+Seguindo os exemplos com seus respectivos `Holder`s, começo com o elemento
+neutro, depois atualizo o `Holder` a cada elemento novo recebido; e caso
+precise combinar dois `Holder`s? Só mistura os elementos deles e retorna
+`this`:
+
+```java
+public static <T> Collector<T, ?, T> reducing(T identity, BinaryOperator<T> op) {
+    class Holder {
+        T el = identity;
+        
+        void acc(T another) {
+            el = op.apply(el, another);
+        }
+        
+        Holder combine(Holder o) {
+            el = op.apply(el, o.el);
+            return this;
+        }
+        
+        T finish() {
+            return el;
+        }
+    }
+    return Collectors.of(
+        Holder::new,
+        Holder::acc,
+        Holder::combine,
+        Holder::finish
+    );
+}
+```
+
+Ok, e para o caso que precisa aplicar a função que mapeia? Bem, podemos
+transformar o caso anterior nesse... se eu disser que a função que mapeia é a
+função identidade!
+
+```java
+public static <T> Collector<T, ?, T> reducing(T identity, BinaryOperator<T> op) {
+    return reducing(identity, i -> i, op);
+}
+```
+
+O código é praticamente igual, porém eu aplico a função de mapeamento antes de
+misturar:
+
+```java
+public static <T, R> Collector<T, ?, R> reducing(R identity, Function<T, R> mapping, BinaryOperator<R> op) {
+    class Holder {
+        R el = identity;
+
+        void acc(T another) {
+            el = op.apply(el, mapping.apply(another));
+        }
+
+        Holder combine(Holder o) {
+            el = op.apply(el, o.el);
+            return this;
+        }
+
+        R finish() {
+            return el;
+        }
+    }
+    return Collectors.of(
+        Holder::new,
+        Holder::acc,
+        Holder::combine,
+        Holder::finish
+    );
+}
+```
+
+Certo, e quanto a opção que retorna "vazio" na ausência de valores? Esse
+"vazio" é indicado por `Optional.empty()`. Eu poderia fazer uma volta pra fazer
+colapsar no terceiro sabor ali acima, que acabamos de descrever... ou então
+simplesmente assumir que tá tudo bem fazer outra implementação porque é mais
+simples!
+
+Aqui, o `Holder` precisa identificar se já foi usado, tal qual foi feito para o
+`joining`. A cascata também é a mesma, mas tem um jeito mais simples de
+escrever que não percebi na escrita original do `joining`:
+
+- se ambos foram inicializados, faz a junção dos valores
+- se apenas o do lado direito foi inicializado, sobrescreve os valores do lado
+  esquerdo (o `this`) com as coisas do lado direito
+- retorna `this` que vai estar com os valores mais atuais
+
+No caso do `finisher`, eu verifico se foi inicializado. Se não foi, retorna o
+`Optional.empty`. Caso já foi inicializado, retorna `Optional.ofNullable` do
+valor acumulado:
+
+```java
+public static <T> Collector<T, ?, Optional<T>> reducing(BinaryOperator<T> op) {
+    class Holder {
+        boolean started = false;
+        T el = null;
+
+        void acc(T another) {
+            if (!started) {
+                el = another;
+                started = true;
+            } else {
+                el = op.apply(el, another);
+            }
+        }
+
+        Holder combine(Holder o) {
+            if (this.started && o.started) {
+                el = op.apply(el, o.el);
+            } else if (o.started) {
+                this.started = true;
+                this.el = o.el;
+            }
+            return this;
+        }
+
+        Optional<T> finish() {
+            if (started) {
+                return Optional.ofNullable(el);
+            }
+            return Optional.empty();
+        }
+    }
+    return Collectors.of(
+        Holder::new,
+        Holder::acc,
+        Holder::combine,
+        Holder::finish
+    );
+}
+```
+
+Se eu quisesse transformar esse versão em um dos outros sabores, precisaria
+necessariamente usar o terceiro sabor: o tipo de retorno não é o mesmo tipo do
+dado que entra. Mas... será mesmo? Vamos examinar?
+
+Quando fazemos o `reducing` com apenas o operador de redução, se a lista tiver
+apenas um único elemento, esse elemento é retornado, sem nunca chamar a função
+que faz a acumulação. Portanto, é necessário fazer a distinção se já começou a
+acumular ou não (que no `holder` logo acima é a variável `started`).
+
+Isso foi possível simular desse jeito em uma stream Java com um coletor Java
+tradicional:
+
+```java
+// java.util.stream.Stream<Integer> s = ...;
+System.out.println(s.limit(1).collect(java.util.stream.Collectors.reducing((a, b) -> {
+    System.out.println("no acumulador " + (a + b));
+    return a + b;
+})));
+```
+
+Em nenhum momento o `System.out` é chamado aqui. Então para fazer isso eu
+preciso de uma maneira de identificar que o primeiro elemento não foi usado.
+Então... que tal... alterar o `finisher`? Vamos fazer um `reducer` que vai
+adaptar a chamada adequada? Vou expressar em TypeScript porque acho mais
+adequado para fazer sum-types:
+
+```ts
+function reducer<T>(lhs: NEUTRAL | Optional<T>, rhs: Optional<T>): Optional<T> {
+    // ...
+}
+```
+
+E para o operador de redução que vou de fato encadear? Bem, só vou chamar ele
+caso o meu elemento da esquerda não seja o `NEUTRAL`, e vou abrir os `Optional`
+claro (com `null` no padrão):
+
+```ts
+type Reducer<T> = (lhs: NEUTRAL | Optional<T>, rhs: Optional<T>) => Optional<T>;
+
+function fromOperatorReducer2reducer<T>(op: (lhs: T | null, rhs: T | null) => T | null): Reducer<T> {
+    return (lhs: NEUTRAL | Optional<T>, rhs: Optional<T>) => {
+        if (lhs == NEUTRAL) {
+            return rhs;
+        }
+        // portanto, agora lhs é Optional<T>
+        const lhsv = lhs.orElse(null);
+        const rhsv = rhs.orElse(null);
+        return Optional.ofNullable(lhsv, rhsv);
+    }
+}
+```
+
+Preciso identificar só a questão do elemento chamado de `NEUTRAL`. Para o caso
+de por acaso a lista estar vazia, preciso adaptar o `finisher` para transformar
+o `NEUTRAL` em `Optional.empty`. Esse processo é conhecido por ser "coletar e
+então", ou `collectingAndThen`! Quando se toma uma ação após a coleta terminar.
+
+Vamos fazer isso em Java agora?
+
+```java
+public static <T> Collector<T, ?, Optional<T>> reducing(BinaryOperator<T> op) {
+    final Object NEUTRAL = new Object(); 
+    return Collectors.collectingAndThen(reducing(NEUTRAL, Optional::ofNullable, (a, b) -> {
+        // aqui para o java tanto a quanto b são Object, mas eu sei que o b foi gerado com o mapper
+        if (a == NEUTRAL) {
+            return b;
+        }
+
+        // como java não conhece bem sum-types, preciso fazer o casting na mão
+        final Optional<T> ao = (Optional<T>) a;
+        final Optional<T> bo = (Optional<T>) b;
+        final T av = ao.orElse(null);
+        final T bv = bo.orElse(null);
+        return Optional.ofNullable(op.apply(av, bv));
+    }), a -> a == NEUTRAL? Optional.empty(): (Optional<T>) a);
+}
+```
+
+O teste disso aqui, como podemos conferir os resultados? Bem, vamos começar com
+um cara que gera streams de modo unificado, assim podemos validar os diversos
+sabores rapidamente para a mesma stream:
+
+```java
+final Supplier<Stream<Integer>> s = () -> Stream.iterate(0, i -> true, i -> i + 1).limit(6).flatMap(i -> Stream.of(i, i));
+```
+
+E então, vamos fazer a redução tosca somando! Para o primeiro sabor:
+
+```java
+final int l1 = s.get().collect(Collectors.reducing((a, b) -> a + b)); // Valued[30]
+```
+
+Posso verificar também forçando um `limit(0)` para ver como se comporta com
+streams vazias:
+
+```java
+final int l2 = s.get().limit(0).collect(Collectors.reducing((a, b) -> a + b)); // Empty[]
+```
+
+Acumulando com elemento neutro:
+
+```java
+final int l3 = s.get().collect(Collectors.reducing(0, (a, b) -> a + b)); // 30
+```
+
+Variando o elemento neutro para obter outros valores também... (o que em tese
+significa que não seria o elemento neutro, né? Enfim, só para testar hipóteses
+mesmo...)
+
+```java
+final int l4 = s.get().collect(Collectors.reducing(100, (a, b) -> a + b)); // 130
+```
+
+> Sério, não façam isso de colocar um elemento não neutro! Nada fica confiável!
+
+E, finalmente, que tal uma redução de concatenação de strings para o último
+sabor?
+
+```java
+final String l5 = s.get().collect(Collectors.reducing("", a -> "" + a, (a, b) -> a + b));
+// 001122334455
+```
 
 ## summing
 
@@ -3588,7 +4033,7 @@ public class IntSummaryStatistics implements IntConsumer {
 }
 ```
 
-Para teste? Que tal pegar o `summaryzingInt` para os números de 1 a 4?
+Para teste? Que tal pegar o `summarizingInt` para os números de 1 a 4?
 
 ```java
 System.out.println(
@@ -3630,11 +4075,983 @@ E o resultado veio conforme esperado (aqui eu dei um _prettify_):
 
 ## toMap
 
-> XXX
+O `toMap` vem em dois sabores:
+
+- não vai ter conflito de chaves
+- vai ter conflito de chaves (passando uma função de merge)
+
+Eu posso meio que mapear o sabor de que não vai ter conflito passando como
+função de merge uma função que estoura uma exceção ao ser chamada:
+
+```java
+public static <T, K, V> Collector<T, ?, Map<K, V>> toMap(Function<T, K> keyExtractor,
+                                                         Function<T, V> valueExtractor) {
+
+    return toMap(keyExtractor, valueExtractor,
+                 (a, b) -> {
+                    throw new IllegalStateException("oops, conflito de chave");
+                });
+}
+```
+
+Ok, e como podemos lidar com o coletor para mapa? Bem, se eu tivesse acesso à
+API `default` do mapa de usar `merge`, tudo seria fácil. Vamos explorar essa
+possibilidade?
+
+```java
+public static <T, K, V> Collector<T, ?, Map<K, V>> toMap(Function<T, K> keyExtractor,
+                                                         Function<T, V> valueExtractor,
+                                                         BinaryOperator<V> conflictMerge) {
+
+    return of(
+        HashMap::new,
+        (m, e) -> m.merge(
+            keyExtractor.apply(e),
+            valueExtractor.apply(e),
+            conflictMerge
+        ),
+        toOperator(Map::putAll)
+    );
+}
+```
+
+MAS... eu não tenho essa operação de `Map.merge`, então preciso simular ela na
+prática. Então, vamos simular esse `merge`?
+
+Primeiro, eu vou precisar da chave e do valor. Vou tentar fazer o mínimo de
+operações de `put`, logo nada de fazer `put` e com isso obter o valor anterior
+que tinha ali. Pela documentação desse coletor, ele delegaria para `Map.merge`
+tal qual foi ensaiado ali. Como eu faria? Resgata o valor antigo, combina com o
+novo, insere. E segundo a documentação desse método, como que ele faz? Tem
+ordem na operação de combinar/mergear?
+
+```java
+V oldValue = map.get(key);
+V newValue = (oldValue == null) ? value : remappingFunction.apply(oldValue, value);
+if (newValue == null)
+    map.remove(key);
+ else
+    map.put(key, newValue);
+```
+
+Ok, não só tem como ele também remove o valor antigo. Fui atrás de saber como
+que era a ordem dos argumentos da operação e tenho um algoritmo pronto. E não
+iria diferir muito do que eu usaria:
+
+```java
+public static <T, K, V> Collector<T, ?, Map<K, V>> toMap(Function<T, K> keyExtractor,
+                                                         Function<T, V> valueExtractor,
+                                                         BinaryOperator<V> conflictMerge) {
+
+    return of(
+        HashMap::new,
+        (m, e) -> {
+            final K key = keyExtractor.apply(e);
+            final V value = valueExtractor.apply(e);
+            final V oldValue = m.get(key);
+            final V newValue;
+
+            if (oldValue == null) {
+                newValue = value;
+            } else {
+                newValue = conflictMerge.apply(oldValue, value);
+            }
+            m.put(key, newValue);
+        },
+        toOperator(Map::putAll)
+    );
+}
+```
+
+Mas... e tá certo isso? Bem, tem uma chance de que os acumuladores
+intermediários compartilhem uma chave, o que significa que eu deveria passar
+pelo `conflictMerge` no lugar de `putAll`... Ok, precisamos ajeitar esse ponto
+do combinador! O que significa que vou precisar fazer o mesmo processo de
+`merge` no combinador também. A função de merge recebe 4 valores:
+
+- mapa onde vai ser inserido valor
+- chave
+- novo valor a entrar (ou mesclar)
+- `conflictMerge`
+
+Vou chamar essa função de `mapMerge`:
+
+```java
+private static <K, V> void mapMerge(Map<K, V> m,
+                                    K key,
+                                    V value,
+                                    BinaryOperator<V> conflictMerge) {
+    final V oldValue = m.get(key);
+    final V newValue;
+
+    if (oldValue == null) {
+        newValue = value;
+    } else {
+        newValue = conflictMerge.apply(oldValue, value);
+    }
+    m.put(key, newValue);
+}
+```
+
+Substituindo no acumulador:
+
+```java
+(m, e) -> {
+    final K key = keyExtractor.apply(e);
+    final V value = valueExtractor.apply(e);
+    mapMerge(m, key, value, conflictMerge);
+}
+```
+
+E para o combinador é ainda mais fácil: itero no mapa do lado direito e chamo
+para cada par o `mapMerge`:
+
+```java
+(lhs, rhs) -> {
+    for (final Entry<K, V> e: rhs.entrySet()) {
+        final K key = e.getKey();
+        final V value = e.getValue();
+        mapMerge(lhs, key, value, conflictMerge);
+    }
+    return lhs;
+}
+```
+
+Tudo junto ficaria assim:
+
+```java
+private static <K, V> void mapMerge(Map<K, V> m,
+                                    K key,
+                                    V value,
+                                    BinaryOperator<V> conflictMerge) {
+    final V oldValue = m.get(key);
+    final V newValue;
+
+    if (oldValue == null) {
+        newValue = value;
+    } else {
+        newValue = conflictMerge.apply(oldValue, value);
+    }
+    m.put(key, newValue);
+}
+
+public static <T, K, V> Collector<T, ?, Map<K, V>> toMap(Function<T, K> keyExtractor,
+                                                         Function<T, V> valueExtractor,
+                                                         BinaryOperator<V> conflictMerge) {
+
+    return of(
+        HashMap::new,
+        (m, e) -> {
+            final K key = keyExtractor.apply(e);
+            final V value = valueExtractor.apply(e);
+            mapMerge(m, key, value, conflictMerge);
+        },
+        (lhs, rhs) -> {
+            for (final Entry<K, V> e: rhs.entrySet()) {
+                final K key = e.getKey();
+                final V value = e.getValue();
+                mapMerge(lhs, key, value, conflictMerge);
+            }
+            return lhs;
+        }
+    );
+}
+```
 
 # APIs além do Java 8
 
-Os gatherers serão deixados de lado, irei pegar as evoluções de `Stream` e de
-`Optional` até o Java 17.
+Os gatherers serão deixados de lado, irei pegar as evoluções de `Stream`, de
+`Optional` e de `Collectors` até o Java 17 e fazer o backport.
 
-> XXX COMPLETAR
+## Novidades
+
+Stream:
+
+- `mapMulti` (16)
+- `takeWhile` (9)
+- `dropWhile` (9)
+- `toList` (16)
+- `ofNullable` (9)
+- `iterate` (9)
+  - sabor com seed, operador para próximo elemento e condicional de saber se
+    tem próximo
+
+O `iterate` já foi feito, como explicado acima, por facilidade.
+
+Optional:
+
+- `isEmpty` (11)
+- `ifPresentOrElse` (9)
+- `or` (9)
+- `stream` (9)
+- `orElseThrow` (10)
+  - sabor vazio, lança `NoSuchElementException`
+
+Collectors:
+
+- `flatMapping` (9)
+- `filtering` (9)
+- `teeing` (12)
+
+Para as implementações do `Optional`, vou fornecer tanto para o "sabor" com
+subclasses como para o "sabor" em que o objeto precisa se inspecionar para
+saber se tem conteúdo.
+
+Para as abordagens do `Optional` como subclasses, vou usar a versão com as
+classes nomeadas `Just`/`None` que servem o mesmo propósito do que a
+instanciação anônima, sem necessidade de maiores divagações.
+
+## Stream.mapMulti
+
+Aqui recebemos um argumento: um `BiConsumer`, que recebe tanto um elemento que
+vem da stream sendo processada quanto também um `Consumer` para o elemento que
+vem a seguir.
+
+Por exemplo, podemos usar para pegar os divisores de um número:
+
+```java
+// Stream<Integer> s = ...
+s.mapMulti((i, c) -> {
+    for (int d = 1; d <= i; d++) {
+        if (i % d == 0) {
+            c.accept(d);
+        }
+    }
+}).toList();
+```
+
+Muito bem, agora, como podemos transformar isso para as restrições que temos?
+Bem, isso isso mapeia um objeto do tipo `T` para (possivelmente) muitos objetos
+do tipo `R`. Sabe o que mais também faz isso? `flatMap`!
+
+Então, como podemos transformar esse `Consumer<R>` que é passado para a função
+algo que retorne um `Stream<R>`? Bem, podemos passar um `Stream.Builder<R>`!
+
+Então, vamos lá... vou transformar um `mapMulti` em uma chamada de `flatMap`,
+de algum jeito... que tal, para cada elemento recebido, criar um
+`Stream.Builder<R>` próprio e depois que terminar retornar o `build` dela?
+
+```java
+public <R> Stream<R> mapMulti(BiConsumer<T, Consumer<R>> c) {
+    return flatMap(t -> {
+        Builder<R> b = builder();
+        c.accept(t, b);
+        return b.build();
+    });
+}
+```
+
+Dá para fazer de outro modo mais direto? Sim, plenamente possível. Porém
+transformar esse `BiConsumer` para mandar de modo guloso para o resto da
+pipeline sem terminar o processamento do elemento passado no `mapMulti` é uma
+engenharia completamente diferente do que foi feito aqui para a implementação
+do `Stream` contido aqui. Mas isso já está bom o suficiente, tal qual o momento
+em que fizemos uma implementação um dedo eager do `filter`.
+
+## Stream.takeWhile
+
+Aqui a ideia é parar o processamento na primeira vez que o meu predicado
+indicar que deu ruim. Então, vamos seguir normalmente como um simples wrapper:
+
+```java
+// TODO apenas um dummy para começar a pensar!
+public Stream<T> takeWhile(Predicate<T> condition) {
+    return new Stream<>(() -> new Iterator<>() {
+
+        private final Iterator<T> innerIterator;
+
+        {
+            this.innerIterator = it.iterator();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return innerIterator.hasNext();
+        }
+
+        @Override
+        public T next() {
+            return innerIterator.next();
+        }
+    });
+}
+```
+
+Ok, agora eu preciso identificar se ele já encontrou uma condição ruim. Posso
+manter uma variável chamada `goon` que, antes de perguntar se tem próximo,
+consulta essa variável. Se pode ir adiante, segue normal. Caso contrário, já
+podemos parar o processamento:
+
+```java
+// TODO apenas um dummy para começar a pensar!
+public Stream<T> takeWhile(Predicate<T> condition) {
+    return new Stream<>(() -> new Iterator<>() {
+
+        private final Iterator<T> innerIterator;
+        private boolean goon = true;
+
+        {
+            this.innerIterator = it.iterator();
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (!goon) {
+                return false;
+            }
+            return innerIterator.hasNext();
+        }
+
+        @Override
+        public T next() {
+            return innerIterator.next();
+        }
+    });
+}
+```
+
+Agora, para eu saber se de fato tem um próximo elemento, primeiro eu preciso
+fazer o `fetch` desse elemento, e só eu posso passar para a condição. Aqui vou
+seguir uma estratégia semelhante a que foi usada no `filter`: fazer o `fetch` a
+priori e depois a cada `next` atualizar o elemento. E, quando se resgatar o
+elemento, eu já aproveito e passo na condição. Falando nisso, agora que vou
+fazer o fetch gulosamente, não preciso verificar no meu iterator se ele ainda
+tem elemento: eu já sei disso.
+
+Então, como que fica?
+
+```java
+public Stream<T> takeWhile(Predicate<T> condition) {
+    return new Stream<>(() -> new Iterator<>() {
+
+        private final Iterator<T> innerIterator;
+        private boolean goon = true;
+        private T nextElement;
+
+        {
+            this.innerIterator = it.iterator();
+            magicFunction();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return goon;
+        }
+
+        @Override
+        public T next() {
+            final T returnedValue = nextElement;
+            magicFunction();
+            return returnedValue;
+        }
+
+        private void magicFunction() {
+            if (!innerIterator.hasNext()) {
+                goon = false;
+                return;
+            }
+            nextElement = innerIterator.next();
+            goon = condition.test(nextElement);
+        }
+    });
+}
+```
+
+Hmmm, tentei começar com algo mais distinto do `filter` mas acabei fazendo uma
+função bem dizer igualzinha, né? Com poucas diferenças: só o `magicFunction`
+mesmo que muda. Então, por que não utilizar os moldes de lá?
+
+```java
+public Stream<T> takeWhile(Predicate<T> condition) {
+    return new Stream<>(() -> new Iterator<>() {
+
+        private final Iterator<T> innerIterator;
+        private boolean _hasNext;
+        private T _next;
+        
+        {
+            this.innerIterator = it.iterator();
+            magicFunction();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return _hasNext;
+        }
+
+        @Override
+        public T next() {
+            final T returnedValue = _next;
+            magicFunction();
+            return returnedValue;
+        }
+
+        private void magicFunction() {
+            if (!innerIterator.hasNext()) {
+                _hasNext = false;
+                return;
+            }
+            _next = innerIterator.next();
+            _hasNext = condition.test(_next);
+        }
+    });
+}
+```
+
+## Stream.dropWhile
+
+Aqui a ideia é começar com o primeiro elemento na moda do `filter`, mas pro
+elemento seguinte seria só um wrapper comum em cima do iterador. Então, será
+que agora dá certo começar com o wrapper e terminar com boa parte intacta dele?
+
+```java
+// TODO apenas um dummy para começar a pensar!
+public Stream<T> dropWhile(Predicate<T> dropCondition) {
+    return new Stream<>(() -> new Iterator<>() {
+
+        private final Iterator<T> innerIterator;
+
+        {
+            this.innerIterator = it.iterator();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return innerIterator.hasNext();
+        }
+
+        @Override
+        public T next() {
+            return innerIterator.next();
+        }
+    });
+}
+```
+
+Eu preciso fazer um comportamento especial apenas na primeira chamada. Então
+vou criar aqui um fluxo especial só pra isso. E preciso identificar
+separadamente para `hasNext` e para `next`, de modo que a primeira chamada do
+`hasNext` ache apenas uma vez o primeiro elemento:
+
+```java
+// TODO apenas um dummy para começar a pensar!
+public Stream<T> dropWhile(Predicate<T> dropCondition) {
+    return new Stream<>(() -> new Iterator<>() {
+
+        private final Iterator<T> innerIterator;
+        private boolean beforeFirst = true;
+        private boolean beforeFirstNext = true;
+        private boolean foundFirstElement;
+        private T firstElement;
+
+        {
+            this.innerIterator = it.iterator();
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (beforeFirst) {
+                beforeFirst = false; // garante que só faz uma vez
+                _dropWhile();
+                return foundFirstElement;
+            } else if (beforeFirstNext) {
+                return foundFirstElement;
+            }
+            return innerIterator.hasNext();
+        }
+
+        @Override
+        public T next() {
+            if (beforeFirstNext) {
+                beforeFirstNext = false;
+                return firstElement;
+            }
+            return innerIterator.next();
+        }
+
+        private void _dropWhile() {
+            // TODO fazer aqui os efeitos colaterais adequados
+            // preencher `foundFirstElement` e `firstElement`
+        }
+    });
+}
+```
+
+Ok, agora... algumas coisinhas para se levar em consideração... o comportamento
+parece por cima adequado para se usar via iteração tradicional do Java (não com
+chamadas manuais, mas enfim, no geral no caso de uso sim, até porque não tenho
+esse iterador exposto). Mas... o `firstElement` fica preso. Isso é ruim. Então,
+após achar o valor, podemos limpar a memória: não tenho porque ficar com isso
+preso sem deixar ser coletado!
+
+```java
+@Override
+public T next() {
+    if (beforeFirstNext) {
+        final T el = firstElement;
+        firstElement = null;
+        beforeFirstNext = false;
+        return el;
+    }
+    return innerIterator.next();
+}
+```
+
+Pronto, agora só implementar `_dropWhile()`... Mas, sinceramente, essa é fácil!
+Loopar no iterador até encontrar algo que não satisfaça o filtro: achou isso,
+marcamos que achou o primeiro elemento e povoamos ele:
+
+```java
+private void _dropWhile() {
+    while (innerIterator.hasNext()) { // claro que só podemos loopar enquanto há elementos!
+        final T t = innerIterator.next();
+        if (!dropCondition.test(t)) {
+            // não é mais condição de dropar, agora abortamos com algo
+            foundFirstElement = true;
+            firstElement = t;
+            return;
+        }
+    }
+    foundFirstElement = false;
+}
+```
+
+Na visão geral fica assim:
+
+```java
+public Stream<T> dropWhile(Predicate<T> dropCondition) {
+    return new Stream<>(() -> new Iterator<>() {
+
+        private final Iterator<T> innerIterator;
+        private boolean beforeFirst = true;
+        private boolean beforeFirstNext = true;
+        private boolean foundFirstElement;
+        private T firstElement;
+
+        {
+            this.innerIterator = it.iterator();
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (beforeFirst) {
+                beforeFirst = false; // garante que só faz uma vez
+                _dropWhile();
+                return foundFirstElement;
+            } else if (beforeFirstNext) {
+                return foundFirstElement;
+            }
+            return innerIterator.hasNext();
+        }
+
+        @Override
+        public T next() {
+            if (beforeFirstNext) {
+                final T el = firstElement;
+                firstElement = null;
+                beforeFirstNext = false;
+                return el;
+            }
+            return innerIterator.next();
+        }
+
+        private void _dropWhile() {
+            while (innerIterator.hasNext()) { // claro que só podemos loopar enquanto há elementos!
+                final T t = innerIterator.next();
+                if (!dropCondition.test(t)) {
+                    // não é mais condição de dropar, agora abortamos com algo
+                    foundFirstElement = true;
+                    firstElement = t;
+                    return;
+                }
+            }
+            foundFirstElement = false;
+        }
+    });
+}
+```
+
+Ficou mais conturbado do que eu tinha pensado a primeira vista. Mas manteve por
+alto a aparência do wrapper do iterator.
+
+## Stream.toList
+
+Aqui a saída mais covarde é simplesmente chamar o coletor de lista:
+
+```java
+public List<T> toList() {
+    return collect(Collectors.toList());
+}
+```
+
+Porém podemos fazer isso de modo mais interessante, né? Já que o `stream` no
+final das contas tem um `iterator`, posso adicionar todos os elementos desse
+iterador na minha própria lista:
+
+```java
+public List<T> toList() {
+    final ArrayList<T> c = new ArrayList<>();
+
+    for (final T t: it) {
+        c.add(t);
+    }
+    return c;
+}
+```
+
+## Stream.ofNullable
+
+O `ofNullable` retorna uma stream de um elemento caso ele seja não nulo, ou
+vazio caso ele seja:
+
+```java
+public static <T> Stream<T> ofNullable(T t) {
+    return t == null? empty(): of(t);
+}
+```
+
+## Optional.isEmpty
+
+Basicamente posso sempre implementar como o contrário do `isPresent`:
+
+```java
+public boolean isEmpty() {
+    return !isPresent();
+}
+```
+
+Como isso vai sofrer (muito possivelmente) inlining pelo JIT, tanto faz. Mas
+podemos também fazer a versão direta! Para o caso em que precisa inspecionar o
+valor:
+
+```java
+public boolean isEmpty() {
+    return v == null;
+}
+```
+
+Com subclasses:
+
+```java
+private static class Just<T> extends Optional<T> {
+    // ...
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+}
+
+private static class None<T> extends Optional<T> {
+    // ...
+
+    @Override
+    public boolean isEmpty() {
+        return true;
+    }
+}
+```
+
+## Optional.ifPresentOrElse
+
+Aqui é uma adaptação direta do `ifPresent`. Para o caso em que precisa
+inspecionar o próprio estado:
+
+```java
+public void ifPresentOrElse(Consumer<T> c, Runnable r) {
+    if (v != null) {
+        c.accept(v);
+    } else {
+        r.run();
+    }
+}
+```
+
+Para subclasses:
+
+```java
+private static class Just<T> extends Optional<T> {
+    // ...
+
+    @Override
+    public void ifPresentOrElse(Consumer<T> c, Runnable r) {
+        c.accept(v);
+    }
+}
+
+private static class None<T> extends Optional<T> {
+    // ...
+
+    @Override
+    public void ifPresentOrElse(Consumer<T> c, Runnable r) {
+        r.run();
+    }
+}
+```
+
+## Optional.or
+
+Aqui a intenção é: se meu `Optional` estiver vazio, eu executo a função passada
+e assim obtenho um novo `Optional` de mesmo tipo.
+
+Para a versão que precisa verificar o estado interno:
+
+```java
+public Optional<T> or(Supplier<Optional<T>> supplier) {
+    return v == null? supplier.get(): this;
+}
+```
+
+Para o caso de subclasses, nada demais: o vazio chama o supplier, o que tem
+valor simplesmente se retorna:
+
+```java
+private static class Just<T> extends Optional<T> {
+    // ...
+
+    @Override
+    public Optional<T> or(Supplier<Optional<T>> supplier) {
+        return this;
+    }
+}
+
+private static class None<T> extends Optional<T> {
+    // ...
+
+    @Override
+    public Optional<T> or(Supplier<Optional<T>> supplier) {
+        return supplier.get();
+    }
+}
+```
+
+## Optional.stream
+
+Para o caso em que precisa olhar pra si mesmo: se for vazio, retorna
+`Stream.empty()`. Caso contrário, retorna o próprio elemento em uma
+stream unitária:
+
+```java
+public Stream<T> stream() {
+    return v == null? Stream.empty(): Stream.of(v);
+}
+```
+
+Ou então usando o `Stream.ofNullable`:
+
+```java
+public Stream<T> stream() {
+    return Stream.ofNullable(v);
+}
+```
+
+Para subclasses, o `None` retorna simplesmente que é `empty` e o `Just`
+retorna `Stream.of`:
+
+```java
+private static class Just<T> extends Optional<T> {
+    // ...
+
+    @Override
+    public Stream<T> stream() {
+        return Stream.of(v);
+    }
+}
+
+private static class None<T> extends Optional<T> {
+    // ...
+
+    @Override
+    public Stream<T> stream() {
+        return Stream.empty();
+    }
+}
+```
+
+## Optional.orElseThrow
+
+Aqui eu simplesmente delego para o `orElseThrow` existente, chamando o
+`Supplier` de exceção adequado:
+
+```java
+public T orElseThrow() {
+    return orElseThrow(() -> new NoSuchElementException("Optional is empty!"));
+}
+```
+
+Isso para o caso em que eu defino tanto para o `Optional` que olha o seu estado
+quanto possivelmente para saber se é vazio como para o `None`. Para o caso do
+`Optional` via subclasses com valor, o `orElseThrow` simplesmente retorna o seu
+próprio valor interno, tal qual o outro sabor do `orElseThrow`:
+
+```java
+private static class Just<T> extends Optional<T> {
+    // ... implementação anterior ...
+
+    // mantendo a referência só para ficar mais fácil consultar
+    @Override
+    public <E extends Exception> T orElseThrow(Supplier<E> s) throws E {
+        return v;
+    }
+
+    @Override
+    public T orElseThrow() {
+        return v;
+    }
+}
+```
+
+Outra alternativa do `None` seria simplesmente lançar a exceção:
+
+```java
+private static class None<T> extends Optional<T> {
+    // ...
+    public T orElseThrow() {
+        throw new NoSuchElementException("Optional is empty!");
+    }
+}
+```
+
+## Collectors.flatMapping
+
+A ideia do `flatMapping` é aplainar elementos em forma de stream antes de
+passar esses elementos para o coletor final. Só que com esse cuidado segundo a
+documentação:
+
+> If a mapped stream is null an empty stream is used, instead.
+
+Ou seja, se mapear pra nulo, retornar uma stream vazia no lugar. Ok, como
+podemos fazer isso? Vamos usar como intermediário o que é gerado pelo
+`downstream`. Na hora de receber um elemento do tipo `T` (que vem da minha
+stream nativa, digamos assim), eu não o jogo diretamente para o acumulador,
+porém eu pego o stream gerado e consumo todos os elementos dele no
+acumulador. Hmmm, é, na prática se eu receber nulo eu posso simplesmente
+abortar a computação, né?
+
+```java
+public static <T, U, A, V> Collector<T, ?, V> flatMapping(Function<T, Stream<U>> mapper, Collector<U, A, V> downstream) {
+    final BiConsumer<A, U> baseAcc = downstream.accumulator();
+    return of(
+        downstream.supplier(),
+        (m, t) -> {
+            final Stream<U> flattened = mapper.apply(t);
+            if (flattened == null) {
+                return;
+            }
+            flattened.forEach(u -> baseAcc.accept(m, u));
+        },
+        downstream.combiner(),
+        downstream.finisher()
+    );
+}
+```
+
+Bem, aparentemente é só isso, sem maiores complicações.
+
+## Collectors.filtering
+
+Aqui a ideia é passar apenas alguns dos argumentos para o acumulador. Bem
+direto:
+
+```java
+public static <T, A, V> Collector<T, ?, V> filtering(Predicate<T> filter, Collector<T, A, V> downstream) {
+    final BiConsumer<A, T> baseAcc = downstream.accumulator();
+    return of(
+        downstream.supplier(),
+        (m, t) -> {
+            if (filter.test(t)) {
+                baseAcc.accept(m, t);
+            }
+        },
+        downstream.combiner(),
+        downstream.finisher()
+    );
+}
+```
+
+## Collectors.teeing
+
+Aqui vamos fazer bem dizer a operação `tee`: pegar um input e direcionar para
+dois outputs. A diferença apenas é que depois de obter dois resultados, iremos
+combinar os dois resultados no final: ou seja, o `finisher` é aplicar os
+`finisher`s de cada coletor e depois aplicar a função específica de combinação
+de resultados.
+
+O meu maior mistério é entender porque o pessoal do Java não quis explicitar os
+tipos intermediários dos dois coletores, isso na minha visão atrapalha a
+codificação do `teeing`, mas tudo bem, vamos abstrair isso! Como? Chamando uma
+função que tenha essas genéricos:
+
+```java
+public static <T, R1, R2,R> Collector<T,?,R> teeing(Collector<T, ?, R1> downstream1,
+                                                    Collector<T, ?, R2> downstream2,
+                                                    BiFunction<R1, R2, R> merger) {
+    return _teeing(downstream1, downstream2, merger);
+}
+
+private static <T, A1, A2, R1, R2, R> Collector<T,?,R> _teeing(Collector<T, A1, R1> downstream1,
+                                                Collector<T, A2, R2> downstream2,
+                                                BiFunction<R1, R2, R> merger) {
+    // TODO completar
+    return ...;
+}
+```
+
+Ok, vamos manter os valores intermediários? Vou precisar de um `Holder` local
+aqui por conta dos dois acumuladores intermediários. Esse `Holder` vai ser bem
+monótono: só delegar às funções dos downstreams. Só o `finisher` que é quase
+mais interessante, porque vai precisar passar para o `merger`. Mas só isso,
+nada de mais:
+
+```java
+private static <T, A1, A2, R1, R2, R> Collector<T,?,R> _teeing(Collector<T, A1, R1> downstream1,
+                                                Collector<T, A2, R2> downstream2,
+                                                BiFunction<R1, R2, R> merger) {
+
+    final BiConsumer<A1, T> acc1 = downstream1.accumulator();
+    final BiConsumer<A2, T> acc2 = downstream2.accumulator();
+    
+    final BinaryOperator<A1> comb1 = downstream1.combiner();
+    final BinaryOperator<A2> comb2 = downstream2.combiner();
+    
+    final Supplier<A1> sup1 = downstream1.supplier();
+    final Supplier<A2> sup2 = downstream2.supplier();
+
+    class Holder {
+        A1 a1;
+        A2 a2;
+        
+        Holder() {
+            a1 = sup1.get();
+            a2 = sup2.get();
+        }
+
+        void acc(T t) {
+            acc1.accept(a1, t);
+            acc2.accept(a2, t);
+        }
+        
+        Holder comb(Holder other) {
+            a1 = comb1.apply(a1, other.a1);
+            a2 = comb2.apply(a2, other.a2);
+            return this;
+        }
+        
+        R finisher() {
+            final R1 r1 = downstream1.finisher().apply(a1);
+            final R2 r2 = downstream2.finisher().apply(a2);
+            
+            return merger.apply(r1, r2);
+        }
+    }
+    return of(
+        Holder::new,
+        Holder::acc,
+        Holder::comb,
+        Holder::finisher
+    );
+}
+```
+
+Os valores intermediários guardados são apenas para não ficar chamando diversas
+vezes `downstream.accumulator()` ou outros dos métodos do coletor.
