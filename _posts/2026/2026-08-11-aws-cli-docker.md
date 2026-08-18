@@ -447,7 +447,6 @@ Esse eu mantive na raiz do repositório. Mas também achei prudente colocar um
 
 ```gitignore
 .terraform
-.terraform.lock.hcl
 .terraform.tfstate.lock.info
 
 # terraform.tfstate não deve estar commitado
@@ -458,11 +457,11 @@ terraform.tfstate.backup
 Aqui, o `.terraform` é um diretório. Ele foi criado após o `terraform init`.
 O `terraform.tfstate` representar o estado do sistema.
 
-E aí temos uns arquivos de lock! Bem, o que são eles, né? Basicamente, eles
-permitem que apenas uma única instância do elemento que estou trabalho, se
-surgir uma segunda instância ela vai tentar adquirir o lock e não vai
-conseguir, pois o SO deve travar esse recurso com acesso único. E isso que
-protege duas execuções em paralelo de alterar o estado em paralelo.
+E aí temos o arquivo de lock `.terraform.tfstate.lock.info`! Bem, o que são
+eles, né? Basicamente, eles permitem que apenas uma única instância do elemento
+que estou trabalho, se surgir uma segunda instância ela vai tentar adquirir o
+lock e não vai conseguir, pois o SO deve travar esse recurso com acesso único.
+E isso que protege duas execuções em paralelo de alterar o estado em paralelo.
 
 Inclusive, é o mesmo mecanismo que o Git utiliza para não ferrar o banco de
 dados interno dele: ele tem um arquivo próprio, o `.git/index.lock`. Esse
@@ -476,3 +475,16 @@ If no other git process is currently running, this probably means a
 git process crashed in this repository earlier. Make sure no other git
 process is running and remove the file manually to continue.
 ```
+
+Na primeira versão deste artigo, eu mencionei que era para colocar o arquivo
+`.terraform.lock.hcl`. Isso foi um equívoco de minha parte, evidenciado em um
+primeiro momento em uma revisão do Claude.
+
+A lógica por trás desse arquivo `.lock` é distinta do
+`.terraform.tfstate.lock.info`. Enquanto um se preocupa em realizar uma espécie
+de IPC através do sistema de arquivos, o `.terraform.lock.hcl` tem mais
+semelhança com os `.lock` de gerenciamento de dependências, como o
+`Gemfile.lock` de Ruby Gems ou o `package-json.lock` do NPM. Como no caso de
+gerenciamento de dependências, há motivos para você commitar sim o `.lock` no
+controle de versão. Leia mais sobre esse lock na
+[documentação oficial](https://developer.hashicorp.com/terraform/language/files/dependency-lock)
