@@ -10,7 +10,7 @@ twitter: jeffquesado
 
 Recebi uma chamada do Camilo
 [@lixeletto.bsky.social](https://bsky.app/profile/lixeletto.bsky.social)
-[clamando por socorro no BlueSky](https://bsky.app/profile/lixeletto.bsky.social/post/3ln4izmyi4k2bi):
+[clamando por socorro no BlueSky](https://bsky.app/profile/lixeletto.bsky.social/post/3ln4izmyi4k2b):
 
 > Javeires desse site, to tentando fazer um tipo pra um parâmetro de uma função
 > Java que é um callback, se fosse Javascript eu faria uma interface ou type
