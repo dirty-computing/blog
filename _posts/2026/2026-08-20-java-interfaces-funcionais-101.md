@@ -108,7 +108,7 @@ em cima dessa informação eu posso tomar alguma ação. Podemos dizer que eu
 vou... consumir... essa informação. Para isso, podemos usar o `Consumer<T>`:
 
 ```java
-onClick(c -> System.out.prinln("clicou " + c));
+onClick(c -> System.out.println("clicou " + c));
 ```
 
 Normalmente `Consumer`s vão reagir a algo que vai ser fornecido para ele. Um
@@ -294,7 +294,7 @@ Para o caso de funções, existem tanto o caso de `objeto -> primitivo` como
 `primitivo -> objeto`. Por exemplo, `IntFunction` vai pegar um inteiro e
 produzir um objeto. Já um `ToIntFunction` vai pegar um objeto e extrair um
 inteiro de dentro dele. E também a variante `primitivo -> primitivo`, como o
-`DooubleToIntFunction`.
+`DoubleToIntFunction`.
 
 A lista mais completa pode ser procurada na
 [documentação oficial](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/package-summary.html).
