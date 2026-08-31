@@ -58,6 +58,14 @@ podcasts:
         - jeffque
         - giggio
         - victorhg
+    - title: "Distributed Systems: part 2"
+      description: "Engineering Sessions, summer edition s2026e12"
+      links:
+        - "[YouTube](https://youtu.be/DTQK9RBxfxw?si=mUNnisxxdfnfkLIj)"
+      guests:
+        - jeffque
+        - vepo
+        - pbalduino
   channels:
     - "[YouTube](https://www.youtube.com/@carlosenog)"
 - show: "The Leandronsp Show"
@@ -89,3 +97,4 @@ people:
   vepo: "[Victor Osório](https://vepo.dev/)"
   victorhg: "[Victor Hugo Germano](https://www.victorhg.com/)"
   zanfranceschi: "[Zanfranceschi](https://dev.to/zanfranceschi)"
+  pbalduino: "[Plínio Balduíno](http://pbalduino.github.io/)"
