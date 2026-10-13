@@ -253,6 +253,24 @@ module Computaria
           end
 
 
+          class NoopBlock < Liquid::Block
+              def initialize(tag_name, post, tokens)
+                    super
+              end
+
+              def render(context)
+                super.to_s
+              end
+          end
+          class NoopTag < Liquid::Tag
+              def initialize(tag_name, post, tokens)
+                    super
+              end
+
+              def render(context)
+                super.to_s
+              end
+          end
     private
 
     def self.reverse_alias_tag(context)
@@ -285,3 +303,7 @@ Liquid::Template.register_filter(Computaria::PostPathChanged)
 Liquid::Template.register_filter(Computaria::TagNormalizer)
 Liquid::Template.register_tag("post_urlwa", Computaria::PostUrlWA)
 Liquid::Template.register_tag("verbatim_etc", Computaria::VerbatimEtc)
+#Liquid::Template.register_tag("post_urlwa", Computaria::NoopTag)
+#Liquid::Template.register_tag("verbatim_etc", Computaria::NoopBlock)
+#Liquid::Template.register_tag("katex", Computaria::NoopBlock)
+#Liquid::Template.register_tag("katexmm", Computaria::NoopBlock)
