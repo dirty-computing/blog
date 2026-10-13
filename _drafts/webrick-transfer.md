@@ -878,7 +878,7 @@ res.body = Zippy::create_zip_stream(selected_file_abs)
 
 E pronto, é isso!
 
-# Notas sobre a criação do projeto e considerações finais
+# Recapitulando até o momento e algumas considerações
 
 Diferentemente do
 [post sobre criar uma Gem]({% post_url 2022/2022-09-13-criando-gem %}), resolvi
@@ -1068,3 +1068,16 @@ não me importei.
 Esse projeto foi feito para rodar dentro de uma rede interna, nada em rede
 pública. Note que ele não tem o mínimo de segurança. E isso não era o que eu
 queria exercitar neste post, é uma preocupação ortogonal.
+
+# Botando o teste: download grande
+
+Vamos botar para trabalhar. Apontar para o próprio `computaria`, diretório
+local em que coloco muito do meu trabalho em progresso. Atualmente a pasta está
+assim, considerando aqui também arquivos ocultos e possivelmente um ou outro
+`node_modules` que esqueci de apagar:
+
+```bash
+> du -hs ~/computaria 
+712M    ~/computaria
+```
+
