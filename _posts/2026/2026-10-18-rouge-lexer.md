@@ -438,6 +438,25 @@ module RougeMagritte
 end
 ```
 
+Eu consegui transformar o lexer de modo muito mais simples:
+
+```rb
+require "rouge" unless defined?(Rouge)
+
+module RougeGMPL
+    class GMPL < Rouge::RegexLexer
+        # baseado em https://github.com/rouge-ruby/rouge/blob/v4.7.0/lib/rouge/lexers/c.rb
+
+        tag 'gmpl'
+        desc 'GNU MathProg Lang'
+
+        # ...
+    end
+end
+```
+
+Sem precisar me preocupar em colocar em um módulo específico.
+
 Além disso, ao tentar usar comentários no esquema original, eu percebi que fiz
 uma besteira... porque mapeava para um estado que não existia! O comentário em
 GMPL é usando `#`, onde o resto da linha se torna um comentário. Mas do jeito
@@ -455,4 +474,50 @@ end
 ```
 
 No estado `:expre_bol`, ao encontrar o `#`, entra no estado `:macro`. Porém,
-esse estado jamais foi descrito.
+esse estado jamais foi descrito. Isso deu problema ao tentar inserir um
+comentário no código. Isso me fez reexaminar a questão dos blocos de declaração
+sintática. Então resolvi limpar para aquilo que realmente importa:
+
+- geral
+- espaço em branco
+- comentário
+- ajuste nas palavras chaves
+
+`subject to`, como tinha o espaço separando, acabou não sendo detectado
+corretamente nas primeiras implementações. Então acabei retirando ele da lista
+de palavras chaves e passei a tratá-lo de modo especial no estado geral:
+
+```rb
+rule %r/subject#{ws}to/, Keyword
+rule %r/subj#{ws}to/, Keyword
+rule %r/s\.t\./, Keyword
+```
+
+Comentário acabei usando a lógica usada pelo `//`:
+
+```rb
+state :comment_line do
+    rule %r(#(.*)?\n?), Comment::Single
+end
+```
+
+Após bastante tempo eu fui finalmente atrás de ler para entender o propósito
+dessas linhas abaixo:
+
+```rb
+rule id do |m|
+    name = m[0]
+    if self.class.keywords.include? name
+        token Keyword
+    else
+        token Name
+    end
+end
+```
+
+Aqui, está comparando um `id` que é basicamente uma letra ou underscore `_`
+seguido de letras, underscores ou dígitos: `/[a-zA-Z_][a-zA-Z_]*/`. Se casar
+com essa regex, as palavras-chaves também vão estar aí nesse balaio. Logo,
+precisa definir se é um nome normal (a string indicada por `m[0]`) ou se é
+realmente um identificador normal. Caso seja uma palavra0chave, vai retornar
+que é um `Keyword`, caso contrário será só um nome normal mesmo `Name`.

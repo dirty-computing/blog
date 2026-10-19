@@ -12,9 +12,6 @@ module RougeGMPL
 
         def self.keywords
             @keywords ||= Set.new %w(
-                "subject to"
-                "subj to"
-                "s.t."
                 var
                 min
                 minimize
