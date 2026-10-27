@@ -5,6 +5,7 @@ author: "Camilo Micheletto"
 tags: css dom html
 base-assets: "/assets/temas_com_css/"
 twitter: lixeletto
+cite_slug: 2025-08-02-temas_com_css
 ---
 
 Tudo começou com essa mensagem:
