@@ -9,6 +9,7 @@ task :run,[:port] do |t, args|
         'serving' => true
     }
     opts['port'] = args.port unless args.port.nil?
+    opts['host'] = ENV["HOST_ADDRESS"] unless ENV["HOST_ADDRESS"].nil? || ENV["HOST_ADDRESS"].empty?
     conf = Jekyll.configuration(opts)
     Jekyll::Commands::Build.process conf
     Jekyll::Commands::Serve.process conf

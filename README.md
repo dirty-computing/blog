@@ -41,6 +41,13 @@ Para mais informações:
 
 ## Colaborando criando um artigo
 
+A primeira coisa para fazer o setup do ambiente é instalar as dependências pelo
+`bundle`:
+
+```bash
+bundle install
+```
+
 Temos um Rakefile que lida com boa parte da burocracia. Também, como autor externo,
 tem um `.env` para que você possa preencher com suas informações e colaborar o
 quanto desejar com artigos, sem precisar perder muito tempo.
@@ -59,7 +66,8 @@ pelo processo de criação:
 ![Criando um post com rake](/assets/little-improves/rake-blah.md.png)
 
 Para citar posts, use `{% post_url 2021/2021-09-17-desenhos-python-turtle %}` com
-o ano seguido do nome do arquivo do post.
+o ano seguido do nome do arquivo do post. Você pode habilitar o botão para copiar
+o link em forma de markdown (por padrão usa o título da publicação como texto).
 
 > O ano foi adicionado para melhor gerenciar os posts dentro de `/_posts/` dentro
 > de repositório.
@@ -124,3 +132,4 @@ não criar o `.env`):
 - `COMPUTARIA_PIXME`: o seu identificador no https://www.pixme.bio/
 - `BROWSER_NAME `: o nome do browser para abrir via `rake browser`, caso desejado diferente do padrão
 - `TWITTER_HANDLER `: seu handler do Twitter
+- `HOST_ADDRESS`: o nome do host para fazer o bind, útil para escutar requisições de browsers que não sejam a própria máquina
