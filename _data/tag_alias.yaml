@@ -22,3 +22,5 @@
   alias: [ engenharia-software, software-engineering ]
 - tag: autômato
   alias: [ autômatos ]
+- tag: ruby
+  alias: [ rb ]
