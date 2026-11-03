@@ -46,7 +46,7 @@ De modo geral, eu queria que tudo que estivesse no diretório `~/computaria`
 tivesse alguns padrões. E para o trabalho, onde uso Claude Code, eu tenho uma
 trava em que a minha chave SSH exige uma senha, e sem informar mais nada o
 Claude não abre a opção de eu digitar a senha e ele fica perdidinho pensando
-que a senha era unválida. Então eu preciso:
+que a senha era inválida. Então eu preciso:
 
 - um padrão para o sistema
 - algo customizado para o computaria
@@ -81,7 +81,7 @@ E coloquei essas informações no `~/conf/computaria`:
 	email = abobora@computaria.io
 ```
 
-Para o caso do Claude, que minha chacve SSH por padrão que ele pede usa senha,
+Para o caso do Claude, que minha chave SSH por padrão que ele pede usa senha,
 eu teria de pedir que ele usasse um programinha (bobinho e inseguro, não façam
 isso em casa, usem algo mais bem definido) que subia um popup pedindo a senha
 da chave SSH. Para essa configuração eu precisava configurar o
@@ -104,7 +104,7 @@ o `~/.gitconfig` global:
 [includeIf "gitdir:~/computaria/"]
 	path = ~/confs/computaria
 
-[includeIf "gitdir:~/source/firma/cc-work"]
+[includeIf "gitdir:~/source/firma/cc-work/"]
 	path = ~/confs/claude-ssh
 ```
 
@@ -120,8 +120,8 @@ git config get core.sshCommand
 
 E o git vai resolver a configuração e retornar pra você o valor correto.
 
-Mas se você quise "pré-computar" o valor dessas variáveis manualmente, também é
-possível fazer. Imagine que você vai ter uma tabela com os valores, e cada
+Mas se você quiser "pré-computar" o valor dessas variáveis manualmente, também
+é possível fazer. Imagine que você vai ter uma tabela com os valores, e cada
 linha que você lê das configurações do git você pode alterar o valor. E o
 modelo de `conf` que o git usa (pelo menos no que usamos até o momento) é
 sempre uma chave de "classe" seguido de um "específico". Por exemplo, o
@@ -134,7 +134,7 @@ vira:
 ```
 
 E a configuração do git não se importa se eu repetir a mesma chave de classe
-múltiplas vezes. Por tanto, vamos simular aqui para essa configuração:
+múltiplas vezes. Portanto, vamos simular aqui para essa configuração:
 
 ```conf
 [core]
@@ -160,7 +160,7 @@ a tabela de valores. No começo é assim:
     sshCommand=cat
 ```
 
-E a tabela vaiza. Então, lemos o primeiro bloco e fica assim:
+E a tabela vazia. Então, lemos o primeiro bloco e fica assim:
 
 ```conf
 [core]
@@ -243,7 +243,7 @@ Então, bora lá. Para o caso em que eu estou dentro de um subdiretório de
 	# [user]
 	# 	name = Abóbora
 	# 	email = abobora@computaria.io
-[includeIf "gitdir:~/source/firma/cc-work"]
+[includeIf "gitdir:~/source/firma/cc-work/"]
 	path = ~/confs/claude-ssh
 ```
 
@@ -264,7 +264,7 @@ bloco:
 	# [user]
 	# 	name = Abóbora
 	# 	email = abobora@computaria.io
-[includeIf "gitdir:~/source/firma/cc-work"]
+[includeIf "gitdir:~/source/firma/cc-work/"]
 	path = ~/confs/claude-ssh
 ```
 
@@ -295,7 +295,7 @@ o mesmo):
 	# [user]
 	# 	name = Abóbora
 	# 	email = abobora@computaria.io
-[includeIf "gitdir:~/source/firma/cc-work"]
+[includeIf "gitdir:~/source/firma/cc-work/"]
 	path = ~/confs/claude-ssh
 ```
 
@@ -315,7 +315,7 @@ Então, aqui, ela vai começar a ler o conteúdo do arquivo incluído:
 	# [user]
 	# 	name = Abóbora
 	# 	email = abobora@computaria.io
-[includeIf "gitdir:~/source/firma/cc-work"]
+[includeIf "gitdir:~/source/firma/cc-work/"]
 	path = ~/confs/claude-ssh
 ```
 
@@ -343,7 +343,7 @@ Ao ler o próximo bloco dentro do arquivo incluído:
 	# 	name = Abóbora
 	# 	email = abobora@computaria.io
 # leitura
-[includeIf "gitdir:~/source/firma/cc-work"]
+[includeIf "gitdir:~/source/firma/cc-work/"]
 	path = ~/confs/claude-ssh
 ```
 
@@ -356,7 +356,7 @@ sshCommand="ssh -i ~/computaria/.ssh/id_ed25519 -o IdentitiesOnly=yes"
 ```
 
 O próximo canto é o `includeIf` que verifica se é um subdiretório de
-`~/source/firma/cc-work`. Como havia em `false`, ele pula a sessão do
+`~/source/firma/cc-work`. Como havia em `false`, ele pula a seção do
 `includeIf` sem de fato fazer inclusão de nada:
 
 ```conf
@@ -372,7 +372,7 @@ O próximo canto é o `includeIf` que verifica se é um subdiretório de
 	# [user]
 	# 	name = Abóbora
 	# 	email = abobora@computaria.io
-[includeIf "gitdir:~/source/firma/cc-work"] # <== avaliou como false
+[includeIf "gitdir:~/source/firma/cc-work/"] # <== avaliou como false
 	path = ~/confs/claude-ssh
 # leitura
 ```
@@ -400,7 +400,7 @@ gente também toma conhecimento da inclusão não condicional. Ela tem a funçã
 abstrair um conjunto de informações. 
 
 Apesar de não servir para criar perfis, como foi feito usando a inclusão
-opcional no `.gitconfig` a nível de usuário, pode ser usad com alguns fins:
+opcional no `.gitconfig` a nível de usuário, pode ser usado com alguns fins:
 
 - isolar para melhor gerenciar um conjunto de informações
 - abstrair opções comuns usadas em diversos módulos
