@@ -1,5 +1,8 @@
 const toggleSwitch = document.querySelector("[role='switch']")
 
+const toggleChangeListener = [
+];
+
 const THEMES = {
     "theme-light": "Tema claro",
     "theme-dark": "Tema escuro"
@@ -40,10 +43,17 @@ function changeTheme(isToggled) {
 }
 
 toggleSwitch.addEventListener("click", ({ target }) => {
-    const isToggled = target.checked
-    const toggleClass = changeTheme(isToggled)
-    setThemeLocalstorage(toggleClass)
+    changeToggleSwitchState(target)
 })
+
+function changeToggleSwitchState(toggleSwitchComponent) {
+    const isToggled = toggleSwitchComponent.checked
+    const toggleClass = changeTheme(isToggled)
+    for (const listener of toggleChangeListener) {
+        listener(toggleClass);
+    }
+    return toggleClass;
+}
 
 toggleSwitch.addEventListener("focus", (event) => {
     event.currentTarget.parentNode.classList.add("switch--focus")
@@ -69,6 +79,12 @@ window.addEventListener("storage", event => {
         applyChangeTheme(event.newValue);
     }
 });
+
+function addToggleChangeListener(listener) {
+    toggleChangeListener.push(listener);
+}
+
+addToggleChangeListener(setThemeLocalstorage)
 
 function enableBeta() {
     const queryParams = new URLSearchParams(window.location.search.substring(1))

@@ -16,7 +16,7 @@ Ambiente Jekyll que gerou essa página? `{{jekyll.environment}}`
         {% if var.env == '*' or var.env == jekyll.environment %}
         <tr>
             <td>{{ var.name }}/{{ var.env }}</td><td>{{ var.description }}</td>
-            <td id="td-{{ var.name }}"></td>
+            <td id="variable-td-{{ var.name }}"></td>
             <td><button onclick="alterarStorage('{{ var.name }}')">Alterar</button></td>
 <td markdown="1">
 {% if var.posts.size > 0 %}
@@ -24,6 +24,30 @@ Ambiente Jekyll que gerou essa página? `{{jekyll.environment}}`
 - [{{ bg_post.title }}]({% post_urlwa {{ bg_post.slug }} %})
 {% endfor %}
 {% endif %}
+</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+
+Customizações diversas:
+
+<table class='marked-table'>
+    <tr>
+        <th>Variável</th><th>Descrição</th><th>Valor</th><th>Toggle</th><th>Posts</th>
+    </tr>
+    <tbody>
+        {% for var in site.data.meta.customizations -%}
+        <tr>
+            <td>{{ var.name }}</td><td>{{ var.description }}</td>
+            <td id="custom-td-{{ var.name }}"></td>
+            <td><button onclick="alterarCustomStorage('{{ var.name }}')">Alterar</button></td>
+<td markdown="1">
+{% if var.posts.size > 0 %}
+{%- for bg_post in var.posts -%}
+- [{{ bg_post.title }}]({% post_urlwa {{ bg_post.slug }} %})
+{% endfor %}
 </td>
         </tr>
         {% endif %}
@@ -44,15 +68,15 @@ Links para meta informação (post citando):
 {% endfor %}
 
 <script>
-const varaiveisStorage = [
+const variaveisStorage = [
 {% for var in site.data.meta.variables -%}
 {% unless forloop.first %} , {% endunless %}
 "{{var.name}}"
 {% endfor %}
 ]
 
-function toTdId(varName) {
-    return "td-" + varName
+function toVariableTdId(varName) {
+    return "variable-td-" + varName
 }
 
 function alterarStorage(varName) {
@@ -60,7 +84,7 @@ function alterarStorage(varName) {
     const newValue = (currValue === "true")? "false": "true"
     localStorage.setItem(varName, newValue)
 
-    const id = toTdId(varName)
+    const id = toVariableTdId(varName)
     const element = document.getElementById(id)
     if (!!element) {
         element.innerText = newValue
@@ -68,7 +92,7 @@ function alterarStorage(varName) {
 }
 
 function populateVar(varName) {
-    const id = toTdId(varName)
+    const id = toVariableTdId(varName)
     const element = document.getElementById(id)
     if (!!element) {
         const varValue = localStorage.getItem(varName)
@@ -76,7 +100,94 @@ function populateVar(varName) {
     }
 }
 
-for (const varName of varaiveisStorage) {
+for (const varName of variaveisStorage) {
     populateVar(varName)
 }
+
+const customStorage = [
+{% for var in site.data.meta.customizations -%}
+{% unless forloop.first %} , {% endunless %}
+"{{var.name}}"
+{% endfor %}
+]
+
+function toCustomTdId(varName) {
+    return "custom-td-" + varName
+}
+
+function listenerCustom(varName) {
+    switch (varName) {
+        case "theme":
+            return () => {
+                addToggleChangeListener((newValue) => {
+                    const id = toCustomTdId(varName)
+                    const element = document.getElementById(id)
+                    if (!!element) {
+                        element.innerText = newValue
+                    }
+                })
+            };
+            break;
+        default:
+            return null;
+    }
+}
+
+function customVariableNewValueFunction(varName) {
+    switch (varName) {
+        case "theme":
+            return (oldValue) =>  {
+                const component = document.querySelector("[role='switch']");
+                component.checked = !component.checked;
+                return changeToggleSwitchState(component)
+            };
+            break;
+        default:
+            return (oldValue) => "";
+    }
+}
+
+function alterarCustomStorage(varName) {
+    const currValue = localStorage.getItem(varName)
+    const newValue = customVariableNewValueFunction(varName)(currValue);
+    localStorage.setItem(varName, newValue)
+
+    const id = toCustomTdId(varName)
+    const element = document.getElementById(id)
+    if (!!element) {
+        element.innerText = newValue
+    }
+}
+
+function populateCustom(varName) {
+    const id = toCustomTdId(varName)
+    const element = document.getElementById(id)
+    if (!!element) {
+        const varValue = localStorage.getItem(varName)
+        element.innerText = varValue
+    }
+}
+
+for (const varName of customStorage) {
+    populateCustom(varName)
+}
+
+window.addEventListener("storage", event => {
+    if (customStorage.includes(event.key)) {
+        populateCustom(event.key);
+    }
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+    for (const varName of customStorage) {
+        const id = toCustomTdId(varName)
+        const element = document.getElementById(id)
+        if (!!element) {
+            const listener = listenerCustom(varName);
+            if (!!listener) {
+                listener();
+            }
+        }
+    }
+})
 </script>

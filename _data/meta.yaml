@@ -5,6 +5,12 @@ variables:
     posts:
       - title: "Post facilmente citável"
         slug: "2024/2024-05-22-citable"
+customizations:
+  - name: theme
+    description: "Tema visual"
+    posts:
+      - title: "Criando um toggle de tema pro Computaria usando a malandragem do CSS"
+        slug: "2025/2025-08-02-temas_com_css"
 links:
   - link: "[Acompanhar pipeline](/blog/about/?status=true)"
     env: "*"
