@@ -106,7 +106,7 @@ se usa `/` junto do `s`, ficando `s/pattern/replace/`, mas no meu caso, como
 tem barras no pattern, fica bem chatinho de escrever a substituição. Mas sabia
 que o `sed` não precisa usar barras? Na real, qualquer caracter serve, contanto
 que você mantenha consisência. Então usei `_`:
-`'s_^.*/blog/\(202[0-9]\).*$/\1/'`.
+`'s_^.*/blog/\(202[0-9]\).*$_\1_'`.
 
 Até agora, ficou assim o comando:
 
